@@ -1,0 +1,74 @@
+import streamlit as st
+import pandas as pd
+import random
+import time
+from datetime import datetime
+
+st.set_page_config(page_title="🚦 OCC Cybersecurity Dashboard", layout="wide")
+
+st.title("🚦 OCC Cybersecurity Dashboard")
+st.caption("Live AGV/AMR telemetry demo: Raspberry Pi → MQTT-style simulation → OCC dashboard")
+
+if "data" not in st.session_state:
+    st.session_state.data = pd.DataFrame(columns=["time", "speed", "battery", "latency", "threats"])
+
+placeholder = st.empty()
+
+while True:
+    now = datetime.now().strftime("%H:%M:%S")
+
+    speed = random.randint(20, 80)
+    battery = random.randint(40, 100)
+    latency = round(random.uniform(5, 25), 2)
+    threats = random.choice([0, 0, 0, 1])
+
+    new_row = pd.DataFrame([{
+        "time": now,
+        "speed": speed,
+        "battery": battery,
+        "latency": latency,
+        "threats": threats
+    }])
+
+    st.session_state.data = pd.concat([st.session_state.data, new_row], ignore_index=True).tail(30)
+
+    with placeholder.container():
+        col1, col2, col3, col4 = st.columns(4)
+
+        col1.metric("🚗 Vehicle", "AGV-01", "ONLINE")
+        col2.metric("⚡ Speed", f"{speed} km/h")
+        col3.metric("🔋 Battery", f"{battery}%")
+        col4.metric("🛡️ Threats", threats)
+
+        st.divider()
+
+        c1, c2 = st.columns(2)
+
+        with c1:
+            st.subheader("📈 Live Latency Graph")
+            st.line_chart(st.session_state.data.set_index("time")["latency"])
+
+        with c2:
+            st.subheader("⚡ Live Speed Graph")
+            st.line_chart(st.session_state.data.set_index("time")["speed"])
+
+        c3, c4 = st.columns(2)
+
+        with c3:
+            st.subheader("🔋 Battery Level")
+            st.area_chart(st.session_state.data.set_index("time")["battery"])
+
+        with c4:
+            st.subheader("🚨 Threat Events")
+            st.bar_chart(st.session_state.data.set_index("time")["threats"])
+
+        st.divider()
+
+        if threats == 0:
+            st.success("✅ System Normal — No active cyber threat detected")
+        else:
+            st.error("🚨 Warning — Possible anomaly detected")
+
+        st.info("📡 Protocol: MQTT | 🖥️ OCC Server: Raspberry Pi | 🧠 Middleware: Active")
+
+    time.sleep(2)
