@@ -1,0 +1,20 @@
+ESP32 Vehicle Node 1
+ESP32 Vehicle Node 2
+        |
+        | Wi-Fi / Hotspot / Lab Network
+        |
+Raspberry Pi 5
+        |
+        | Edge Gateway
+        | Middleware Firewall
+        | Protocol Broker
+        | KPI Collector
+        | Attack Detector
+        |
+Cloud Server
+        |
+        | Database
+        | OCC Dashboard
+        | Report Generator
+        |
+Supervisor Demo / Research Evaluation
