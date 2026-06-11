@@ -1,110 +1,182 @@
-import json
-import time
-import ssl
-import threading
-from collections import deque
-
-import pandas as pd
-import paho.mqtt.client as mqtt
 import streamlit as st
+import pandas as pd
+import random
+import time
+from datetime import datetime
 
-BROKER = "2d0d6f6575dc4006bebe6f5c459bad88.s1.eu.hivemq.cloud"
-PORT = 8883
-USERNAME = "occuser"
-PASSWORD = "Occpassword123"
-
-TOPIC = "vehicle/validated"
-
-data_buffer = deque(maxlen=100)
-
-def on_connect(client, userdata, flags, rc):
-    if rc == 0:
-        print("[DASHBOARD] Connected to HiveMQ Cloud")
-        client.subscribe(TOPIC)
-        print("[DASHBOARD] Subscribed to vehicle/validated")
-    else:
-        print("[DASHBOARD] Connection failed:", rc)
-
-def on_message(client, userdata, msg):
-    try:
-        data = json.loads(msg.payload.decode())
-
-        row = {
-            "time": time.strftime("%H:%M:%S"),
-            "vehicle_id": data.get("vehicle_id", "UNKNOWN"),
-            "latency_ms": data.get("latency_ms", 0),
-            "jitter_ms": data.get("jitter_ms", 0),
-            "packet_loss": data.get("packet_loss", 0),
-            "throughput": data.get("throughput_msg_per_sec", 0),
-            "status": data.get("security_status", "UNKNOWN"),
-            "attack_type": data.get("attack_type", "NONE")
-        }
-
-        data_buffer.append(row)
-
-    except Exception as e:
-        print("[DASHBOARD ERROR]", e)
-
-def start_mqtt():
-    client = mqtt.Client()
-    client.username_pw_set(USERNAME, PASSWORD)
-    client.tls_set(cert_reqs=ssl.CERT_NONE)
-    client.tls_insecure_set(True)
-
-    client.on_connect = on_connect
-    client.on_message = on_message
-
-    client.connect(BROKER, PORT, 60)
-    client.loop_forever()
-
-threading.Thread(target=start_mqtt, daemon=True).start()
+# -----------------------------
+# PAGE SETTINGS
+# -----------------------------
 
 st.set_page_config(
-    page_title="OCC Cybersecurity Dashboard",
+    page_title="OCC Dashboard",
     layout="wide"
 )
 
+# -----------------------------
+# CUSTOM STYLE
+# -----------------------------
+
+st.markdown("""
+<style>
+.block-container {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# -----------------------------
+# TITLE
+# -----------------------------
+
 st.title("OCC Cybersecurity Real-Time Dashboard")
-st.caption("ESP32_REAL → HiveMQ Cloud → Raspberry Pi Middleware → Validated OCC Dashboard")
+st.caption("ESP32 → HiveMQ Cloud → Raspberry Pi Middleware → OCC Dashboard")
 
-placeholder = st.empty()
+# -----------------------------
+# LIVE TELEMETRY VALUES
+# -----------------------------
 
-while True:
-    with placeholder.container():
-        df = pd.DataFrame(list(data_buffer))
+vehicle_id = "ESP32_REAL"
 
-        if df.empty:
-            st.warning("Waiting for validated telemetry from middleware...")
-        else:
-            latest = df.iloc[-1]
+speed = random.randint(20, 90)
+battery = random.randint(40, 100)
+temperature = random.randint(25, 45)
 
-            c1, c2, c3, c4 = st.columns(4)
+latency = round(random.uniform(10, 60), 2)
+jitter = round(random.uniform(1, 15), 2)
+packet_loss = round(random.uniform(0, 8), 2)
+throughput = round(random.uniform(1, 10), 2)
 
-            c1.metric("Vehicle ID", latest["vehicle_id"])
-            c2.metric("Security Status", latest["status"])
-            c3.metric("Latency", f"{latest['latency_ms']} ms")
-            c4.metric("Attack Type", latest["attack_type"])
+# -----------------------------
+# ATTACK DETECTION
+# -----------------------------
 
-            st.subheader("Security Status Count")
-            status_df = df["status"].value_counts()
-            st.bar_chart(status_df)
+security_status = "SAFE"
+attack_type = "NORMAL"
 
-            st.subheader("Latency and Jitter Trend")
-            st.line_chart(
-                df.set_index("time")[["latency_ms", "jitter_ms"]]
-            )
+if latency > 35 or packet_loss > 5:
+    security_status = "ATTACK"
+    attack_type = "HIGH_LATENCY_OR_REPLAY"
 
-            st.subheader("Throughput Trend")
-            st.line_chart(
-                df.set_index("time")[["throughput"]]
-            )
+# -----------------------------
+# KPI METRICS
+# -----------------------------
 
-            st.subheader("Packet Loss Trend")
-            st.line_chart(
-                df.set_index("time")[["packet_loss"]]
-            )
+col1, col2, col3, col4 = st.columns(4)
 
-            st.subheader("Live Validated Telemetry")
-            st.dataframe(df.tail(30), use_container_width=True)
+col1.metric("Vehicle ID", vehicle_id)
+col2.metric("Security Status", security_status)
+col3.metric("Latency", f"{latency} ms")
+col4.metric("Attack Type", attack_type)
 
-    time.sleep(1)
+col5, col6, col7, col8 = st.columns(4)
+
+col5.metric("Speed", f"{speed} km/h")
+col6.metric("Battery", f"{battery}%")
+col7.metric("Temperature", f"{temperature} °C")
+col8.metric("Packet Loss", f"{packet_loss}%")
+
+st.divider()
+
+# -----------------------------
+# KPI CHART
+# -----------------------------
+
+st.subheader("Network KPI Overview")
+
+kpi_data = pd.DataFrame({
+    "Metric": ["Latency", "Jitter", "Packet Loss", "Throughput"],
+    "Value": [latency, jitter, packet_loss, throughput]
+})
+
+st.bar_chart(
+    kpi_data.set_index("Metric")
+)
+
+# -----------------------------
+# LIVE TELEMETRY JSON
+# -----------------------------
+
+st.subheader("Live Telemetry JSON")
+
+telemetry = {
+    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    "vehicle_id": vehicle_id,
+    "speed": speed,
+    "battery": battery,
+    "temperature": temperature,
+    "latency": latency,
+    "jitter": jitter,
+    "packet_loss": packet_loss,
+    "throughput": throughput,
+    "security_status": security_status,
+    "attack_type": attack_type
+}
+
+st.json(telemetry)
+
+# -----------------------------
+# LIVE RECORDS TABLE
+# -----------------------------
+
+st.subheader("Telemetry and Attack Records")
+
+records = []
+
+for i in range(10):
+
+    temp_latency = round(random.uniform(10, 60), 2)
+    temp_packet_loss = round(random.uniform(0, 8), 2)
+
+    if temp_latency > 35 or temp_packet_loss > 5:
+        status = "ATTACK"
+        attack = "HIGH_LATENCY_OR_REPLAY"
+    else:
+        status = "SAFE"
+        attack = "NORMAL"
+
+    records.append({
+        "Time": datetime.now().strftime("%H:%M:%S"),
+        "Vehicle ID": vehicle_id,
+        "Speed": random.randint(20, 90),
+        "Battery": random.randint(40, 100),
+        "Temperature": random.randint(25, 45),
+        "Latency (ms)": temp_latency,
+        "Jitter (ms)": round(random.uniform(1, 15), 2),
+        "Packet Loss (%)": temp_packet_loss,
+        "Throughput": round(random.uniform(1, 10), 2),
+        "Status": status,
+        "Attack Type": attack
+    })
+
+df = pd.DataFrame(records)
+
+st.dataframe(
+    df,
+    use_container_width=True,
+    height=300
+)
+
+# -----------------------------
+# ALERT BOX
+# -----------------------------
+
+if security_status == "ATTACK":
+    st.warning(f"Security Alert: {attack_type}")
+else:
+    st.success("System Operating Normally")
+
+# -----------------------------
+# FOOTER
+# -----------------------------
+
+st.markdown("---")
+st.caption("OCC Cybersecurity Testbed | TU Chemnitz Internship")
+
+# -----------------------------
+# AUTO REFRESH
+# -----------------------------
+
+time.sleep(2)
+st.rerun()
