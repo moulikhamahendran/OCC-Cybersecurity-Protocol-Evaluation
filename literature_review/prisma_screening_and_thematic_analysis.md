@@ -1,7 +1,7 @@
-## PRISMA Database Search and Filtering Process
+# PRISMA Database Search and Filtering Process
 
 | PRISMA Stage | Records |
-|---------------|----------|
+|---|---|
 | Records identified from IEEE Xplore | 35 |
 | Records identified from Scopus | 101 |
 | Records identified from SpringerLink | 422 |
@@ -17,10 +17,10 @@
 
 ---
 
-## Final Thematic Categorization of Selected Studies
+# Final Thematic Categorization of Selected Studies
 
 | Theme | Papers |
-|--------|--------|
+|---|---|
 | MQTT Security and Vulnerabilities | 12 |
 | OPC UA Security and Industrial Communication | 9 |
 | DDS Middleware and Real-Time Communication | 7 |
