@@ -1,0 +1,105 @@
+<div style="padding: 1rem 0 0;">
+<svg width="100%" viewBox="0 0 680 500" role="img">
+<title>PRISMA 2020 flow diagram for the OCC cybersecurity protocols SLR</title>
+<desc>Shows record identification from four databases totaling 581 records, 540 excluded during title and abstract screening including cross-database duplicates, 41 papers selected for full-text and quality assessment, 3 excluded for scoring below the 8 of 16 quality threshold, and 38 studies included in the final review.</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+
+<text class="ts" x="170" y="20">Identification</text>
+<g class="c-blue">
+<rect x="170" y="34" width="260" height="150" rx="8" stroke-width="0.5"/>
+<text class="th" x="190" y="54">Records identified from:</text>
+<text class="t" x="190" y="76">IEEE Xplore</text>
+<text class="t" x="412" y="76" text-anchor="end">35</text>
+<text class="t" x="190" y="94">Scopus</text>
+<text class="t" x="412" y="94" text-anchor="end">101</text>
+<text class="t" x="190" y="112">SpringerLink</text>
+<text class="t" x="412" y="112" text-anchor="end">422</text>
+<text class="t" x="190" y="130">Web of Science</text>
+<text class="t" x="412" y="130" text-anchor="end">23</text>
+<line x1="190" y1="142" x2="412" y2="142" stroke="var(--b)" stroke-width="0.5"/>
+<text class="th" x="190" y="162">Total records identified</text>
+<text class="th" x="412" y="162" text-anchor="end">581</text>
+</g>
+
+<g class="c-gray">
+<rect x="460" y="34" width="180" height="100" rx="8" stroke-width="0.5" stroke-dasharray="4 3"/>
+<text class="th" x="480" y="54">Databases searched:</text>
+<text class="ts" x="480" y="74">IEEE Xplore</text>
+<text class="ts" x="480" y="92">Scopus</text>
+<text class="ts" x="480" y="110">SpringerLink</text>
+<text class="ts" x="480" y="126">Web of Science</text>
+</g>
+<line x1="460" y1="84" x2="432" y2="84" class="arr" marker-end="url(#arrow)"/>
+
+<line x1="300" y1="184" x2="300" y2="216" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="170" y="204">Screening</text>
+<line x1="300" y1="198" x2="458" y2="198" class="arr" marker-end="url(#arrow)"/>
+<g class="c-gray">
+<rect x="460" y="170" width="180" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="550" y="192" text-anchor="middle" dominant-baseline="central">Excluded</text>
+<text class="ts" x="550" y="210" text-anchor="middle" dominant-baseline="central">Title/abstract + dupes (540)</text>
+</g>
+
+<g class="c-blue">
+<rect x="170" y="216" width="260" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="300" y="236" text-anchor="middle" dominant-baseline="central">Selected for full-text review</text>
+<text class="ts" x="300" y="256" text-anchor="middle" dominant-baseline="central">n = 41</text>
+</g>
+
+<line x1="300" y1="272" x2="300" y2="304" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="170" y="296">Eligibility</text>
+<line x1="300" y1="286" x2="458" y2="286" class="arr" marker-end="url(#arrow)"/>
+<g class="c-gray">
+<rect x="460" y="258" width="180" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="550" y="280" text-anchor="middle" dominant-baseline="central">Excluded</text>
+<text class="ts" x="550" y="298" text-anchor="middle" dominant-baseline="central">QA score below 8/16 (3)</text>
+</g>
+
+<g class="c-blue">
+<rect x="170" y="304" width="260" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="300" y="324" text-anchor="middle" dominant-baseline="central">Quality assessed</text>
+<text class="ts" x="300" y="344" text-anchor="middle" dominant-baseline="central">n = 41, threshold 8/16</text>
+</g>
+
+<line x1="300" y1="360" x2="300" y2="382" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="170" y="376">Included</text>
+
+<g class="c-teal">
+<rect x="170" y="386" width="260" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="300" y="406" text-anchor="middle" dominant-baseline="central">Studies included in review</text>
+<text class="th" x="300" y="426" text-anchor="middle" dominant-baseline="central">n = 38</text>
+</g>
+
+<text class="th" x="340" y="470" text-anchor="middle">Thematic categorization of included studies</text>
+</svg>
+<div style="position: relative; width: 100%; height: 320px; margin-top: -8px;">
+<canvas id="themeChartCombo" role="img" aria-label="Horizontal bar chart of 38 included studies by theme: Intrusion Detection/AI-Based Security 11, ICS/IIoT/SCADA Security Background 7, MQTT Security and Vulnerabilities 6, OPC UA Security and Industrial Communication 6, DDS Middleware and Real-Time Communication 4, Performance Evaluation and Protocol Validation 4">Intrusion Detection/AI-Based Security: 11, ICS/IIoT/SCADA Background: 7, MQTT Security: 6, OPC UA Security: 6, DDS Middleware: 4, Performance Evaluation: 4</canvas>
+</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+new Chart(document.getElementById('themeChartCombo'), {
+  type: 'bar',
+  data: {
+    labels: ['Intrusion detection / AI-based security','ICS / IIoT / SCADA background','MQTT security and vulnerabilities','OPC UA security and industrial comm.','DDS middleware and real-time comm.','Performance evaluation and validation'],
+    datasets: [{
+      data: [11,7,6,6,4,4],
+      backgroundColor: '#2a78d6',
+      borderRadius: 4,
+      barThickness: 22
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: '#e1e0d9' }, ticks: { color: '#898781', font: { size: 12 } }, title: { display: true, text: 'Number of papers', color: '#52514e', font: { size: 12 } } },
+      y: { grid: { display: false }, ticks: { color: '#52514e', font: { size: 12 } } }
+    }
+  }
+});
+</script>
