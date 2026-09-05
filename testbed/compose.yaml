@@ -1,0 +1,11 @@
+services:
+  mqtt:
+    image: eclipse-mosquitto:2
+    volumes:
+      - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    networks:
+      - mqtt_lab
+
+networks:
+  mqtt_lab:
+    internal: true
