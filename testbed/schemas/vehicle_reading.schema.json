@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vehicle_reading.schema.json",
+  "title": "Vehicle Telemetry Reading",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "vehicle_id",
+    "sequence",
+    "speed_mps",
+    "battery_percent",
+    "position"
+  ],
+  "properties": {
+    "vehicle_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "speed_mps": {
+      "type": "number",
+      "minimum": 0
+    },
+    "battery_percent": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "position": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x_m", "y_m"],
+      "properties": {
+        "x_m": {
+          "type": "number"
+        },
+        "y_m": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}
