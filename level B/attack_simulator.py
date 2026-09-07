@@ -4,10 +4,24 @@ import time
 import random
 import ssl
 
-BROKER = "2d0d6f6575dc4006bebe6f5c459bad88.s1.eu.hivemq.cloud"
-PORT = 8883
-USERNAME = "occuser"
-PASSWORD = "Occpassword123"
+import os
+
+BROKER = os.environ.get("HIVEMQ_BROKER")
+PORT = int(os.environ.get("HIVEMQ_PORT", "8883"))
+USERNAME = os.environ.get("HIVEMQ_USERNAME")
+PASSWORD = os.environ.get("HIVEMQ_PASSWORD")
+
+required_variables = {
+    "HIVEMQ_BROKER": BROKER,
+    "HIVEMQ_USERNAME": USERNAME,
+    "HIVEMQ_PASSWORD": PASSWORD,
+}
+
+missing = [name for name, value in required_variables.items() if not value]
+if missing:
+    raise RuntimeError(
+        f"Missing environment variables: {', '.join(missing)}"
+    )
 
 TOPIC = "vehicle/raw"
 
