@@ -1,4 +1,6 @@
+import csv
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import paho.mqtt.client as mqtt
@@ -6,6 +8,8 @@ from jsonschema import ValidationError, validate
 
 TESTBED_DIR = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = TESTBED_DIR / "schemas" / "vehicle_reading.schema.json"
+RESULTS_DIR = TESTBED_DIR / "results"
+EVENTS_PATH = RESULTS_DIR / "events.csv"
 
 BROKER_HOST = "127.0.0.1"
 BROKER_PORT = 1883
@@ -13,6 +17,38 @@ RAW_TOPIC = "uagv/v2/OvGU-Testbed/+/state"
 
 with SCHEMA_PATH.open(encoding="utf-8") as schema_file:
     VEHICLE_SCHEMA = json.load(schema_file)
+
+
+def write_event(topic, attack_type, reason, payload):
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    file_exists = EVENTS_PATH.exists()
+
+    with EVENTS_PATH.open("a", newline="", encoding="utf-8") as event_file:
+        writer = csv.DictWriter(
+            event_file,
+            fieldnames=[
+                "timestamp",
+                "topic",
+                "attack_type",
+                "action",
+                "reason",
+                "payload",
+            ],
+        )
+
+        if not file_exists:
+            writer.writeheader()
+
+        writer.writerow(
+            {
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "topic": topic,
+                "attack_type": attack_type,
+                "action": "BLOCK",
+                "reason": reason,
+                "payload": payload,
+            }
+        )
 
 
 def on_connect(client, userdata, flags, reason_code, properties):
@@ -25,21 +61,48 @@ def on_connect(client, userdata, flags, reason_code, properties):
 
 
 def on_message(client, userdata, message):
+    raw_payload = message.payload.decode("utf-8", errors="replace")
+
     try:
-        payload = json.loads(message.payload.decode("utf-8"))
+        payload = json.loads(raw_payload)
         validate(instance=payload, schema=VEHICLE_SCHEMA)
+
+        serial_number = message.topic.split("/")[-2]
+        verified_topic = (
+            f"uagv/v2/OvGU-Testbed/{serial_number}/verified"
+        )
+
+        client.publish(
+            topic=verified_topic,
+            payload=json.dumps(payload),
+            qos=1,
+        )
 
         print(
             f"PASS | vehicle={payload['vehicle_id']} "
             f"| sequence={payload['sequence']} "
-            f"| topic={message.topic}"
+            f"| forwarded={verified_topic}"
         )
 
-    except (UnicodeDecodeError, json.JSONDecodeError) as error:
-        print(f"BLOCK | malformed JSON | {error}")
+    except json.JSONDecodeError as error:
+        reason = f"Malformed JSON: {error.msg}"
+        write_event(
+            message.topic,
+            "injection",
+            reason,
+            raw_payload,
+        )
+        print(f"BLOCK | {reason}")
 
     except ValidationError as error:
-        print(f"BLOCK | schema violation | {error.message}")
+        reason = f"Schema violation: {error.message}"
+        write_event(
+            message.topic,
+            "injection",
+            reason,
+            raw_payload,
+        )
+        print(f"BLOCK | {reason}")
 
 
 def main():
