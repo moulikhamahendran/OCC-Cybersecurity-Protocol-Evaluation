@@ -1,6 +1,8 @@
 services:
   mqtt:
     image: eclipse-mosquitto:2
+    ports:
+      - "1883:1883"
     volumes:
       - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
     networks:
@@ -8,4 +10,5 @@ services:
 
 networks:
   mqtt_lab:
-    internal: true
+    name: testbed_mqtt_lab
+    driver: bridge
