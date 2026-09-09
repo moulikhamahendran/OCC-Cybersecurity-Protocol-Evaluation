@@ -1,46 +1,142 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "vehicle_reading.schema.json",
-  "title": "Vehicle Telemetry Reading",
+  "title": "VDA 5050 Style Vehicle State",
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "vehicle_id",
-    "sequence",
-    "speed_mps",
-    "battery_percent",
-    "position"
+    "headerId",
+    "timestamp",
+    "version",
+    "manufacturer",
+    "serialNumber",
+    "agvPosition",
+    "velocity",
+    "batteryState",
+    "taskState",
+    "operatingMode",
+    "errors",
+    "t_send_ns"
   ],
   "properties": {
-    "vehicle_id": {
-      "type": "string",
-      "minLength": 1
-    },
-    "sequence": {
+    "headerId": {
       "type": "integer",
       "minimum": 0
     },
-    "speed_mps": {
-      "type": "number",
-      "minimum": 0
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
     },
-    "battery_percent": {
-      "type": "number",
-      "minimum": 0,
-      "maximum": 100
+    "version": {
+      "type": "string",
+      "const": "2.1.0"
     },
-    "position": {
+    "manufacturer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "serialNumber": {
+      "type": "string",
+      "minLength": 1
+    },
+    "agvPosition": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["x_m", "y_m"],
+      "required": [
+        "positionInitialized",
+        "x",
+        "y",
+        "theta",
+        "mapId"
+      ],
       "properties": {
-        "x_m": {
+        "positionInitialized": {
+          "type": "boolean"
+        },
+        "x": {
           "type": "number"
         },
-        "y_m": {
+        "y": {
+          "type": "number"
+        },
+        "theta": {
+          "type": "number",
+          "minimum": -6.28319,
+          "maximum": 6.28319
+        },
+        "mapId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "velocity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "vx",
+        "vy",
+        "omega"
+      ],
+      "properties": {
+        "vx": {
+          "type": "number"
+        },
+        "vy": {
+          "type": "number"
+        },
+        "omega": {
           "type": "number"
         }
       }
+    },
+    "batteryState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "batteryCharge",
+        "charging"
+      ],
+      "properties": {
+        "batteryCharge": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "charging": {
+          "type": "boolean"
+        }
+      }
+    },
+    "taskState": {
+      "type": "string",
+      "enum": [
+        "IDLE",
+        "RUNNING",
+        "PAUSED",
+        "COMPLETED",
+        "ERROR"
+      ]
+    },
+    "operatingMode": {
+      "type": "string",
+      "enum": [
+        "AUTOMATIC",
+        "SEMIAUTOMATIC",
+        "MANUAL",
+        "SERVICE",
+        "TEACHIN"
+      ]
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "t_send_ns": {
+      "type": "integer",
+      "minimum": 0
     }
   }
 }

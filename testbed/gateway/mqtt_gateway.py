@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import paho.mqtt.client as mqtt
-from jsonschema import ValidationError, validate
+from jsonschema import FormatChecker, ValidationError, validate
 
 TESTBED_DIR = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = TESTBED_DIR / "schemas" / "vehicle_reading.schema.json"
@@ -65,7 +65,12 @@ def on_message(client, userdata, message):
 
     try:
         payload = json.loads(raw_payload)
-        validate(instance=payload, schema=VEHICLE_SCHEMA)
+
+        validate(
+            instance=payload,
+            schema=VEHICLE_SCHEMA,
+            format_checker=FormatChecker(),
+        )
 
         serial_number = message.topic.split("/")[-2]
         verified_topic = (
@@ -79,29 +84,33 @@ def on_message(client, userdata, message):
         )
 
         print(
-            f"PASS | vehicle={payload['vehicle_id']} "
-            f"| sequence={payload['sequence']} "
+            f"PASS | vehicle={payload['serialNumber']} "
+            f"| headerId={payload['headerId']} "
             f"| forwarded={verified_topic}"
         )
 
     except json.JSONDecodeError as error:
         reason = f"Malformed JSON: {error.msg}"
+
         write_event(
             message.topic,
             "injection",
             reason,
             raw_payload,
         )
+
         print(f"BLOCK | {reason}")
 
     except ValidationError as error:
         reason = f"Schema violation: {error.message}"
+
         write_event(
             message.topic,
             "injection",
             reason,
             raw_payload,
         )
+
         print(f"BLOCK | {reason}")
 
 
@@ -118,10 +127,16 @@ def main():
     print("Press Control+C to stop")
 
     try:
-        client.connect(BROKER_HOST, BROKER_PORT, keepalive=60)
+        client.connect(
+            BROKER_HOST,
+            BROKER_PORT,
+            keepalive=60,
+        )
         client.loop_forever()
+
     except KeyboardInterrupt:
         print("\nGateway stopped")
+
     finally:
         client.disconnect()
 
