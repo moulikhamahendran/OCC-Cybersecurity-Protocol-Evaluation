@@ -8,6 +8,7 @@ import paho.mqtt.client as mqtt
 from jsonschema import FormatChecker, ValidationError, validate
 
 from kpi_recorder import write_kpi
+from threat_detector import ThreatDetector
 
 
 TESTBED_DIR = Path(__file__).resolve().parents[1]
@@ -17,9 +18,10 @@ EVENTS_PATH = RESULTS_DIR / "events.csv"
 
 BROKER_HOST = "127.0.0.1"
 BROKER_PORT = 1883
-
 RAW_TOPIC = "uagv/v2/OvGU-Testbed/+/state"
 LATENCY_WARNING_MS = 250.0
+
+THREAT_DETECTOR = ThreatDetector()
 
 with SCHEMA_PATH.open(encoding="utf-8") as schema_file:
     VEHICLE_SCHEMA = json.load(schema_file)
@@ -32,8 +34,6 @@ def write_event(
     reason: str,
     payload,
 ) -> None:
-    """Write blocked or suspicious messages to events.csv."""
-
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     file_exists = EVENTS_PATH.exists()
 
@@ -99,28 +99,49 @@ def on_message(client, userdata, message):
             format_checker=FormatChecker(),
         )
     except ValidationError as error:
-        reason = error.message
-        print(f"BLOCK | Schema violation: {reason}")
+        print(f"BLOCK | Schema violation: {error.message}")
 
         write_event(
             topic=topic,
             attack_type="schema_violation",
             action="BLOCK",
-            reason=reason,
+            reason=error.message,
             payload=payload,
         )
         return
 
-    sent_ns = payload["t_send_ns"]
-    latency_ms = (received_ns - sent_ns) / 1_000_000
+    latency_ms = (received_ns - payload["t_send_ns"]) / 1_000_000
+    threats = THREAT_DETECTOR.detect(payload)
+
+    if threats:
+        for threat in threats:
+            print(
+                f"{threat['action']} | {threat['type']} "
+                f"| vehicle={payload['serialNumber']} "
+                f"| headerId={payload['headerId']} "
+                f"| {threat['reason']}"
+            )
+
+            write_event(
+                topic=topic,
+                attack_type=threat["type"],
+                action=threat["action"],
+                reason=threat["reason"],
+                payload=payload,
+            )
+
+        write_kpi(
+            payload=payload,
+            latency_ms=latency_ms,
+            verdict="BLOCK",
+            condition=threats[0]["type"],
+        )
+        return
+
+    verdict = "PASS"
 
     if latency_ms > LATENCY_WARNING_MS:
         verdict = "FLAG"
-        print(
-            f"FLAG | vehicle={payload['serialNumber']} "
-            f"| headerId={payload['headerId']} "
-            f"| latency={latency_ms:.3f} ms"
-        )
 
         write_event(
             topic=topic,
@@ -132,8 +153,6 @@ def on_message(client, userdata, message):
             ),
             payload=payload,
         )
-    else:
-        verdict = "PASS"
 
     verified_topic = (
         f"uagv/v2/OvGU-Testbed/"
@@ -173,11 +192,7 @@ def main():
     print("Press Control+C to stop")
 
     try:
-        client.connect(
-            BROKER_HOST,
-            BROKER_PORT,
-            keepalive=60,
-        )
+        client.connect(BROKER_HOST, BROKER_PORT, keepalive=60)
         client.loop_forever()
 
     except KeyboardInterrupt:
