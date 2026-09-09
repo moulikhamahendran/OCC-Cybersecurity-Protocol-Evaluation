@@ -1,10 +1,14 @@
 import csv
 import json
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
 import paho.mqtt.client as mqtt
 from jsonschema import FormatChecker, ValidationError, validate
+
+from kpi_recorder import write_kpi
+
 
 TESTBED_DIR = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = TESTBED_DIR / "schemas" / "vehicle_reading.schema.json"
@@ -13,13 +17,23 @@ EVENTS_PATH = RESULTS_DIR / "events.csv"
 
 BROKER_HOST = "127.0.0.1"
 BROKER_PORT = 1883
+
 RAW_TOPIC = "uagv/v2/OvGU-Testbed/+/state"
+LATENCY_WARNING_MS = 250.0
 
 with SCHEMA_PATH.open(encoding="utf-8") as schema_file:
     VEHICLE_SCHEMA = json.load(schema_file)
 
 
-def write_event(topic, attack_type, reason, payload):
+def write_event(
+    topic: str,
+    attack_type: str,
+    action: str,
+    reason: str,
+    payload,
+) -> None:
+    """Write blocked or suspicious messages to events.csv."""
+
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     file_exists = EVENTS_PATH.exists()
 
@@ -44,9 +58,9 @@ def write_event(topic, attack_type, reason, payload):
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "topic": topic,
                 "attack_type": attack_type,
-                "action": "BLOCK",
+                "action": action,
                 "reason": reason,
-                "payload": payload,
+                "payload": json.dumps(payload, separators=(",", ":")),
             }
         )
 
@@ -54,64 +68,96 @@ def write_event(topic, attack_type, reason, payload):
 def on_connect(client, userdata, flags, reason_code, properties):
     if reason_code == 0:
         print(f"Gateway connected to {BROKER_HOST}:{BROKER_PORT}")
-        print(f"Listening on {RAW_TOPIC}")
         client.subscribe(RAW_TOPIC, qos=1)
+        print(f"Listening on {RAW_TOPIC}")
     else:
-        print(f"Gateway connection failed: {reason_code}")
+        print(f"Connection failed: {reason_code}")
 
 
 def on_message(client, userdata, message):
-    raw_payload = message.payload.decode("utf-8", errors="replace")
+    received_ns = time.time_ns()
+    topic = message.topic
 
     try:
-        payload = json.loads(raw_payload)
+        payload = json.loads(message.payload.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        print(f"BLOCK | Invalid JSON | {error}")
 
+        write_event(
+            topic=topic,
+            attack_type="malformed_payload",
+            action="BLOCK",
+            reason=f"Invalid JSON: {error}",
+            payload=message.payload.decode("utf-8", errors="replace"),
+        )
+        return
+
+    try:
         validate(
             instance=payload,
             schema=VEHICLE_SCHEMA,
             format_checker=FormatChecker(),
         )
-
-        serial_number = message.topic.split("/")[-2]
-        verified_topic = (
-            f"uagv/v2/OvGU-Testbed/{serial_number}/verified"
-        )
-
-        client.publish(
-            topic=verified_topic,
-            payload=json.dumps(payload),
-            qos=1,
-        )
-
-        print(
-            f"PASS | vehicle={payload['serialNumber']} "
-            f"| headerId={payload['headerId']} "
-            f"| forwarded={verified_topic}"
-        )
-
-    except json.JSONDecodeError as error:
-        reason = f"Malformed JSON: {error.msg}"
-
-        write_event(
-            message.topic,
-            "injection",
-            reason,
-            raw_payload,
-        )
-
-        print(f"BLOCK | {reason}")
-
     except ValidationError as error:
-        reason = f"Schema violation: {error.message}"
+        reason = error.message
+        print(f"BLOCK | Schema violation: {reason}")
 
         write_event(
-            message.topic,
-            "injection",
-            reason,
-            raw_payload,
+            topic=topic,
+            attack_type="schema_violation",
+            action="BLOCK",
+            reason=reason,
+            payload=payload,
+        )
+        return
+
+    sent_ns = payload["t_send_ns"]
+    latency_ms = (received_ns - sent_ns) / 1_000_000
+
+    if latency_ms > LATENCY_WARNING_MS:
+        verdict = "FLAG"
+        print(
+            f"FLAG | vehicle={payload['serialNumber']} "
+            f"| headerId={payload['headerId']} "
+            f"| latency={latency_ms:.3f} ms"
         )
 
-        print(f"BLOCK | {reason}")
+        write_event(
+            topic=topic,
+            attack_type="high_latency",
+            action="FLAG",
+            reason=(
+                f"Latency {latency_ms:.3f} ms exceeds "
+                f"{LATENCY_WARNING_MS:.3f} ms"
+            ),
+            payload=payload,
+        )
+    else:
+        verdict = "PASS"
+
+    verified_topic = (
+        f"uagv/v2/OvGU-Testbed/"
+        f"{payload['serialNumber']}/verified"
+    )
+
+    client.publish(
+        verified_topic,
+        json.dumps(payload, separators=(",", ":")),
+        qos=1,
+    )
+
+    write_kpi(
+        payload=payload,
+        latency_ms=latency_ms,
+        verdict=verdict,
+    )
+
+    print(
+        f"{verdict} | vehicle={payload['serialNumber']} "
+        f"| headerId={payload['headerId']} "
+        f"| latency={latency_ms:.3f} ms "
+        f"| forwarded={verified_topic}"
+    )
 
 
 def main():
