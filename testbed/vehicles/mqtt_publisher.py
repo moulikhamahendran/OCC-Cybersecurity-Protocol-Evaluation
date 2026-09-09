@@ -1,54 +1,66 @@
 import json
-import sys
+import os
 import time
-from pathlib import Path
 
 import paho.mqtt.client as mqtt
 
-TESTBED_DIR = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(TESTBED_DIR))
-
-from vehicles.data_generator import make_reading
-
-BROKER_HOST = "127.0.0.1"
-BROKER_PORT = 1883
-SERIAL_NUMBER = "VM-001"
-TOPIC = f"uagv/v2/OvGU-Testbed/{SERIAL_NUMBER}/state"
-PUBLISH_RATE_HZ = 10
+from data_generator import make_reading
 
 
-def main():
+BROKER_HOST = os.getenv("MQTT_HOST", "127.0.0.1")
+BROKER_PORT = int(os.getenv("MQTT_PORT", "1883"))
+MQTT_USERNAME = os.getenv("MQTT_USERNAME")
+MQTT_PASSWORD = os.getenv("MQTT_PASSWORD")
+SECURITY_LEVEL = os.getenv("MQTT_SECURITY_LEVEL", "C0")
+
+TOPIC = "uagv/v2/OvGU-Testbed/VM-001/state"
+PUBLISH_INTERVAL_SECONDS = 0.1
+
+
+def main() -> None:
     client = mqtt.Client(
         callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
-        client_id=f"vehicle-{SERIAL_NUMBER}",
+        client_id=f"vehicle-VM-001-{time.time_ns()}",
     )
 
-    client.connect(BROKER_HOST, BROKER_PORT, keepalive=60)
+    if MQTT_USERNAME:
+        client.username_pw_set(
+            username=MQTT_USERNAME,
+            password=MQTT_PASSWORD,
+        )
+
+    print(
+        f"Connecting publisher to {BROKER_HOST}:{BROKER_PORT} "
+        f"using security level {SECURITY_LEVEL}"
+    )
+
+    client.connect(
+        BROKER_HOST,
+        BROKER_PORT,
+        keepalive=60,
+    )
     client.loop_start()
 
     sequence = 0
-    interval = 1 / PUBLISH_RATE_HZ
-
-    print(f"Connected to MQTT broker at {BROKER_HOST}:{BROKER_PORT}")
-    print(f"Publishing to {TOPIC} at {PUBLISH_RATE_HZ} messages/second")
-    print("Press Control+C to stop")
 
     try:
         while True:
-            reading = make_reading(sequence)
-            payload = json.dumps(reading)
+            payload = make_reading(sequence)
 
-            message = client.publish(
-                topic=TOPIC,
-                payload=payload,
+            publication = client.publish(
+                TOPIC,
+                json.dumps(payload, separators=(",", ":")),
                 qos=1,
             )
-            message.wait_for_publish()
+            publication.wait_for_publish()
 
-            print(f"Published sequence {sequence}: {payload}")
+            print(
+                f"Published sequence {sequence}: "
+                f"{json.dumps(payload)}"
+            )
 
             sequence += 1
-            time.sleep(interval)
+            time.sleep(PUBLISH_INTERVAL_SECONDS)
 
     except KeyboardInterrupt:
         print("\nVehicle publisher stopped")

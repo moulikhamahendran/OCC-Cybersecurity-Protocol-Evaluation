@@ -1,5 +1,6 @@
 import csv
 import json
+import os
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -16,8 +17,12 @@ SCHEMA_PATH = TESTBED_DIR / "schemas" / "vehicle_reading.schema.json"
 RESULTS_DIR = TESTBED_DIR / "results"
 EVENTS_PATH = RESULTS_DIR / "events.csv"
 
-BROKER_HOST = "127.0.0.1"
-BROKER_PORT = 1883
+BROKER_HOST = os.getenv("MQTT_HOST", "127.0.0.1")
+BROKER_PORT = int(os.getenv("MQTT_PORT", "1883"))
+MQTT_USERNAME = os.getenv("MQTT_USERNAME")
+MQTT_PASSWORD = os.getenv("MQTT_PASSWORD")
+SECURITY_LEVEL = os.getenv("MQTT_SECURITY_LEVEL", "C0")
+
 RAW_TOPIC = "uagv/v2/OvGU-Testbed/+/state"
 LATENCY_WARNING_MS = 250.0
 
@@ -67,7 +72,10 @@ def write_event(
 
 def on_connect(client, userdata, flags, reason_code, properties):
     if reason_code == 0:
-        print(f"Gateway connected to {BROKER_HOST}:{BROKER_PORT}")
+        print(
+            f"Gateway connected to {BROKER_HOST}:{BROKER_PORT} "
+            f"using security level {SECURITY_LEVEL}"
+        )
         client.subscribe(RAW_TOPIC, qos=1)
         print(f"Listening on {RAW_TOPIC}")
     else:
@@ -134,6 +142,7 @@ def on_message(client, userdata, message):
             payload=payload,
             latency_ms=latency_ms,
             verdict="BLOCK",
+            security_level=SECURITY_LEVEL,
             condition=threats[0]["type"],
         )
         return
@@ -169,10 +178,12 @@ def on_message(client, userdata, message):
         payload=payload,
         latency_ms=latency_ms,
         verdict=verdict,
+        security_level=SECURITY_LEVEL,
     )
 
     print(
-        f"{verdict} | vehicle={payload['serialNumber']} "
+        f"{verdict} | security={SECURITY_LEVEL} "
+        f"| vehicle={payload['serialNumber']} "
         f"| headerId={payload['headerId']} "
         f"| latency={latency_ms:.3f} ms "
         f"| forwarded={verified_topic}"
@@ -182,17 +193,28 @@ def on_message(client, userdata, message):
 def main():
     client = mqtt.Client(
         callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
-        client_id="occ-cybersecurity-gateway",
+        client_id=f"occ-gateway-{SECURITY_LEVEL.lower()}",
     )
+
+    if MQTT_USERNAME:
+        client.username_pw_set(
+            username=MQTT_USERNAME,
+            password=MQTT_PASSWORD,
+        )
 
     client.on_connect = on_connect
     client.on_message = on_message
 
     print("Starting OCC cybersecurity gateway")
+    print(f"Security level: {SECURITY_LEVEL}")
     print("Press Control+C to stop")
 
     try:
-        client.connect(BROKER_HOST, BROKER_PORT, keepalive=60)
+        client.connect(
+            BROKER_HOST,
+            BROKER_PORT,
+            keepalive=60,
+        )
         client.loop_forever()
 
     except KeyboardInterrupt:

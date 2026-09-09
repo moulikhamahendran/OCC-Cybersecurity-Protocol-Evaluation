@@ -8,6 +8,16 @@ services:
     networks:
       - mqtt_lab
 
+  mqtt-c1:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1884:1883"
+    volumes:
+      - ./config/mosquitto-c1.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./config/password_file:/mosquitto/config/password_file:ro
+    networks:
+      - mqtt_lab
+
 networks:
   mqtt_lab:
     name: testbed_mqtt_lab
