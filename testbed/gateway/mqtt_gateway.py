@@ -1,6 +1,7 @@
 import csv
 import json
 import os
+import ssl
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -16,11 +17,14 @@ TESTBED_DIR = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = TESTBED_DIR / "schemas" / "vehicle_reading.schema.json"
 RESULTS_DIR = TESTBED_DIR / "results"
 EVENTS_PATH = RESULTS_DIR / "events.csv"
+DEFAULT_CA_CERT = TESTBED_DIR / "config" / "certs" / "ca.crt"
 
 BROKER_HOST = os.getenv("MQTT_HOST", "127.0.0.1")
 BROKER_PORT = int(os.getenv("MQTT_PORT", "1883"))
 MQTT_USERNAME = os.getenv("MQTT_USERNAME")
 MQTT_PASSWORD = os.getenv("MQTT_PASSWORD")
+MQTT_USE_TLS = os.getenv("MQTT_TLS", "false").lower() == "true"
+MQTT_CA_CERT = os.getenv("MQTT_CA_CERT", str(DEFAULT_CA_CERT))
 SECURITY_LEVEL = os.getenv("MQTT_SECURITY_LEVEL", "C0")
 
 RAW_TOPIC = "uagv/v2/OvGU-Testbed/+/state"
@@ -202,11 +206,18 @@ def main():
             password=MQTT_PASSWORD,
         )
 
+    if MQTT_USE_TLS:
+        client.tls_set(
+            ca_certs=MQTT_CA_CERT,
+            tls_version=ssl.PROTOCOL_TLS_CLIENT,
+        )
+
     client.on_connect = on_connect
     client.on_message = on_message
 
     print("Starting OCC cybersecurity gateway")
     print(f"Security level: {SECURITY_LEVEL}")
+    print(f"TLS enabled: {MQTT_USE_TLS}")
     print("Press Control+C to stop")
 
     try:
