@@ -16,3 +16,5 @@ __pycache__/
 .DS_Store
 config/password_file
 config/certs/
+# OPC UA generated certificates/private keys
+config/opcua/certs/*
