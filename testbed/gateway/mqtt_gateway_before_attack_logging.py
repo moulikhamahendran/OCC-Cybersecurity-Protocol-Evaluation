@@ -89,101 +89,39 @@ def write_event(
     payload,
 ) -> None:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-
-    timestamp = datetime.now(timezone.utc).isoformat()
-
-    # Keep the existing global event log for compatibility.
-    global_fields = [
-        "timestamp",
-        "topic",
-        "attack_type",
-        "action",
-        "reason",
-        "payload",
-    ]
-
-    global_row = {
-        "timestamp": timestamp,
-        "topic": topic,
-        "attack_type": attack_type,
-        "action": action,
-        "reason": reason,
-        "payload": json.dumps(payload, separators=(",", ":")),
-    }
-
-    global_needs_header = (
+    needs_header = (
         not EVENTS_PATH.exists()
         or EVENTS_PATH.stat().st_size == 0
     )
 
     with EVENTS_PATH.open(
-        "a",
-        newline="",
-        encoding="utf-8",
+        "a", newline="", encoding="utf-8"
     ) as event_file:
         writer = csv.DictWriter(
             event_file,
-            fieldnames=global_fields,
+            fieldnames=[
+                "timestamp",
+                "topic",
+                "attack_type",
+                "action",
+                "reason",
+                "payload",
+            ],
         )
 
-        if global_needs_header:
+        if needs_header:
             writer.writeheader()
 
-        writer.writerow(global_row)
-
-    # Also write a run-specific event ledger.
-    run_dir = RESULTS_DIR / "runs" / RUN_ID
-    run_dir.mkdir(parents=True, exist_ok=True)
-
-    run_events_path = run_dir / "events.csv"
-
-    run_fields = [
-        "timestamp",
-        "run_id",
-        "protocol",
-        "security_level",
-        "net_profile",
-        "repeat_index",
-        "topic",
-        "attack_type",
-        "action",
-        "reason",
-        "payload",
-    ]
-
-    run_needs_header = (
-        not run_events_path.exists()
-        or run_events_path.stat().st_size == 0
-    )
-
-    run_row = {
-        "timestamp": timestamp,
-        "run_id": RUN_ID,
-        "protocol": os.getenv("PROTOCOL", "MQTT"),
-        "security_level": SECURITY_LEVEL,
-        "net_profile": os.getenv("NET_PROFILE", "NET-ideal"),
-        "repeat_index": os.getenv("REPEAT_INDEX", "1"),
-        "topic": topic,
-        "attack_type": attack_type,
-        "action": action,
-        "reason": reason,
-        "payload": json.dumps(payload, separators=(",", ":")),
-    }
-
-    with run_events_path.open(
-        "a",
-        newline="",
-        encoding="utf-8",
-    ) as run_event_file:
-        writer = csv.DictWriter(
-            run_event_file,
-            fieldnames=run_fields,
+        writer.writerow(
+            {
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "topic": topic,
+                "attack_type": attack_type,
+                "action": action,
+                "reason": reason,
+                "payload": json.dumps(payload, separators=(",", ":")),
+            }
         )
-
-        if run_needs_header:
-            writer.writeheader()
-
-        writer.writerow(run_row)
 
 
 def on_connect(client, userdata, flags, reason_code, properties):
