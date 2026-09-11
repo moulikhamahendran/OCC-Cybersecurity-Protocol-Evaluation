@@ -1,6 +1,7 @@
 import csv
 import json
 import os
+import re
 import ssl
 import time
 from datetime import datetime, timezone
@@ -9,7 +10,7 @@ from pathlib import Path
 import paho.mqtt.client as mqtt
 from jsonschema import FormatChecker, ValidationError, validate
 
-from kpi_recorder import write_kpi
+from kpi_recorder import RUN_ID, write_kpi
 from threat_detector import ThreatDetector
 
 
@@ -32,8 +33,52 @@ LATENCY_WARNING_MS = 250.0
 
 THREAT_DETECTOR = ThreatDetector()
 
+RECEIPT_FIELDS = [
+    "timestamp",
+    "run_id",
+    "security_level",
+    "topic",
+    "serial_number",
+    "header_id",
+    "t_send_ns",
+    "received_ns",
+    "payload_bytes",
+    "mqtt_duplicate",
+    "json_valid",
+]
+
 with SCHEMA_PATH.open(encoding="utf-8") as schema_file:
     VEHICLE_SCHEMA = json.load(schema_file)
+
+
+def write_receipt(
+    userdata,
+    message,
+    received_ns,
+    payload,
+    json_valid,
+):
+    fields = payload if isinstance(payload, dict) else {}
+
+    userdata["receipt_writer"].writerow(
+        {
+            "timestamp": datetime.fromtimestamp(
+                received_ns / 1_000_000_000,
+                timezone.utc,
+            ).isoformat(),
+            "run_id": RUN_ID,
+            "security_level": SECURITY_LEVEL,
+            "topic": message.topic,
+            "serial_number": fields.get("serialNumber", ""),
+            "header_id": fields.get("headerId", ""),
+            "t_send_ns": fields.get("t_send_ns", ""),
+            "received_ns": received_ns,
+            "payload_bytes": len(message.payload),
+            "mqtt_duplicate": int(message.dup),
+            "json_valid": int(json_valid),
+        }
+    )
+    userdata["receipt_file"].flush()
 
 
 def write_event(
@@ -44,9 +89,14 @@ def write_event(
     payload,
 ) -> None:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    file_exists = EVENTS_PATH.exists()
+    needs_header = (
+        not EVENTS_PATH.exists()
+        or EVENTS_PATH.stat().st_size == 0
+    )
 
-    with EVENTS_PATH.open("a", newline="", encoding="utf-8") as event_file:
+    with EVENTS_PATH.open(
+        "a", newline="", encoding="utf-8"
+    ) as event_file:
         writer = csv.DictWriter(
             event_file,
             fieldnames=[
@@ -59,7 +109,7 @@ def write_event(
             ],
         )
 
-        if not file_exists:
+        if needs_header:
             writer.writeheader()
 
         writer.writerow(
@@ -81,9 +131,9 @@ def on_connect(client, userdata, flags, reason_code, properties):
             f"using security level {SECURITY_LEVEL}"
         )
         client.subscribe(RAW_TOPIC, qos=1)
-        print(f"Listening on {RAW_TOPIC}")
+        print(f"Subscription requested for {RAW_TOPIC}")
     else:
-        print(f"Connection failed: {reason_code}")
+        raise RuntimeError(f"Connection failed: {reason_code}")
 
 
 def on_message(client, userdata, message):
@@ -93,8 +143,11 @@ def on_message(client, userdata, message):
     try:
         payload = json.loads(message.payload.decode("utf-8"))
     except (UnicodeDecodeError, json.JSONDecodeError) as error:
-        print(f"BLOCK | Invalid JSON | {error}")
+        write_receipt(
+            userdata, message, received_ns, None, False
+        )
 
+        print(f"BLOCK | Invalid JSON | {error}")
         write_event(
             topic=topic,
             attack_type="malformed_payload",
@@ -104,6 +157,10 @@ def on_message(client, userdata, message):
         )
         return
 
+    write_receipt(
+        userdata, message, received_ns, payload, True
+    )
+
     try:
         validate(
             instance=payload,
@@ -112,7 +169,6 @@ def on_message(client, userdata, message):
         )
     except ValidationError as error:
         print(f"BLOCK | Schema violation: {error.message}")
-
         write_event(
             topic=topic,
             attack_type="schema_violation",
@@ -155,7 +211,6 @@ def on_message(client, userdata, message):
 
     if latency_ms > LATENCY_WARNING_MS:
         verdict = "FLAG"
-
         write_event(
             topic=topic,
             attack_type="high_latency",
@@ -172,11 +227,16 @@ def on_message(client, userdata, message):
         f"{payload['serialNumber']}/verified"
     )
 
-    client.publish(
+    publication = client.publish(
         verified_topic,
         json.dumps(payload, separators=(",", ":")),
         qos=1,
     )
+
+    if publication.rc != mqtt.MQTT_ERR_SUCCESS:
+        raise RuntimeError(
+            f"Could not queue forwarding: {publication.rc}"
+        )
 
     write_kpi(
         payload=payload,
@@ -190,49 +250,72 @@ def on_message(client, userdata, message):
         f"| vehicle={payload['serialNumber']} "
         f"| headerId={payload['headerId']} "
         f"| latency={latency_ms:.3f} ms "
-        f"| forwarded={verified_topic}"
+        f"| forwarding_queued={verified_topic}"
     )
 
 
 def main():
-    client = mqtt.Client(
-        callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
-        client_id=f"occ-gateway-{SECURITY_LEVEL.lower()}",
-    )
+    if not re.fullmatch(r"[A-Za-z0-9_-]+", RUN_ID):
+        raise ValueError("Invalid RUN_ID")
 
-    if MQTT_USERNAME:
-        client.username_pw_set(
-            username=MQTT_USERNAME,
-            password=MQTT_PASSWORD,
+    run_dir = RESULTS_DIR / "runs" / RUN_ID
+    run_dir.mkdir(parents=True, exist_ok=True)
+    receipt_path = run_dir / "gateway_receipts.csv"
+
+    with receipt_path.open(
+        "x", newline="", encoding="utf-8"
+    ) as receipt_file:
+        receipt_writer = csv.DictWriter(
+            receipt_file,
+            fieldnames=RECEIPT_FIELDS,
+        )
+        receipt_writer.writeheader()
+        receipt_file.flush()
+
+        client = mqtt.Client(
+            callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
+            client_id=f"occ-gateway-{SECURITY_LEVEL.lower()}",
+            userdata={
+                "receipt_writer": receipt_writer,
+                "receipt_file": receipt_file,
+            },
         )
 
-    if MQTT_USE_TLS:
-        client.tls_set(
-            ca_certs=MQTT_CA_CERT,
-            tls_version=ssl.PROTOCOL_TLS_CLIENT,
-        )
+        if MQTT_USERNAME:
+            client.username_pw_set(
+                username=MQTT_USERNAME,
+                password=MQTT_PASSWORD,
+            )
 
-    client.on_connect = on_connect
-    client.on_message = on_message
+        if MQTT_USE_TLS:
+            client.tls_set(
+                ca_certs=MQTT_CA_CERT,
+                tls_version=ssl.PROTOCOL_TLS_CLIENT,
+            )
 
-    print("Starting OCC cybersecurity gateway")
-    print(f"Security level: {SECURITY_LEVEL}")
-    print(f"TLS enabled: {MQTT_USE_TLS}")
-    print("Press Control+C to stop")
+        client.on_connect = on_connect
+        client.on_message = on_message
 
-    try:
-        client.connect(
-            BROKER_HOST,
-            BROKER_PORT,
-            keepalive=60,
-        )
-        client.loop_forever()
+        print("Starting OCC cybersecurity gateway")
+        print(f"Run ID: {RUN_ID}")
+        print(f"Security level: {SECURITY_LEVEL}")
+        print(f"TLS enabled: {MQTT_USE_TLS}")
+        print(f"Receipt ledger: {receipt_path}")
+        print("Press Control+C to stop")
 
-    except KeyboardInterrupt:
-        print("\nGateway stopped")
+        try:
+            client.connect(
+                BROKER_HOST,
+                BROKER_PORT,
+                keepalive=60,
+            )
+            client.loop_forever()
 
-    finally:
-        client.disconnect()
+        except KeyboardInterrupt:
+            print("\nGateway stopped")
+
+        finally:
+            client.disconnect()
 
 
 if __name__ == "__main__":
