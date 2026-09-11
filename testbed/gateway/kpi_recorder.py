@@ -7,14 +7,25 @@ from collections import deque
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 
 TESTBED_DIR = Path(__file__).resolve().parents[1]
 RESULTS_DIR = TESTBED_DIR / "results"
 KPI_PATH = RESULTS_DIR / "kpi_stream.csv"
 
+# Automated runs receive RUN_ID from the experiment runner.
+# Manually started gateways receive their own unique ID.
+RUN_ID = os.getenv("RUN_ID") or (
+    "manual_"
+    + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    + "_"
+    + uuid4().hex
+)
+
 CSV_FIELDS = [
     "timestamp",
+    "run_id",
     "protocol",
     "security_level",
     "net_profile",
@@ -58,10 +69,11 @@ def _prepare_kpi_file() -> None:
         if existing_header != CSV_FIELDS:
             archive_timestamp = datetime.now(
                 timezone.utc
-            ).strftime("%Y%m%dT%H%M%SZ")
+            ).strftime("%Y%m%dT%H%M%S%fZ")
 
             archive_path = RESULTS_DIR / (
-                f"kpi_stream_legacy_{archive_timestamp}.csv"
+                f"kpi_stream_legacy_{archive_timestamp}_"
+                f"{uuid4().hex}.csv"
             )
 
             KPI_PATH.rename(archive_path)
@@ -71,7 +83,7 @@ def _prepare_kpi_file() -> None:
                 f"{archive_path.name}"
             )
 
-    if not KPI_PATH.exists():
+    if not KPI_PATH.exists() or KPI_PATH.stat().st_size == 0:
         with KPI_PATH.open(
             "w",
             newline="",
@@ -110,15 +122,15 @@ def _calculate_metrics(
     if previous_latency is None:
         jitter_ms = 0.0
     else:
-        jitter_ms = abs(
-            latency_ms - previous_latency
-        )
+        jitter_ms = abs(latency_ms - previous_latency)
 
     state["previous_latency_ms"] = latency_ms
     state["received_messages"] += 1
 
     previous_header_id = state["previous_header_id"]
 
+    # Provisional sequence-gap estimate, not measured network loss.
+    # This will be replaced by sent-versus-received accounting.
     if header_id is not None:
         if (
             previous_header_id is not None
@@ -126,8 +138,6 @@ def _calculate_metrics(
         ):
             gap = header_id - previous_header_id - 1
 
-            # Ignore very large jumps caused by restarted tests
-            # or the special ID ranges used by attack simulations.
             if gap <= 1000:
                 state["lost_messages"] += gap
 
@@ -141,12 +151,11 @@ def _calculate_metrics(
     lost_messages = state["lost_messages"]
     expected_messages = received_messages + lost_messages
 
-    if expected_messages > 0:
-        loss_percent = (
-            lost_messages / expected_messages
-        ) * 100.0
-    else:
-        loss_percent = 0.0
+    loss_percent = (
+        lost_messages / expected_messages * 100.0
+        if expected_messages > 0
+        else 0.0
+    )
 
     recent_messages = state["recent_messages"]
     recent_messages.append((now, payload_bytes))
@@ -168,25 +177,19 @@ def _calculate_metrics(
         for _, message_size in recent_messages
     )
 
+    # JSON payload throughput only; excludes protocol overhead.
     throughput_kbps = (
-        bytes_in_window * 8
-    ) / 1000.0 / WINDOW_SECONDS
+        bytes_in_window * 8 / 1000.0 / WINDOW_SECONDS
+    )
 
     return {
         "jitter_ms": round(jitter_ms, 3),
         "throughput_messages_per_second": round(
-            throughput_messages_per_second,
-            3,
+            throughput_messages_per_second, 3
         ),
-        "throughput_kbps": round(
-            throughput_kbps,
-            3,
-        ),
+        "throughput_kbps": round(throughput_kbps, 3),
         "lost_messages": lost_messages,
-        "loss_percent": round(
-            loss_percent,
-            3,
-        ),
+        "loss_percent": round(loss_percent, 3),
     }
 
 
@@ -198,13 +201,8 @@ def write_kpi(
     condition: str = "normal",
 ) -> dict[str, float | int]:
     protocol = os.getenv("PROTOCOL", "MQTT")
-    net_profile = os.getenv(
-        "NET_PROFILE",
-        "NET-ideal",
-    )
-    repeat_index = int(
-        os.getenv("REPEAT_INDEX", "1")
-    )
+    net_profile = os.getenv("NET_PROFILE", "NET-ideal")
+    repeat_index = int(os.getenv("REPEAT_INDEX", "1"))
 
     serial_number = str(
         payload.get(
@@ -235,6 +233,7 @@ def write_kpi(
     )
 
     key = (
+        RUN_ID,
         protocol,
         security_level,
         net_profile,
@@ -257,31 +256,22 @@ def write_kpi(
             "timestamp": datetime.now(
                 timezone.utc
             ).isoformat(),
+            "run_id": RUN_ID,
             "protocol": protocol,
             "security_level": security_level,
             "net_profile": net_profile,
             "condition": condition,
             "repeat_index": repeat_index,
             "serial_number": serial_number,
-            "header_id": (
-                header_id
-                if header_id is not None
-                else ""
-            ),
+            "header_id": header_id if header_id is not None else "",
             "latency_ms": round(latency_ms, 3),
             "jitter_ms": metrics["jitter_ms"],
             "throughput_messages_per_second": metrics[
                 "throughput_messages_per_second"
             ],
-            "throughput_kbps": metrics[
-                "throughput_kbps"
-            ],
-            "lost_messages": metrics[
-                "lost_messages"
-            ],
-            "loss_percent": metrics[
-                "loss_percent"
-            ],
+            "throughput_kbps": metrics["throughput_kbps"],
+            "lost_messages": metrics["lost_messages"],
+            "loss_percent": metrics["loss_percent"],
             "verdict": verdict,
         }
 

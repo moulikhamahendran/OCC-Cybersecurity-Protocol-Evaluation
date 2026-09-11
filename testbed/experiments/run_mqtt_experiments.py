@@ -7,6 +7,7 @@ import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
+from uuid import uuid4
 
 
 TESTBED_DIR = Path(__file__).resolve().parents[1]
@@ -55,7 +56,7 @@ def check_broker(host: str, port: int) -> None:
     except OSError as error:
         raise RuntimeError(
             f"MQTT broker is unavailable at {host}:{port}. "
-            f"Start Docker Compose before running experiments."
+            "Start Docker Compose before running experiments."
         ) from error
 
 
@@ -87,7 +88,7 @@ def build_environment(
         if not username or not password:
             raise RuntimeError(
                 f"{security_level} requires MQTT_USERNAME "
-                f"and MQTT_PASSWORD environment variables."
+                "and MQTT_PASSWORD environment variables."
             )
 
         environment["MQTT_USERNAME"] = username
@@ -155,8 +156,10 @@ def run_single_experiment(
         f"mqtt_{security_level.lower()}_"
         f"{net_profile.lower()}_"
         f"repeat_{repeat_index}_"
-        f"{utc_timestamp()}"
+        f"{utc_timestamp()}_{uuid4().hex[:8]}"
     )
+
+    environment["RUN_ID"] = run_name
 
     gateway_log_path = LOGS_DIR / (
         f"{run_name}_gateway.log"
@@ -166,6 +169,7 @@ def run_single_experiment(
     )
 
     print()
+    print(f"Run ID: {run_name}")
     print(
         f"Starting MQTT {security_level}, "
         f"network={net_profile}, "
@@ -199,7 +203,7 @@ def run_single_experiment(
 
             if gateway_process.poll() is not None:
                 raise RuntimeError(
-                    f"Gateway failed to start. "
+                    "Gateway failed to start. "
                     f"Check {gateway_log_path}"
                 )
 
@@ -221,13 +225,13 @@ def run_single_experiment(
             while time.monotonic() < experiment_end:
                 if gateway_process.poll() is not None:
                     raise RuntimeError(
-                        f"Gateway stopped unexpectedly. "
+                        "Gateway stopped unexpectedly. "
                         f"Check {gateway_log_path}"
                     )
 
                 if publisher_process.poll() is not None:
                     raise RuntimeError(
-                        f"Publisher stopped unexpectedly. "
+                        "Publisher stopped unexpectedly. "
                         f"Check {publisher_log_path}"
                     )
 
