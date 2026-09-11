@@ -1,0 +1,12 @@
+security_level,attack_type,runs,controls_passed,pass_rate_percent,expected_outcome,observed_outcome
+C0,anonymous_access,3,3,100.0,ALLOWED,ALLOWED
+C0,unauthorized_write,3,3,100.0,REJECTED,REJECTED
+C0,wrong_security,3,3,100.0,REJECTED,REJECTED
+C1,anonymous_access,3,3,100.0,REJECTED,REJECTED
+C1,invalid_credentials,3,3,100.0,REJECTED,REJECTED
+C1,unauthorized_write,3,3,100.0,REJECTED,REJECTED
+C1,wrong_security,3,3,100.0,REJECTED,REJECTED
+C2,anonymous_access,3,3,100.0,REJECTED,REJECTED
+C2,invalid_credentials,3,3,100.0,REJECTED,REJECTED
+C2,unauthorized_write,3,3,100.0,REJECTED,REJECTED
+C2,wrong_security,3,3,100.0,REJECTED,REJECTED
