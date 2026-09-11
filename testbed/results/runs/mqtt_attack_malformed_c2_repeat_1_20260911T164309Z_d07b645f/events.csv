@@ -1,0 +1,2 @@
+timestamp,run_id,protocol,security_level,net_profile,repeat_index,topic,attack_type,action,reason,payload
+2026-09-11T16:43:11.385473+00:00,mqtt_attack_malformed_c2_repeat_1_20260911T164309Z_d07b645f,MQTT,C2,NET-ideal,1,uagv/v2/OvGU-Testbed/VM-001/state,malformed_payload,BLOCK,Invalid JSON: Expecting value: line 1 column 59 (char 58),"""{\""headerId\"":920001,\""serialNumber\"":\""VM-001\"",\""batteryState\"":invalid}"""

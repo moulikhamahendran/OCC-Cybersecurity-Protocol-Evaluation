@@ -1,0 +1,12 @@
+Starting OCC cybersecurity gateway
+Run ID: mqtt_attack_replay_c0_repeat_1_20260911T162904Z_bfd55cc7
+Security level: C0
+TLS enabled: False
+Receipt ledger: /Users/moulikham/Documents/GitHub/OCC-Cybersecurity-Protocol-Evaluation/testbed/results/runs/mqtt_attack_replay_c0_repeat_1_20260911T162904Z_bfd55cc7/gateway_receipts.csv
+Press Control+C to stop
+Gateway connected to 127.0.0.1:1883 using security level C0
+Subscription requested for uagv/v2/OvGU-Testbed/+/state
+PASS | security=C0 | vehicle=VM-001 | headerId=900001 | latency=2.371 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+BLOCK | replay | vehicle=VM-001 | headerId=900001 | Duplicate headerId 900001 received within 10 seconds
+
+Gateway stopped

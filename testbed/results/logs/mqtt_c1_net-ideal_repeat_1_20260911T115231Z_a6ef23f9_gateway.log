@@ -1,0 +1,37 @@
+Starting OCC cybersecurity gateway
+Run ID: mqtt_c1_net-ideal_repeat_1_20260911T115231Z_a6ef23f9
+Security level: C1
+TLS enabled: False
+Receipt ledger: /Users/moulikham/Documents/GitHub/OCC-Cybersecurity-Protocol-Evaluation/testbed/results/runs/mqtt_c1_net-ideal_repeat_1_20260911T115231Z_a6ef23f9/gateway_receipts.csv
+Press Control+C to stop
+Traceback (most recent call last):
+  File "/Users/moulikham/Documents/GitHub/OCC-Cybersecurity-Protocol-Evaluation/testbed/gateway/mqtt_gateway.py", line 322, in <module>
+    main()
+    ~~~~^^
+  File "/Users/moulikham/Documents/GitHub/OCC-Cybersecurity-Protocol-Evaluation/testbed/gateway/mqtt_gateway.py", line 312, in main
+    client.loop_forever()
+    ~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/moulikham/Library/Python/3.13/lib/python/site-packages/paho/mqtt/client.py", line 2297, in loop_forever
+    rc = self._loop(timeout)
+  File "/Users/moulikham/Library/Python/3.13/lib/python/site-packages/paho/mqtt/client.py", line 1686, in _loop
+    rc = self.loop_read()
+  File "/Users/moulikham/Library/Python/3.13/lib/python/site-packages/paho/mqtt/client.py", line 2100, in loop_read
+    rc = self._packet_read()
+  File "/Users/moulikham/Library/Python/3.13/lib/python/site-packages/paho/mqtt/client.py", line 3142, in _packet_read
+    rc = self._packet_handle()
+  File "/Users/moulikham/Library/Python/3.13/lib/python/site-packages/paho/mqtt/client.py", line 3814, in _packet_handle
+    return self._handle_connack()
+           ~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/moulikham/Library/Python/3.13/lib/python/site-packages/paho/mqtt/client.py", line 3934, in _handle_connack
+    on_connect(
+    ~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<3 lines>...
+        properties,
+        ^^^^^^^^^^^
+    )
+    ^
+  File "/Users/moulikham/Documents/GitHub/OCC-Cybersecurity-Protocol-Evaluation/testbed/gateway/mqtt_gateway.py", line 136, in on_connect
+    raise RuntimeError(f"Connection failed: {reason_code}")
+RuntimeError: Connection failed: Not authorized

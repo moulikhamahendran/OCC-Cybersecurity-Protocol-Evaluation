@@ -1,0 +1,2 @@
+timestamp,run_id,security_level,topic,serial_number,header_id,t_send_ns,received_ns,payload_bytes,mqtt_duplicate,json_valid
+2026-09-11T16:46:13.882350+00:00,mqtt_attack_spoofing_c0_repeat_1_20260911T164611Z_75d7a52a,C0,uagv/v2/OvGU-Testbed/VM-001/state,VM-FAKE-001,900003,1789145173880356000,1789145173882350000,428,0,1

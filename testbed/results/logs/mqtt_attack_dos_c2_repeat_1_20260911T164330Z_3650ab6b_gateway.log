@@ -1,0 +1,210 @@
+Starting OCC cybersecurity gateway
+Run ID: mqtt_attack_dos_c2_repeat_1_20260911T164330Z_3650ab6b
+Security level: C2
+TLS enabled: True
+Receipt ledger: /Users/moulikham/Documents/GitHub/OCC-Cybersecurity-Protocol-Evaluation/testbed/results/runs/mqtt_attack_dos_c2_repeat_1_20260911T164330Z_3650ab6b/gateway_receipts.csv
+Press Control+C to stop
+Gateway connected to 127.0.0.1:8883 using security level C2
+Subscription requested for uagv/v2/OvGU-Testbed/+/state
+PASS | security=C2 | vehicle=VM-001 | headerId=910000 | latency=2.015 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910001 | latency=12.571 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910002 | latency=21.047 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910003 | latency=27.240 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910004 | latency=32.264 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910005 | latency=37.266 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910006 | latency=42.317 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910007 | latency=47.317 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910008 | latency=52.374 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910009 | latency=57.396 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910010 | latency=62.365 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910011 | latency=67.345 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910012 | latency=72.346 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910013 | latency=77.326 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910014 | latency=82.320 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910015 | latency=87.334 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910016 | latency=92.337 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910017 | latency=97.313 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910018 | latency=102.295 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910019 | latency=107.303 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910020 | latency=112.252 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910021 | latency=117.258 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910022 | latency=122.259 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910023 | latency=127.213 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910024 | latency=132.223 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910025 | latency=137.165 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910026 | latency=142.127 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910027 | latency=147.102 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910028 | latency=152.052 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910029 | latency=157.009 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910030 | latency=162.034 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910031 | latency=166.986 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910032 | latency=171.993 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910033 | latency=176.931 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910034 | latency=181.875 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910035 | latency=186.853 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910036 | latency=191.805 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910037 | latency=196.770 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910038 | latency=201.745 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910039 | latency=206.682 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910040 | latency=211.697 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910041 | latency=216.679 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910042 | latency=221.638 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910043 | latency=226.636 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910044 | latency=231.618 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910045 | latency=236.592 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910046 | latency=241.568 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C2 | vehicle=VM-001 | headerId=910047 | latency=246.548 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+FLAG | security=C2 | vehicle=VM-001 | headerId=910048 | latency=251.523 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+FLAG | security=C2 | vehicle=VM-001 | headerId=910049 | latency=256.966 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910050 | Message rate 51 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910051 | Message rate 52 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910052 | Message rate 53 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910053 | Message rate 54 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910054 | Message rate 55 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910055 | Message rate 56 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910056 | Message rate 57 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910057 | Message rate 58 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910058 | Message rate 59 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910059 | Message rate 60 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910060 | Message rate 61 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910061 | Message rate 62 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910062 | Message rate 63 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910063 | Message rate 64 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910064 | Message rate 65 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910065 | Message rate 66 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910066 | Message rate 67 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910067 | Message rate 68 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910068 | Message rate 69 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910069 | Message rate 70 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910070 | Message rate 71 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910071 | Message rate 72 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910072 | Message rate 73 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910073 | Message rate 74 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910074 | Message rate 75 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910075 | Message rate 76 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910076 | Message rate 77 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910077 | Message rate 78 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910078 | Message rate 79 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910079 | Message rate 80 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910080 | Message rate 81 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910081 | Message rate 82 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910082 | Message rate 83 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910083 | Message rate 84 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910084 | Message rate 85 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910085 | Message rate 86 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910086 | Message rate 87 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910087 | Message rate 88 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910088 | Message rate 89 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910089 | Message rate 90 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910090 | Message rate 91 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910091 | Message rate 92 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910092 | Message rate 93 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910093 | Message rate 94 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910094 | Message rate 95 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910095 | Message rate 96 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910096 | Message rate 97 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910097 | Message rate 98 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910098 | Message rate 99 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910099 | Message rate 100 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910100 | Message rate 101 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910101 | Message rate 102 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910102 | Message rate 103 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910103 | Message rate 104 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910104 | Message rate 105 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910105 | Message rate 106 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910106 | Message rate 107 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910107 | Message rate 108 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910108 | Message rate 109 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910109 | Message rate 110 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910110 | Message rate 111 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910111 | Message rate 112 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910112 | Message rate 113 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910113 | Message rate 114 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910114 | Message rate 115 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910115 | Message rate 116 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910116 | Message rate 117 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910117 | Message rate 118 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910118 | Message rate 119 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910119 | Message rate 120 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910120 | Message rate 121 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910121 | Message rate 122 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910122 | Message rate 123 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910123 | Message rate 124 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910124 | Message rate 125 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910125 | Message rate 126 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910126 | Message rate 127 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910127 | Message rate 128 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910128 | Message rate 129 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910129 | Message rate 130 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910130 | Message rate 131 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910131 | Message rate 132 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910132 | Message rate 133 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910133 | Message rate 134 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910134 | Message rate 135 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910135 | Message rate 136 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910136 | Message rate 137 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910137 | Message rate 138 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910138 | Message rate 139 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910139 | Message rate 140 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910140 | Message rate 141 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910141 | Message rate 142 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910142 | Message rate 143 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910143 | Message rate 144 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910144 | Message rate 145 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910145 | Message rate 146 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910146 | Message rate 147 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910147 | Message rate 148 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910148 | Message rate 149 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910149 | Message rate 150 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910150 | Message rate 151 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910151 | Message rate 152 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910152 | Message rate 153 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910153 | Message rate 154 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910154 | Message rate 155 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910155 | Message rate 156 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910156 | Message rate 157 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910157 | Message rate 158 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910158 | Message rate 159 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910159 | Message rate 160 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910160 | Message rate 161 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910161 | Message rate 162 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910162 | Message rate 163 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910163 | Message rate 164 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910164 | Message rate 165 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910165 | Message rate 166 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910166 | Message rate 167 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910167 | Message rate 168 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910168 | Message rate 169 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910169 | Message rate 170 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910170 | Message rate 171 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910171 | Message rate 172 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910172 | Message rate 173 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910173 | Message rate 174 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910174 | Message rate 175 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910175 | Message rate 176 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910176 | Message rate 177 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910177 | Message rate 178 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910178 | Message rate 179 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910179 | Message rate 180 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910180 | Message rate 181 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910181 | Message rate 182 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910182 | Message rate 183 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910183 | Message rate 184 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910184 | Message rate 185 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910185 | Message rate 186 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910186 | Message rate 187 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910187 | Message rate 188 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910188 | Message rate 189 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910189 | Message rate 190 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910190 | Message rate 191 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910191 | Message rate 192 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910192 | Message rate 193 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910193 | Message rate 194 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910194 | Message rate 194 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910195 | Message rate 194 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910196 | Message rate 195 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910197 | Message rate 195 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910198 | Message rate 195 messages/second exceeds limit of 50
+BLOCK | dos_rate | vehicle=VM-001 | headerId=910199 | Message rate 195 messages/second exceeds limit of 50
+
+Gateway stopped

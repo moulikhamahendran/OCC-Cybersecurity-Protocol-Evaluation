@@ -1,0 +1,2 @@
+timestamp,run_id,security_level,topic,serial_number,header_id,t_send_ns,received_ns,payload_bytes,mqtt_duplicate,json_valid
+2026-09-11T16:46:01.276417+00:00,mqtt_attack_stale_c0_repeat_1_20260911T164559Z_3fb13010,C0,uagv/v2/OvGU-Testbed/VM-001/state,VM-001,900002,1789145161274294000,1789145161276417000,423,0,1

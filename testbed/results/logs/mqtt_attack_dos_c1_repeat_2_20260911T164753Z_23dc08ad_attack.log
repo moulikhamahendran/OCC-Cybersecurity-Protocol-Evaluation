@@ -1,0 +1,4 @@
+Connecting attack simulator to 127.0.0.1:1884 using security level C1
+DoS: publishing 200 messages rapidly
+DoS: 200 messages submitted
+dos attack test completed

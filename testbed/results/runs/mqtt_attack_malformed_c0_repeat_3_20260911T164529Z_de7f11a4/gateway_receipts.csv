@@ -1,0 +1,2 @@
+timestamp,run_id,security_level,topic,serial_number,header_id,t_send_ns,received_ns,payload_bytes,mqtt_duplicate,json_valid
+2026-09-11T16:45:31.274273+00:00,mqtt_attack_malformed_c0_repeat_3_20260911T164529Z_de7f11a4,C0,uagv/v2/OvGU-Testbed/VM-001/state,,,,1789145131274273000,66,0,0

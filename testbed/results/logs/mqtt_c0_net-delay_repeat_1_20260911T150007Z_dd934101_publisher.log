@@ -1,0 +1,34 @@
+Connecting publisher to 127.0.0.1:2883 using security level C0
+Run ID: mqtt_c0_net-delay_repeat_1_20260911T150007Z_dd934101
+Publisher ledger: /Users/moulikham/Documents/GitHub/OCC-Cybersecurity-Protocol-Evaluation/testbed/results/runs/mqtt_c0_net-delay_repeat_1_20260911T150007Z_dd934101/publisher.csv
+Broker acknowledged sequence 0
+Broker acknowledged sequence 1
+Broker acknowledged sequence 2
+Broker acknowledged sequence 3
+Broker acknowledged sequence 4
+Broker acknowledged sequence 5
+Broker acknowledged sequence 6
+Broker acknowledged sequence 7
+Broker acknowledged sequence 8
+Broker acknowledged sequence 9
+Broker acknowledged sequence 10
+Broker acknowledged sequence 11
+Broker acknowledged sequence 12
+Broker acknowledged sequence 13
+Broker acknowledged sequence 14
+Broker acknowledged sequence 15
+Broker acknowledged sequence 16
+Broker acknowledged sequence 17
+Broker acknowledged sequence 18
+Broker acknowledged sequence 19
+Broker acknowledged sequence 20
+Broker acknowledged sequence 21
+Broker acknowledged sequence 22
+Broker acknowledged sequence 23
+Broker acknowledged sequence 24
+Broker acknowledged sequence 25
+Broker acknowledged sequence 26
+Broker acknowledged sequence 27
+Broker acknowledged sequence 28
+Broker acknowledged sequence 29
+Vehicle publisher stopped

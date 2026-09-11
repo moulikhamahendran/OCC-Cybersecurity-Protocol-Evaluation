@@ -1,0 +1,4 @@
+Connecting attack simulator to 127.0.0.1:1884 using security level C1
+Replay: original message published
+Replay: duplicate message published
+replay attack test completed

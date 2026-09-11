@@ -1,0 +1,58 @@
+Starting OCC cybersecurity gateway
+Run ID: mqtt_c0_net-ideal_repeat_1_20260911T112459Z_99f37d46
+Security level: C0
+TLS enabled: False
+Receipt ledger: /Users/moulikham/Documents/GitHub/OCC-Cybersecurity-Protocol-Evaluation/testbed/results/runs/mqtt_c0_net-ideal_repeat_1_20260911T112459Z_99f37d46/gateway_receipts.csv
+Press Control+C to stop
+Gateway connected to 127.0.0.1:1883 using security level C0
+Subscription requested for uagv/v2/OvGU-Testbed/+/state
+PASS | security=C0 | vehicle=VM-001 | headerId=0 | latency=0.652 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=1 | latency=1.417 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=2 | latency=1.613 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=3 | latency=2.071 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=4 | latency=1.959 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=5 | latency=1.921 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=6 | latency=1.861 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=7 | latency=1.787 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=8 | latency=1.829 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=9 | latency=1.966 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=10 | latency=2.016 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=11 | latency=1.903 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=12 | latency=1.548 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=13 | latency=1.933 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=14 | latency=1.755 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=15 | latency=1.428 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=16 | latency=1.565 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=17 | latency=2.132 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=18 | latency=2.152 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=19 | latency=2.191 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=20 | latency=4.791 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=21 | latency=1.558 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=22 | latency=1.231 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=23 | latency=1.555 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=24 | latency=1.006 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=25 | latency=1.417 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=26 | latency=1.064 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=27 | latency=1.584 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=28 | latency=1.340 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=29 | latency=1.608 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=30 | latency=1.877 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=31 | latency=1.639 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=32 | latency=2.003 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=33 | latency=1.999 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=34 | latency=1.881 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=35 | latency=1.717 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=36 | latency=1.167 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=37 | latency=1.463 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=38 | latency=1.836 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=39 | latency=1.554 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=40 | latency=1.789 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=41 | latency=1.680 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=42 | latency=1.812 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=43 | latency=1.894 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=44 | latency=1.574 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=45 | latency=1.728 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=46 | latency=1.711 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+PASS | security=C0 | vehicle=VM-001 | headerId=47 | latency=1.669 ms | forwarding_queued=uagv/v2/OvGU-Testbed/VM-001/verified
+
+Gateway stopped

@@ -1,0 +1,11 @@
+Starting OCC cybersecurity gateway
+Run ID: mqtt_attack_schema_c2_repeat_3_20260911T164826Z_e4c9d07c
+Security level: C2
+TLS enabled: True
+Receipt ledger: /Users/moulikham/Documents/GitHub/OCC-Cybersecurity-Protocol-Evaluation/testbed/results/runs/mqtt_attack_schema_c2_repeat_3_20260911T164826Z_e4c9d07c/gateway_receipts.csv
+Press Control+C to stop
+Gateway connected to 127.0.0.1:8883 using security level C2
+Subscription requested for uagv/v2/OvGU-Testbed/+/state
+BLOCK | Schema violation: 101 is greater than the maximum of 100
+
+Gateway stopped

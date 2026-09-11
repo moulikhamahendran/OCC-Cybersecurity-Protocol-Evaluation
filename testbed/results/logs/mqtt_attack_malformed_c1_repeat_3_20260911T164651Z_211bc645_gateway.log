@@ -1,0 +1,11 @@
+Starting OCC cybersecurity gateway
+Run ID: mqtt_attack_malformed_c1_repeat_3_20260911T164651Z_211bc645
+Security level: C1
+TLS enabled: False
+Receipt ledger: /Users/moulikham/Documents/GitHub/OCC-Cybersecurity-Protocol-Evaluation/testbed/results/runs/mqtt_attack_malformed_c1_repeat_3_20260911T164651Z_211bc645/gateway_receipts.csv
+Press Control+C to stop
+Gateway connected to 127.0.0.1:1884 using security level C1
+Subscription requested for uagv/v2/OvGU-Testbed/+/state
+BLOCK | Invalid JSON | Expecting value: line 1 column 59 (char 58)
+
+Gateway stopped
