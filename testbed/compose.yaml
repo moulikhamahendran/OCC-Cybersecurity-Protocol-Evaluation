@@ -1,4 +1,5 @@
 services:
+
   mqtt:
     image: eclipse-mosquitto:2
     ports:
@@ -28,6 +29,23 @@ services:
       - ./config/certs/ca.crt:/mosquitto/config/certs/ca.crt:ro
       - ./config/certs/server.crt:/mosquitto/config/certs/server.crt:ro
       - ./config/certs/server.key:/mosquitto/config/certs/server.key:ro
+    networks:
+      - mqtt_lab
+
+  netem-proxy:
+    build:
+      context: ./network
+    container_name: testbed-netem-proxy
+    cap_add:
+      - NET_ADMIN
+    depends_on:
+      - mqtt
+      - mqtt-c1
+      - mqtt-c2
+    ports:
+      - "2883:1883"
+      - "2884:1884"
+      - "9883:8883"
     networks:
       - mqtt_lab
 

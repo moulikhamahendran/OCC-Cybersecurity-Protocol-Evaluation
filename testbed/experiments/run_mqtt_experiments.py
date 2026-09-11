@@ -16,27 +16,37 @@ PROJECT_DIR = TESTBED_DIR.parent
 GATEWAY_PATH = TESTBED_DIR / "gateway" / "mqtt_gateway.py"
 PUBLISHER_PATH = TESTBED_DIR / "vehicles" / "mqtt_publisher.py"
 CA_CERT_PATH = TESTBED_DIR / "config" / "certs" / "ca.crt"
+
 RESULTS_DIR = TESTBED_DIR / "results"
 LOGS_DIR = RESULTS_DIR / "logs"
 
 BROKER_HOST = os.getenv("MQTT_HOST", "127.0.0.1")
+PROXY_HOST = os.getenv("MQTT_PROXY_HOST", "127.0.0.1")
+
 
 SECURITY_PROFILES = {
     "C0": {
-        "port": "1883",
-        "tls": "false",
+        "port": 1883,
+        "tls": False,
         "authentication": False,
     },
     "C1": {
-        "port": "1884",
-        "tls": "false",
+        "port": 1884,
+        "tls": False,
         "authentication": True,
     },
     "C2": {
-        "port": "8883",
-        "tls": "true",
+        "port": 8883,
+        "tls": True,
         "authentication": True,
     },
+}
+
+
+PROXY_PORTS = {
+    "C0": 2883,
+    "C1": 2884,
+    "C2": 9883,
 }
 
 
@@ -46,18 +56,190 @@ def utc_timestamp() -> str:
     )
 
 
-def check_broker(host: str, port: int) -> None:
+def use_proxy(net_profile: str) -> bool:
+    return net_profile != "NET-ideal"
+
+
+def connection_target(
+    security_level: str,
+    net_profile: str,
+) -> tuple[str, int]:
+
+    if use_proxy(net_profile):
+        return (
+            PROXY_HOST,
+            PROXY_PORTS[security_level],
+        )
+
+    return (
+        BROKER_HOST,
+        SECURITY_PROFILES[security_level]["port"],
+    )
+
+
+def check_endpoint(
+    host: str,
+    port: int,
+) -> None:
+
     try:
         with socket.create_connection(
             (host, port),
             timeout=3,
         ):
-            return
+            pass
+
     except OSError as error:
         raise RuntimeError(
-            f"MQTT broker is unavailable at {host}:{port}. "
-            "Start Docker Compose before running experiments."
+            f"MQTT endpoint unavailable at "
+            f"{host}:{port}"
         ) from error
+
+
+def process_exists(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+        return True
+
+    except ProcessLookupError:
+        return False
+
+    except PermissionError:
+        return True
+
+
+def find_stale_testbed_processes() -> list[tuple[int, str]]:
+    """
+    Find old gateway/publisher processes from this repository.
+
+    A stale process can continue writing KPI rows using an old
+    RUN_ID and contaminate later experiments.
+    """
+
+    result = subprocess.run(
+        [
+            "ps",
+            "-Ao",
+            "pid=,command=",
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    gateway_path = str(GATEWAY_PATH)
+    publisher_path = str(PUBLISHER_PATH)
+
+    stale = []
+
+    for line in result.stdout.splitlines():
+
+        stripped = line.strip()
+
+        if not stripped:
+            continue
+
+        parts = stripped.split(
+            None,
+            1,
+        )
+
+        if len(parts) != 2:
+            continue
+
+        try:
+            pid = int(parts[0])
+
+        except ValueError:
+            continue
+
+        if pid == os.getpid():
+            continue
+
+        command = parts[1]
+
+        if gateway_path in command:
+            stale.append(
+                (pid, "Gateway")
+            )
+
+        elif publisher_path in command:
+            stale.append(
+                (pid, "Publisher")
+            )
+
+    return stale
+
+
+def clean_stale_testbed_processes() -> None:
+    stale = find_stale_testbed_processes()
+
+    if not stale:
+        return
+
+    print()
+    print(
+        "WARNING: stale MQTT testbed "
+        "processes detected."
+    )
+
+    for pid, name in stale:
+        print(
+            f"Stopping stale {name}: PID {pid}"
+        )
+
+        try:
+            os.kill(
+                pid,
+                signal.SIGTERM,
+            )
+
+        except ProcessLookupError:
+            continue
+
+    deadline = time.monotonic() + 2.0
+
+    while time.monotonic() < deadline:
+
+        remaining = [
+            (pid, name)
+            for pid, name in stale
+            if process_exists(pid)
+        ]
+
+        if not remaining:
+            break
+
+        time.sleep(0.1)
+
+    for pid, name in stale:
+
+        if not process_exists(pid):
+            continue
+
+        print(
+            f"Force killing stale "
+            f"{name}: PID {pid}"
+        )
+
+        try:
+            os.kill(
+                pid,
+                signal.SIGKILL,
+            )
+
+        except ProcessLookupError:
+            pass
+
+    time.sleep(0.25)
+
+    remaining = find_stale_testbed_processes()
+
+    if remaining:
+        raise RuntimeError(
+            "Could not clean stale MQTT "
+            f"processes: {remaining}"
+        )
 
 
 def build_environment(
@@ -65,16 +247,29 @@ def build_environment(
     repeat_index: int,
     net_profile: str,
 ) -> dict[str, str]:
-    profile = SECURITY_PROFILES[security_level]
+
+    profile = SECURITY_PROFILES[
+        security_level
+    ]
+
+    mqtt_host, mqtt_port = connection_target(
+        security_level,
+        net_profile,
+    )
+
     environment = os.environ.copy()
 
     environment.update(
         {
             "PYTHONUNBUFFERED": "1",
             "PROTOCOL": "MQTT",
-            "MQTT_HOST": BROKER_HOST,
-            "MQTT_PORT": profile["port"],
-            "MQTT_TLS": profile["tls"],
+            "MQTT_HOST": mqtt_host,
+            "MQTT_PORT": str(mqtt_port),
+            "MQTT_TLS": (
+                "true"
+                if profile["tls"]
+                else "false"
+            ),
             "MQTT_SECURITY_LEVEL": security_level,
             "NET_PROFILE": net_profile,
             "REPEAT_INDEX": str(repeat_index),
@@ -82,57 +277,134 @@ def build_environment(
     )
 
     if profile["authentication"]:
-        username = os.getenv("MQTT_USERNAME")
-        password = os.getenv("MQTT_PASSWORD")
+
+        username = os.getenv(
+            "MQTT_USERNAME"
+        )
+
+        password = os.getenv(
+            "MQTT_PASSWORD"
+        )
 
         if not username or not password:
             raise RuntimeError(
-                f"{security_level} requires MQTT_USERNAME "
-                "and MQTT_PASSWORD environment variables."
+                f"{security_level} requires "
+                "MQTT_USERNAME and "
+                "MQTT_PASSWORD."
             )
 
-        environment["MQTT_USERNAME"] = username
-        environment["MQTT_PASSWORD"] = password
+        environment[
+            "MQTT_USERNAME"
+        ] = username
+
+        environment[
+            "MQTT_PASSWORD"
+        ] = password
 
     else:
-        environment.pop("MQTT_USERNAME", None)
-        environment.pop("MQTT_PASSWORD", None)
+        environment.pop(
+            "MQTT_USERNAME",
+            None,
+        )
 
-    if profile["tls"] == "true":
+        environment.pop(
+            "MQTT_PASSWORD",
+            None,
+        )
+
+    if profile["tls"]:
+
         if not CA_CERT_PATH.exists():
             raise RuntimeError(
-                f"CA certificate not found: {CA_CERT_PATH}"
+                f"CA certificate not found: "
+                f"{CA_CERT_PATH}"
             )
 
-        environment["MQTT_CA_CERT"] = str(CA_CERT_PATH)
+        environment[
+            "MQTT_CA_CERT"
+        ] = str(CA_CERT_PATH)
+
     else:
-        environment.pop("MQTT_CA_CERT", None)
+        environment.pop(
+            "MQTT_CA_CERT",
+            None,
+        )
 
     return environment
+
+
+def signal_process_group(
+    process: subprocess.Popen,
+    sig: signal.Signals,
+) -> None:
+
+    if process.poll() is not None:
+        return
+
+    try:
+        os.killpg(
+            process.pid,
+            sig,
+        )
+
+    except ProcessLookupError:
+        pass
 
 
 def stop_process(
     process: subprocess.Popen,
     process_name: str,
 ) -> None:
+
     if process.poll() is not None:
         return
 
-    process.send_signal(signal.SIGINT)
+    # Because every child is started with start_new_session=True,
+    # its PID is also the process-group ID.
+    signal_process_group(
+        process,
+        signal.SIGINT,
+    )
 
     try:
-        process.wait(timeout=5)
+        process.wait(
+            timeout=5,
+        )
+
+        return
+
     except subprocess.TimeoutExpired:
         print(
-            f"{process_name} did not stop normally; terminating it."
+            f"{process_name} ignored SIGINT; "
+            "sending SIGTERM."
         )
-        process.terminate()
 
-        try:
-            process.wait(timeout=3)
-        except subprocess.TimeoutExpired:
-            process.kill()
-            process.wait()
+    signal_process_group(
+        process,
+        signal.SIGTERM,
+    )
+
+    try:
+        process.wait(
+            timeout=3,
+        )
+
+        return
+
+    except subprocess.TimeoutExpired:
+        print(
+            f"{process_name} ignored SIGTERM; "
+            "sending SIGKILL."
+        )
+
+    signal_process_group(
+        process,
+        signal.SIGKILL,
+    )
+
+    process.wait(
+        timeout=3,
+    )
 
 
 def run_single_experiment(
@@ -141,10 +413,20 @@ def run_single_experiment(
     duration_seconds: float,
     net_profile: str,
 ) -> None:
-    profile = SECURITY_PROFILES[security_level]
-    broker_port = int(profile["port"])
 
-    check_broker(BROKER_HOST, broker_port)
+    # Critical isolation guard.
+    # Nothing from an earlier experiment is allowed to survive.
+    clean_stale_testbed_processes()
+
+    mqtt_host, mqtt_port = connection_target(
+        security_level,
+        net_profile,
+    )
+
+    check_endpoint(
+        mqtt_host,
+        mqtt_port,
+    )
 
     environment = build_environment(
         security_level=security_level,
@@ -156,7 +438,8 @@ def run_single_experiment(
         f"mqtt_{security_level.lower()}_"
         f"{net_profile.lower()}_"
         f"repeat_{repeat_index}_"
-        f"{utc_timestamp()}_{uuid4().hex[:8]}"
+        f"{utc_timestamp()}_"
+        f"{uuid4().hex[:8]}"
     )
 
     environment["RUN_ID"] = run_name
@@ -164,17 +447,35 @@ def run_single_experiment(
     gateway_log_path = LOGS_DIR / (
         f"{run_name}_gateway.log"
     )
+
     publisher_log_path = LOGS_DIR / (
         f"{run_name}_publisher.log"
     )
 
     print()
-    print(f"Run ID: {run_name}")
+    print(
+        f"Run ID: {run_name}"
+    )
+
     print(
         f"Starting MQTT {security_level}, "
         f"network={net_profile}, "
         f"repeat={repeat_index}, "
         f"duration={duration_seconds} seconds"
+    )
+
+    print(
+        f"MQTT endpoint: "
+        f"{mqtt_host}:{mqtt_port}"
+    )
+
+    print(
+        "Network path: "
+        + (
+            "netem proxy"
+            if use_proxy(net_profile)
+            else "direct broker"
+        )
     )
 
     gateway_process = None
@@ -187,6 +488,7 @@ def run_single_experiment(
         "w",
         encoding="utf-8",
     ) as publisher_log:
+
         try:
             gateway_process = subprocess.Popen(
                 [
@@ -197,6 +499,10 @@ def run_single_experiment(
                 env=environment,
                 stdout=gateway_log,
                 stderr=subprocess.STDOUT,
+
+                # Creates a dedicated process group so cleanup
+                # can reliably terminate the entire experiment.
+                start_new_session=True,
             )
 
             time.sleep(1.5)
@@ -216,13 +522,19 @@ def run_single_experiment(
                 env=environment,
                 stdout=publisher_log,
                 stderr=subprocess.STDOUT,
+                start_new_session=True,
             )
 
             experiment_end = (
-                time.monotonic() + duration_seconds
+                time.monotonic()
+                + duration_seconds
             )
 
-            while time.monotonic() < experiment_end:
+            while (
+                time.monotonic()
+                < experiment_end
+            ):
+
                 if gateway_process.poll() is not None:
                     raise RuntimeError(
                         "Gateway stopped unexpectedly. "
@@ -238,6 +550,9 @@ def run_single_experiment(
                 time.sleep(0.25)
 
         finally:
+
+            # Stop publisher first so no new messages enter
+            # the network while the gateway is shutting down.
             if publisher_process is not None:
                 stop_process(
                     publisher_process,
@@ -252,6 +567,21 @@ def run_single_experiment(
                     "Gateway",
                 )
 
+    # Final process-level isolation check.
+    stale_after_run = (
+        find_stale_testbed_processes()
+    )
+
+    if stale_after_run:
+
+        clean_stale_testbed_processes()
+
+        raise RuntimeError(
+            "Experiment processes remained alive "
+            "after shutdown. They were terminated. "
+            f"Invalid run: {run_name}"
+        )
+
     print(
         f"Completed MQTT {security_level}, "
         f"network={net_profile}, "
@@ -260,59 +590,112 @@ def run_single_experiment(
 
 
 def main() -> None:
+
     parser = argparse.ArgumentParser(
         description=(
-            "Run repeatable MQTT C0, C1 and C2 "
-            "baseline experiments."
+            "Run isolated, repeatable MQTT "
+            "C0/C1/C2 experiments."
         )
     )
 
     parser.add_argument(
         "--levels",
         nargs="+",
-        choices=["C0", "C1", "C2"],
-        default=["C0", "C1", "C2"],
-        help="MQTT security levels to test.",
+        choices=[
+            "C0",
+            "C1",
+            "C2",
+        ],
+        default=[
+            "C0",
+            "C1",
+            "C2",
+        ],
+        help="MQTT security levels.",
     )
 
     parser.add_argument(
         "--duration",
         type=float,
         default=10.0,
-        help="Duration of each experiment in seconds.",
+        help=(
+            "Duration of each experiment "
+            "in seconds."
+        ),
     )
 
     parser.add_argument(
         "--repeats",
         type=int,
         default=1,
-        help="Number of repetitions per security level.",
+        help=(
+            "Number of repetitions per "
+            "security level."
+        ),
     )
 
     parser.add_argument(
         "--net-profile",
         default="NET-ideal",
-        help="Network profile label written to KPI results.",
+        help=(
+            "NET-ideal uses direct broker "
+            "ports. Other profiles use "
+            "the network-emulation proxy."
+        ),
     )
 
     arguments = parser.parse_args()
 
     if arguments.duration <= 0:
-        parser.error("--duration must be greater than zero")
+        parser.error(
+            "--duration must be greater than zero"
+        )
 
     if arguments.repeats <= 0:
-        parser.error("--repeats must be greater than zero")
+        parser.error(
+            "--repeats must be greater than zero"
+        )
 
     LOGS_DIR.mkdir(
         parents=True,
         exist_ok=True,
     )
 
+    # Clean anything left behind by an earlier interrupted run.
+    clean_stale_testbed_processes()
+
+    print()
+    print(
+        "MQTT experiment configuration"
+    )
+
+    print(
+        "Levels: "
+        + ", ".join(arguments.levels)
+    )
+
+    print(
+        f"Network profile: "
+        f"{arguments.net_profile}"
+    )
+
+    print(
+        f"Duration: "
+        f"{arguments.duration} seconds"
+    )
+
+    print(
+        f"Repeats: "
+        f"{arguments.repeats}"
+    )
+
     for security_level in arguments.levels:
+
         for repeat_index in range(
             1,
             arguments.repeats + 1,
         ):
+
             run_single_experiment(
                 security_level=security_level,
                 repeat_index=repeat_index,
@@ -321,9 +704,18 @@ def main() -> None:
             )
 
     print()
-    print("All requested MQTT experiments completed")
-    print(f"KPI results: {RESULTS_DIR / 'kpi_stream.csv'}")
-    print(f"Run logs: {LOGS_DIR}")
+    print(
+        "All requested MQTT experiments completed"
+    )
+
+    print(
+        f"KPI results: "
+        f"{RESULTS_DIR / 'kpi_stream.csv'}"
+    )
+
+    print(
+        f"Run logs: {LOGS_DIR}"
+    )
 
 
 if __name__ == "__main__":
