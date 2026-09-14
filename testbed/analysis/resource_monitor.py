@@ -240,7 +240,7 @@ def sample_process(args, elapsed_s, label, pattern):
     )
 
 
-def read_docker_stats():
+def read_docker_stats(container_names):
     command = [
         "docker",
         "stats",
@@ -248,6 +248,11 @@ def read_docker_stats():
         "--format",
         "{{json .}}",
     ]
+
+    # Ask Docker only for the containers used by this run.
+    # This avoids intermittent omissions seen when Docker Desktop
+    # scans every running container.
+    command.extend(container_names)
 
     try:
         result = subprocess.run(
@@ -284,7 +289,9 @@ def sample_containers(args, elapsed_s, container_targets):
     if not container_targets:
         return []
 
-    docker_records = read_docker_stats()
+    docker_records = read_docker_stats(
+        list(container_targets.values())
+    )
     rows = []
 
     if docker_records is None:
@@ -531,6 +538,12 @@ def main():
                     container_targets,
                 )
             )
+
+            # A stop signal can interrupt an active Docker stats
+            # request. Discard that partial shutdown sample instead
+            # of recording a false docker_unavailable status.
+            if STOP_REQUESTED:
+                break
 
             writer.writerows(rows)
             csv_file.flush()

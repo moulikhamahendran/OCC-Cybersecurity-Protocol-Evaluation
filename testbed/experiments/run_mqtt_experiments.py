@@ -444,12 +444,34 @@ def run_single_experiment(
 
     environment["RUN_ID"] = run_name
 
+    resource_monitor_path = (
+        TESTBED_DIR
+        / "analysis"
+        / "resource_monitor.py"
+    )
+
+    resource_output_path = (
+        RESULTS_DIR
+        / "resources"
+        / f"resource_{run_name}.csv"
+    )
+
+    broker_containers = {
+        "C0": "testbed-mqtt-1",
+        "C1": "testbed-mqtt-c1-1",
+        "C2": "testbed-mqtt-c2-1",
+    }
+
     gateway_log_path = LOGS_DIR / (
         f"{run_name}_gateway.log"
     )
 
     publisher_log_path = LOGS_DIR / (
         f"{run_name}_publisher.log"
+    )
+
+    resource_log_path = LOGS_DIR / (
+        f"{run_name}_resource_monitor.log"
     )
 
     print()
@@ -478,8 +500,13 @@ def run_single_experiment(
         )
     )
 
+    print(
+        f"Resource results: {resource_output_path}"
+    )
+
     gateway_process = None
     publisher_process = None
+    resource_process = None
 
     with gateway_log_path.open(
         "w",
@@ -487,7 +514,10 @@ def run_single_experiment(
     ) as gateway_log, publisher_log_path.open(
         "w",
         encoding="utf-8",
-    ) as publisher_log:
+    ) as publisher_log, resource_log_path.open(
+        "w",
+        encoding="utf-8",
+    ) as resource_log:
 
         try:
             gateway_process = subprocess.Popen(
@@ -525,6 +555,65 @@ def run_single_experiment(
                 start_new_session=True,
             )
 
+            resource_command = [
+                sys.executable,
+                str(resource_monitor_path),
+                "--run-id",
+                run_name,
+                "--protocol",
+                "MQTT",
+                "--security-profile",
+                security_level,
+                "--scenario",
+                net_profile,
+                "--duration",
+                str(duration_seconds + 5.0),
+                "--interval",
+                "1",
+                "--process",
+                "gateway=mqtt_gateway.py",
+                "--process",
+                "publisher=mqtt_publisher.py",
+                "--container",
+                (
+                    "broker="
+                    + broker_containers[security_level]
+                ),
+                "--output",
+                str(resource_output_path),
+            ]
+
+            if use_proxy(net_profile):
+                resource_command.extend(
+                    [
+                        "--container",
+                        "netem_proxy=testbed-netem-proxy",
+                    ]
+                )
+
+            resource_process = subprocess.Popen(
+                resource_command,
+                cwd=PROJECT_DIR,
+                env=environment,
+                stdout=resource_log,
+                stderr=subprocess.STDOUT,
+                start_new_session=True,
+            )
+
+            time.sleep(0.5)
+
+            if publisher_process.poll() is not None:
+                raise RuntimeError(
+                    "Publisher failed to start. "
+                    f"Check {publisher_log_path}"
+                )
+
+            if resource_process.poll() is not None:
+                raise RuntimeError(
+                    "Resource monitor failed to start. "
+                    f"Check {resource_log_path}"
+                )
+
             experiment_end = (
                 time.monotonic()
                 + duration_seconds
@@ -547,6 +636,12 @@ def run_single_experiment(
                         f"Check {publisher_log_path}"
                     )
 
+                if resource_process.poll() is not None:
+                    raise RuntimeError(
+                        "Resource monitor stopped unexpectedly. "
+                        f"Check {resource_log_path}"
+                    )
+
                 time.sleep(0.25)
 
         finally:
@@ -567,6 +662,17 @@ def run_single_experiment(
                     "Gateway",
                 )
 
+            # Stop monitoring after the application processes so
+            # their shutdown is included in the measurement window.
+            if (
+                resource_process is not None
+                and resource_process.poll() is None
+            ):
+                stop_process(
+                    resource_process,
+                    "Resource monitor",
+                )
+
     # Final process-level isolation check.
     stale_after_run = (
         find_stale_testbed_processes()
@@ -580,6 +686,13 @@ def run_single_experiment(
             "Experiment processes remained alive "
             "after shutdown. They were terminated. "
             f"Invalid run: {run_name}"
+        )
+
+    if not resource_output_path.exists():
+        raise RuntimeError(
+            "Resource CSV was not created. "
+            f"Invalid run: {run_name}. "
+            f"Check {resource_log_path}"
         )
 
     print(
