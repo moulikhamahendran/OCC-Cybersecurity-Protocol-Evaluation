@@ -1,8 +1,8 @@
 import asyncio
 import json
 import os
+import sys
 import time
-from datetime import datetime, timezone
 from pathlib import Path
 
 from asyncua import Server, ua
@@ -10,13 +10,25 @@ from asyncua.crypto.permission_rules import User, UserRole
 
 
 TESTBED_DIR = Path(__file__).resolve().parents[2]
-CERT_DIR = TESTBED_DIR / "config" / "opcua" / "certs"
+sys.path.insert(0, str(TESTBED_DIR))
 
+from vehicles.data_generator import make_reading
+
+
+CERT_DIR = TESTBED_DIR / "config" / "opcua" / "certs"
 SERVER_CERT = CERT_DIR / "server_cert.der"
 SERVER_KEY = CERT_DIR / "server_key.pem"
 
-SECURITY_LEVEL = os.getenv("OPCUA_SECURITY_LEVEL", "C0").upper()
-USERNAME = os.getenv("OPCUA_USERNAME", "occuser")
+SECURITY_LEVEL = os.getenv(
+    "OPCUA_SECURITY_LEVEL",
+    "C0",
+).upper()
+
+USERNAME = os.getenv(
+    "OPCUA_USERNAME",
+    "occuser",
+)
+
 PASSWORD = os.getenv("OPCUA_PASSWORD")
 
 PORTS = {
@@ -25,7 +37,7 @@ PORTS = {
     "C2": 4842,
 }
 
-SERVER_URI = "urn:ovgu:occ-testbed:opcua:server"
+SERVER_URI = "urn:ovgu:occ-testbed:opcua"
 NAMESPACE_URI = "urn:ovgu:occ-testbed:vehicle"
 
 PUBLISH_INTERVAL_SECONDS = 0.1
@@ -40,9 +52,14 @@ class OCCUserManager:
         certificate=None,
     ):
         if SECURITY_LEVEL == "C0":
-            return User(role=UserRole.User)
+            return User(
+                role=UserRole.User,
+            )
 
-        if username == USERNAME and password == PASSWORD:
+        if (
+            username == USERNAME
+            and password == PASSWORD
+        ):
             return User(
                 role=UserRole.User,
                 name=username,
@@ -54,32 +71,44 @@ class OCCUserManager:
 async def configure_security(server):
     if SECURITY_LEVEL == "C0":
         server.set_security_policy(
-            [ua.SecurityPolicyType.NoSecurity]
+            [
+                ua.SecurityPolicyType.NoSecurity,
+            ]
         )
 
         server.set_identity_tokens(
-            [ua.AnonymousIdentityToken]
+            [
+                ua.AnonymousIdentityToken,
+            ]
         )
 
         return
 
     if PASSWORD is None:
         raise RuntimeError(
-            f"OPCUA_PASSWORD must be set for {SECURITY_LEVEL}"
+            f"OPCUA_PASSWORD must be set for "
+            f"{SECURITY_LEVEL}"
         )
 
-    await server.load_certificate(SERVER_CERT)
-    await server.load_private_key(SERVER_KEY)
+    await server.load_certificate(
+        SERVER_CERT
+    )
+
+    await server.load_private_key(
+        SERVER_KEY
+    )
 
     server.set_identity_tokens(
-        [ua.UserNameIdentityToken]
+        [
+            ua.UserNameIdentityToken,
+        ]
     )
 
     if SECURITY_LEVEL == "C1":
         server.set_security_policy(
             [
                 ua.SecurityPolicyType
-                .Basic256Sha256_Sign
+                .Basic256Sha256_Sign,
             ]
         )
 
@@ -87,17 +116,24 @@ async def configure_security(server):
         server.set_security_policy(
             [
                 ua.SecurityPolicyType
-                .Basic256Sha256_SignAndEncrypt
+                .Basic256Sha256_SignAndEncrypt,
             ]
         )
 
     else:
         raise ValueError(
-            f"Unknown security level: {SECURITY_LEVEL}"
+            f"Unknown security level: "
+            f"{SECURITY_LEVEL}"
         )
 
 
 async def main():
+    if SECURITY_LEVEL not in PORTS:
+        raise ValueError(
+            f"Unknown security level: "
+            f"{SECURITY_LEVEL}"
+        )
+
     port = PORTS[SECURITY_LEVEL]
 
     server = Server(
@@ -150,11 +186,20 @@ async def main():
     )
 
     print("Starting OPC UA server")
-    print(f"Security level: {SECURITY_LEVEL}")
     print(
-        f"Endpoint: opc.tcp://127.0.0.1:{port}/occ/"
+        f"Security level: {SECURITY_LEVEL}"
     )
-    print("Stream rate: 10 messages/second")
+    print(
+        f"Endpoint: "
+        f"opc.tcp://127.0.0.1:{port}/occ/"
+    )
+    print(
+        "Payload semantics: "
+        "VDA 5050 v2.1.0 aligned"
+    )
+    print(
+        "Stream rate: 10 messages/second"
+    )
 
     sequence = 0
     heartbeat_counter = 0
@@ -164,18 +209,10 @@ async def main():
         while True:
             sequence += 1
 
-            payload = {
-                "serialNumber": "VM-001",
-                "headerId": sequence,
-                "timestamp": (
-                    datetime.now(timezone.utc)
-                    .isoformat()
-                ),
-                "t_send_ns": time.time_ns(),
-                "speed": 1.5,
-                "batteryCharge": 85.0,
-                "temperature": 25.0,
-            }
+            payload = make_reading(
+                sequence=sequence,
+                serial_number="VM-001",
+            )
 
             await reading.write_value(
                 json.dumps(
@@ -186,7 +223,10 @@ async def main():
 
             now = time.monotonic()
 
-            if now - last_heartbeat >= 1:
+            if (
+                now - last_heartbeat
+                >= 1.0
+            ):
                 heartbeat_counter += 1
 
                 await heartbeat.write_value(

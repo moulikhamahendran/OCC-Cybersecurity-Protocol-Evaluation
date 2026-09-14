@@ -1,7 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "vehicle_reading.schema.json",
-  "title": "VDA 5050 Style Vehicle State",
+  "title": "VDA 5050 2.1.0-Aligned Vehicle State",
+  "description": "VDA 5050-aligned state with t_send_ns as a testbed measurement extension.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -10,12 +11,18 @@
     "version",
     "manufacturer",
     "serialNumber",
-    "agvPosition",
-    "velocity",
+    "orderId",
+    "orderUpdateId",
+    "lastNodeId",
+    "lastNodeSequenceId",
+    "nodeStates",
+    "edgeStates",
+    "driving",
+    "actionStates",
     "batteryState",
-    "taskState",
     "operatingMode",
     "errors",
+    "safetyState",
     "t_send_ns"
   ],
   "properties": {
@@ -37,7 +44,76 @@
     },
     "serialNumber": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_.:-]+$"
+    },
+    "orderId": {
+      "type": "string"
+    },
+    "orderUpdateId": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "lastNodeId": {
+      "type": "string"
+    },
+    "lastNodeSequenceId": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "nodeStates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "nodeId",
+          "sequenceId",
+          "released"
+        ],
+        "properties": {
+          "nodeId": {
+            "type": "string"
+          },
+          "sequenceId": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "released": {
+            "type": "boolean"
+          },
+          "nodeDescription": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "edgeStates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "edgeId",
+          "sequenceId",
+          "released"
+        ],
+        "properties": {
+          "edgeId": {
+            "type": "string"
+          },
+          "sequenceId": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "released": {
+            "type": "boolean"
+          },
+          "edgeDescription": {
+            "type": "string"
+          }
+        }
+      }
     },
     "agvPosition": {
       "type": "object",
@@ -53,6 +129,15 @@
         "positionInitialized": {
           "type": "boolean"
         },
+        "localizationScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "deviationRange": {
+          "type": "number",
+          "minimum": 0
+        },
         "x": {
           "type": "number"
         },
@@ -61,23 +146,21 @@
         },
         "theta": {
           "type": "number",
-          "minimum": -6.28319,
-          "maximum": 6.28319
+          "minimum": -3.141592653589793,
+          "maximum": 3.141592653589793
         },
         "mapId": {
           "type": "string",
           "minLength": 1
+        },
+        "mapDescription": {
+          "type": "string"
         }
       }
     },
     "velocity": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "vx",
-        "vy",
-        "omega"
-      ],
       "properties": {
         "vx": {
           "type": "number"
@@ -87,6 +170,57 @@
         },
         "omega": {
           "type": "number"
+        }
+      },
+      "minProperties": 1
+    },
+    "driving": {
+      "type": "boolean"
+    },
+    "paused": {
+      "type": "boolean"
+    },
+    "newBaseRequest": {
+      "type": "boolean"
+    },
+    "distanceSinceLastNode": {
+      "type": "number",
+      "minimum": 0
+    },
+    "actionStates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "actionId",
+          "actionStatus"
+        ],
+        "properties": {
+          "actionId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "actionType": {
+            "type": "string"
+          },
+          "actionDescription": {
+            "type": "string"
+          },
+          "actionStatus": {
+            "type": "string",
+            "enum": [
+              "WAITING",
+              "INITIALIZING",
+              "RUNNING",
+              "PAUSED",
+              "FINISHED",
+              "FAILED"
+            ]
+          },
+          "resultDescription": {
+            "type": "string"
+          }
         }
       }
     },
@@ -103,20 +237,23 @@
           "minimum": 0,
           "maximum": 100
         },
+        "batteryVoltage": {
+          "type": "number",
+          "minimum": 0
+        },
+        "batteryHealth": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
         "charging": {
           "type": "boolean"
+        },
+        "reach": {
+          "type": "number",
+          "minimum": 0
         }
       }
-    },
-    "taskState": {
-      "type": "string",
-      "enum": [
-        "IDLE",
-        "RUNNING",
-        "PAUSED",
-        "COMPLETED",
-        "ERROR"
-      ]
     },
     "operatingMode": {
       "type": "string",
@@ -131,10 +268,73 @@
     "errors": {
       "type": "array",
       "items": {
-        "type": "object"
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "errorType",
+          "errorLevel"
+        ],
+        "properties": {
+          "errorType": {
+            "type": "string",
+            "minLength": 1
+          },
+          "errorDescription": {
+            "type": "string"
+          },
+          "errorLevel": {
+            "type": "string",
+            "enum": [
+              "WARNING",
+              "FATAL"
+            ]
+          },
+          "errorReferences": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "referenceKey",
+                "referenceValue"
+              ],
+              "properties": {
+                "referenceKey": {
+                  "type": "string"
+                },
+                "referenceValue": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "safetyState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "eStop",
+        "fieldViolation"
+      ],
+      "properties": {
+        "eStop": {
+          "type": "string",
+          "enum": [
+            "AUTOACK",
+            "MANUAL",
+            "REMOTE",
+            "NONE"
+          ]
+        },
+        "fieldViolation": {
+          "type": "boolean"
+        }
       }
     },
     "t_send_ns": {
+      "description": "OCC testbed extension used only for one-way latency measurement.",
       "type": "integer",
       "minimum": 0
     }
