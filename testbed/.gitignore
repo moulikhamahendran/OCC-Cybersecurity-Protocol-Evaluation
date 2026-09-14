@@ -18,3 +18,6 @@ config/password_file
 config/certs/
 # OPC UA generated certificates/private keys
 config/opcua/certs/*
+
+# Generated DDS Security credentials
+config/dds/security/

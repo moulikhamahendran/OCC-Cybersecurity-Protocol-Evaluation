@@ -1,4 +1,5 @@
 import argparse
+import os
 import json
 import time
 
@@ -66,7 +67,7 @@ def main() -> None:
     print("DDS subscriber started")
     print(f"Domain: {arguments.domain}")
     print(f"Topic: {TOPIC_NAME}")
-    print("Security profile: C0")
+    print(f"Security profile: {os.getenv('DDS_SECURITY_LEVEL', 'C0').upper()}")
 
     try:
         while time.monotonic() < deadline:
