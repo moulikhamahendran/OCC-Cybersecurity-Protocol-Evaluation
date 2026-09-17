@@ -191,6 +191,12 @@ def main() -> None:
     unexpected_count = 0
     previous_latency = None
     seen_header_ids = set()
+    eligible_received_ids = set()
+    expected_header_ids = (
+        set(range(arguments.expected_messages))
+        if arguments.expected_messages is not None
+        else None
+    )
     seen_payload_hashes = {}
     delivery_observations = []
     samples = []
@@ -222,7 +228,7 @@ def main() -> None:
             and (
                 arguments.expected_messages
                 is None
-                or received
+                or len(eligible_received_ids)
                 < arguments.expected_messages
             )
         ):
@@ -351,6 +357,13 @@ def main() -> None:
                 )
                 seen_header_ids.add(header_id)
 
+                if (
+                    expected_header_ids is None
+                    or header_id in expected_header_ids
+                ):
+                    eligible_received_ids.add(
+                        header_id
+                    )
                 latency_ms = (
                     received_ns
                     - sample.t_send_ns
