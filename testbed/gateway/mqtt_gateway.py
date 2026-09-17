@@ -28,6 +28,20 @@ MQTT_USE_TLS = os.getenv("MQTT_TLS", "false").lower() == "true"
 MQTT_CA_CERT = os.getenv("MQTT_CA_CERT", str(DEFAULT_CA_CERT))
 SECURITY_LEVEL = os.getenv("MQTT_SECURITY_LEVEL", "C0")
 
+OUTPUT_BROKER_HOST = os.getenv("MQTT_OUTPUT_HOST")
+OUTPUT_BROKER_PORT = int(os.getenv("MQTT_OUTPUT_PORT", "1883"))
+OUTPUT_MQTT_USERNAME = os.getenv("MQTT_OUTPUT_USERNAME")
+OUTPUT_MQTT_PASSWORD = os.getenv("MQTT_OUTPUT_PASSWORD")
+OUTPUT_MQTT_USE_TLS = (
+    os.getenv("MQTT_OUTPUT_TLS", "false").lower() == "true"
+)
+OUTPUT_MQTT_CA_CERT = os.getenv(
+    "MQTT_OUTPUT_CA_CERT",
+    str(DEFAULT_CA_CERT),
+)
+
+FORWARD_CLIENT = None
+
 RAW_TOPIC = "uagv/v2/OvGU-Testbed/+/state"
 LATENCY_WARNING_MS = 250.0
 
@@ -289,7 +303,7 @@ def on_message(client, userdata, message):
         f"{payload['serialNumber']}/verified"
     )
 
-    publication = client.publish(
+    publication = FORWARD_CLIENT.publish(
         verified_topic,
         json.dumps(payload, separators=(",", ":")),
         qos=1,
@@ -317,6 +331,7 @@ def on_message(client, userdata, message):
 
 
 def main():
+    global FORWARD_CLIENT
     if not re.fullmatch(r"[A-Za-z0-9_-]+", RUN_ID):
         raise ValueError("Invalid RUN_ID")
 
@@ -355,6 +370,33 @@ def main():
                 tls_version=ssl.PROTOCOL_TLS_CLIENT,
             )
 
+        FORWARD_CLIENT = client
+
+        if OUTPUT_BROKER_HOST:
+            FORWARD_CLIENT = mqtt.Client(
+                callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
+                client_id=f"occ-gateway-output-{SECURITY_LEVEL.lower()}",
+            )
+
+            if OUTPUT_MQTT_USERNAME:
+                FORWARD_CLIENT.username_pw_set(
+                    username=OUTPUT_MQTT_USERNAME,
+                    password=OUTPUT_MQTT_PASSWORD,
+                )
+
+            if OUTPUT_MQTT_USE_TLS:
+                FORWARD_CLIENT.tls_set(
+                    ca_certs=OUTPUT_MQTT_CA_CERT,
+                    tls_version=ssl.PROTOCOL_TLS_CLIENT,
+                )
+
+            FORWARD_CLIENT.connect(
+                OUTPUT_BROKER_HOST,
+                OUTPUT_BROKER_PORT,
+                keepalive=60,
+            )
+            FORWARD_CLIENT.loop_start()
+
         client.on_connect = on_connect
         client.on_message = on_message
 
@@ -362,6 +404,13 @@ def main():
         print(f"Run ID: {RUN_ID}")
         print(f"Security level: {SECURITY_LEVEL}")
         print(f"TLS enabled: {MQTT_USE_TLS}")
+        if OUTPUT_BROKER_HOST:
+            print(
+                "Forwarding verified messages to "
+                f"{OUTPUT_BROKER_HOST}:{OUTPUT_BROKER_PORT}"
+            )
+        else:
+            print("Forwarding verified messages through the input broker")
         print(f"Receipt ledger: {receipt_path}")
         print("Press Control+C to stop")
 
@@ -377,6 +426,9 @@ def main():
             print("\nGateway stopped")
 
         finally:
+            if FORWARD_CLIENT is not None and FORWARD_CLIENT is not client:
+                FORWARD_CLIENT.loop_stop()
+                FORWARD_CLIENT.disconnect()
             client.disconnect()
 
 

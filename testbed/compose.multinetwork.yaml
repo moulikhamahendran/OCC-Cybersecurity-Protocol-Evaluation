@@ -1,0 +1,102 @@
+services:
+  vehicle-broker:
+    image: eclipse-mosquitto:2
+    container_name: occ-vehicle-broker
+    ports:
+      - "11883:1883"
+    volumes:
+      - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    networks:
+      - vehicle_zone
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          mosquitto_sub -h 127.0.0.1
+          -t '$$SYS/broker/uptime'
+          -C 1 -W 3 >/dev/null 2>&1
+      interval: 2s
+      timeout: 4s
+      retries: 15
+
+  occ-broker:
+    image: eclipse-mosquitto:2
+    container_name: occ-control-broker
+    ports:
+      - "21883:1883"
+    volumes:
+      - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    networks:
+      - occ_zone
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          mosquitto_sub -h 127.0.0.1
+          -t '$$SYS/broker/uptime'
+          -C 1 -W 3 >/dev/null 2>&1
+      interval: 2s
+      timeout: 4s
+      retries: 15
+
+  security-gateway:
+    build:
+      context: ..
+      dockerfile: testbed/integration/Dockerfile
+    container_name: occ-security-gateway
+    environment:
+      MQTT_HOST: vehicle-broker
+      MQTT_PORT: "1883"
+      MQTT_SECURITY_LEVEL: C0
+      MQTT_OUTPUT_HOST: occ-broker
+      MQTT_OUTPUT_PORT: "1883"
+      RUN_ID: multinetwork_c0
+      NET_PROFILE: MULTI-isolated
+      REPEAT_INDEX: "1"
+    command:
+      - python
+      - testbed/gateway/mqtt_gateway.py
+    volumes:
+      - ./results:/workspace/testbed/results
+    networks:
+      - vehicle_zone
+      - occ_zone
+    depends_on:
+      vehicle-broker:
+        condition: service_healthy
+      occ-broker:
+        condition: service_healthy
+    restart: on-failure
+
+  vehicle-publisher:
+    build:
+      context: ..
+      dockerfile: testbed/integration/Dockerfile
+    container_name: occ-vehicle-publisher
+    environment:
+      MQTT_HOST: vehicle-broker
+      MQTT_PORT: "1883"
+      MQTT_SECURITY_LEVEL: C0
+      RUN_ID: multinetwork_c0
+    command:
+      - python
+      - testbed/vehicles/mqtt_publisher.py
+      - --duration
+      - "10"
+      - --rate
+      - "10"
+    networks:
+      - vehicle_zone
+    depends_on:
+      security-gateway:
+        condition: service_started
+    profiles:
+      - experiment
+
+networks:
+  vehicle_zone:
+    name: occ_vehicle_zone
+    driver: bridge
+  occ_zone:
+    name: occ_control_zone
+    driver: bridge
