@@ -542,7 +542,9 @@ def main() -> None:
         RESULTS_DIR
         / "dds_kpi_stream_v2.csv"
     )
-
+    kpi_override = os.getenv("DDS_KPI_OUTPUT")
+    if kpi_override:
+        summary_path = Path(kpi_override)
     summary_path.parent.mkdir(
         parents=True,
         exist_ok=True,

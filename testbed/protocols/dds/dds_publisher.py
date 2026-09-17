@@ -38,6 +38,15 @@ def main() -> None:
         "--serial-number",
         default="VM-001",
     )
+    parser.add_argument(
+        "--header-id-offset",
+        type=int,
+        default=0,
+        help=(
+            "Offset added to generated header IDs; "
+            "used for controlled attack experiments"
+        ),
+    )
     arguments = parser.parse_args()
 
     if arguments.duration <= 0:
@@ -142,7 +151,7 @@ def main() -> None:
                 time.sleep(remaining)
 
             payload = make_reading(
-                sequence,
+                sequence + arguments.header_id_offset,
                 serial_number=arguments.serial_number,
             )
 
