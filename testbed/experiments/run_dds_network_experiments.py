@@ -583,7 +583,7 @@ def main():
     )
     print(
         "KPI results:",
-        RESULTS_DIR / "dds_kpi_stream.csv",
+        RESULTS_DIR / "dds_kpi_stream_v2.csv",
     )
     print("Resource results:", RESOURCE_DIR)
 

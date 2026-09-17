@@ -14,6 +14,10 @@ from cyclonedds.sub import DataReader
 from cyclonedds.topic import Topic
 from jsonschema import FormatChecker, ValidationError, validate
 
+from dds_delivery_metrics import (
+    calculate_delivery_metrics,
+    payload_fingerprint,
+)
 from dds_types import VehicleState
 
 
@@ -182,9 +186,20 @@ def main() -> None:
     received = 0
     invalid = 0
     duplicate_count = 0
+    identical_duplicate_count = 0
+    conflicting_duplicate_count = 0
+    unexpected_count = 0
     previous_latency = None
     seen_header_ids = set()
+    seen_payload_hashes = {}
+    delivery_observations = []
     samples = []
+
+    configured_eligible_ids = (
+        set(range(arguments.expected_messages))
+        if arguments.expected_messages is not None
+        else None
+    )
 
     print("DDS subscriber started")
     print(f"Run ID: {run_id}")
@@ -288,14 +303,52 @@ def main() -> None:
                     sample.header_id
                 )
 
-                if header_id in seen_header_ids:
-                    duplicate_count += 1
+                delivery_observations.append(
+                    (
+                        header_id,
+                        sample.payload_json,
+                    )
+                )
+
+                if (
+                    configured_eligible_ids is not None
+                    and header_id
+                    not in configured_eligible_ids
+                ):
+                    unexpected_count += 1
                     print(
-                        "BLOCK | Duplicate sample "
+                        "BLOCK | Unexpected sample "
                         f"| headerId={header_id}"
                     )
                     continue
 
+                fingerprint = payload_fingerprint(
+                    sample.payload_json
+                )
+
+                if header_id in seen_payload_hashes:
+                    duplicate_count += 1
+
+                    if (
+                        seen_payload_hashes[header_id]
+                        == fingerprint
+                    ):
+                        identical_duplicate_count += 1
+                        duplicate_type = "identical"
+                    else:
+                        conflicting_duplicate_count += 1
+                        duplicate_type = "conflicting"
+
+                    print(
+                        "BLOCK | Duplicate sample "
+                        f"| type={duplicate_type} "
+                        f"| headerId={header_id}"
+                    )
+                    continue
+
+                seen_payload_hashes[header_id] = (
+                    fingerprint
+                )
                 seen_header_ids.add(header_id)
 
                 latency_ms = (
@@ -373,34 +426,49 @@ def main() -> None:
             "No DDS samples received"
         )
 
-    ordered_ids = sorted(
-        seen_header_ids
-    )
+    if configured_eligible_ids is None:
+        eligible_sent_ids = set(
+            seen_header_ids
+        )
+        metric_basis = "observed-only"
+    else:
+        eligible_sent_ids = (
+            configured_eligible_ids
+        )
+        metric_basis = "configured-id-set"
 
-    observed_sequence_span = (
-        ordered_ids[-1]
-        - ordered_ids[0]
-        + 1
+    delivery_metrics = (
+        calculate_delivery_metrics(
+            eligible_sent_ids=eligible_sent_ids,
+            received_samples=(
+                delivery_observations
+            ),
+        )
     )
 
     expected_messages = (
-        arguments.expected_messages
-        if arguments.expected_messages
-        is not None
-        else observed_sequence_span
+        delivery_metrics.eligible_sent_count
     )
-
-    lost_messages = max(
-        0,
-        expected_messages - received,
+    received = (
+        delivery_metrics.unique_received_count
     )
-
+    duplicate_count = (
+        delivery_metrics.duplicate_count
+    )
+    identical_duplicate_count = (
+        delivery_metrics.identical_duplicate_count
+    )
+    conflicting_duplicate_count = (
+        delivery_metrics.conflicting_duplicate_count
+    )
+    unexpected_count = (
+        delivery_metrics.unexpected_count
+    )
+    lost_messages = (
+        delivery_metrics.lost_count
+    )
     loss_percent = (
-        lost_messages
-        / expected_messages
-        * 100
-        if expected_messages
-        else 0.0
+        delivery_metrics.loss_percent
     )
 
     latencies = [
@@ -459,7 +527,7 @@ def main() -> None:
 
     summary_path = (
         RESULTS_DIR
-        / "dds_kpi_stream.csv"
+        / "dds_kpi_stream_v2.csv"
     )
 
     summary_path.parent.mkdir(
@@ -496,7 +564,13 @@ def main() -> None:
                 elapsed,
                 3,
             ),
+        "loss_metric_version":
+            "id-set-v1",
+        "metric_basis":
+            metric_basis,
         "expected_messages":
+            expected_messages,
+        "eligible_sent_messages":
             expected_messages,
         "received_messages":
             received,
@@ -504,8 +578,27 @@ def main() -> None:
             invalid,
         "duplicate_messages":
             duplicate_count,
+        "identical_duplicate_messages":
+            identical_duplicate_count,
+        "conflicting_duplicate_messages":
+            conflicting_duplicate_count,
+        "unexpected_messages":
+            unexpected_count,
+        "startup_messages":
+            delivery_metrics.startup_count,
         "lost_messages":
             lost_messages,
+        "lost_message_ids":
+            ";".join(
+                str(value)
+                for value in delivery_metrics.lost_ids
+            ),
+        "unexpected_message_ids":
+            ";".join(
+                str(value)
+                for value
+                in delivery_metrics.unexpected_ids
+            ),
         "loss_percent":
             round(
                 loss_percent,
@@ -543,7 +636,11 @@ def main() -> None:
         "verdict":
             (
                 "PASS"
-                if invalid == 0
+                if (
+                    invalid == 0
+                    and conflicting_duplicate_count == 0
+                    and unexpected_count == 0
+                )
                 else "BLOCK"
             ),
     }
@@ -576,7 +673,23 @@ def main() -> None:
         f"{duplicate_count}"
     )
     print(
+        "Identical duplicates: "
+        f"{identical_duplicate_count}"
+    )
+    print(
+        "Conflicting duplicates: "
+        f"{conflicting_duplicate_count}"
+    )
+    print(
+        "Unexpected samples: "
+        f"{unexpected_count}"
+    )
+    print(
         f"Lost samples: {lost_messages}"
+    )
+    print(
+        "Lost IDs: "
+        f"{list(delivery_metrics.lost_ids)}"
     )
     print(
         "Loss percent: "
@@ -602,10 +715,19 @@ def main() -> None:
         f"KPI summary: {summary_path}"
     )
 
-    if invalid:
+    blocking_anomalies = (
+        invalid
+        + conflicting_duplicate_count
+        + unexpected_count
+    )
+
+    if blocking_anomalies:
         raise RuntimeError(
-            f"{invalid} invalid DDS "
-            "samples received"
+            "DDS delivery validation failed: "
+            f"invalid={invalid}, "
+            "conflicting_duplicates="
+            f"{conflicting_duplicate_count}, "
+            f"unexpected={unexpected_count}"
         )
 
 

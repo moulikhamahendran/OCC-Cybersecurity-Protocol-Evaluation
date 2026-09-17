@@ -225,7 +225,7 @@ def validate_kpi_results(
 ) -> None:
     summary_path = (
         RESULTS_DIR
-        / "dds_kpi_stream.csv"
+        / "dds_kpi_stream_v2.csv"
     )
 
     if not summary_path.exists():
@@ -265,9 +265,41 @@ def validate_kpi_results(
             "count does not match workload"
         )
 
+    if row["loss_metric_version"] != "id-set-v1":
+        raise RuntimeError(
+            "DDS run used an unexpected loss metric"
+        )
+
+    if row["metric_basis"] != "configured-id-set":
+        raise RuntimeError(
+            "DDS run did not use configured sent IDs"
+        )
+
     if int(row["invalid_messages"]) != 0:
         raise RuntimeError(
             "DDS run produced invalid messages"
+        )
+
+    if int(row["unexpected_messages"]) != 0:
+        raise RuntimeError(
+            "DDS run produced unexpected messages"
+        )
+
+    if (
+        int(row["conflicting_duplicate_messages"])
+        != 0
+    ):
+        raise RuntimeError(
+            "DDS run produced conflicting duplicates"
+        )
+
+    eligible = int(row["eligible_sent_messages"])
+    received = int(row["received_messages"])
+    lost = int(row["lost_messages"])
+
+    if received + lost != eligible:
+        raise RuntimeError(
+            "DDS delivery accounting is inconsistent"
         )
 
 
@@ -704,7 +736,7 @@ def main() -> None:
     print(
         "KPI results:",
         RESULTS_DIR
-        / "dds_kpi_stream.csv",
+        / "dds_kpi_stream_v2.csv",
     )
     print(
         "Run data:",
