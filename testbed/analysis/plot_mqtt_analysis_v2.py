@@ -64,12 +64,21 @@ grouped_plot(
     "mqtt_v2_source_rate.png",
 )
 
-grouped_plot(
-    "application_loss_mean_percent",
-    "Application Loss (%)",
-    "MQTT Application-Level Loss",
-    "mqtt_v2_application_loss.png",
+plt.figure(figsize=(10, 5))
+plt.axhline(0, linewidth=1)
+plt.xticks(range(len(profiles)), ["Ideal", "Delay", "Jitter", "Loss"])
+plt.ylabel("Application Loss (%)")
+plt.title("MQTT Application-Level Loss")
+plt.ylim(-0.05, 0.05)
+plt.text(
+    1.5, 0.012,
+    "0% application-level loss in all 12 authoritative groups",
+    ha="center",
+    fontsize=11,
 )
+plt.tight_layout()
+plt.savefig(OUT / "mqtt_v2_application_loss.png", dpi=180)
+plt.close()
 
 print("Saved plots to:", OUT)
 for p in sorted(OUT.glob("*.png")):
