@@ -15,8 +15,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 RUNS_DIR = ROOT / "testbed/results/runs"
 RESOURCE_DIR = ROOT / "testbed/results/resources"
+LOGS_DIR = ROOT / "testbed/results/logs"
 OUTPUT_DIR = ROOT / "testbed/results/audit"
 OUTPUT_FILE = OUTPUT_DIR / "mqtt_common_core_authoritative.csv"
+LEGACY_INVENTORY = OUTPUT_DIR / "mqtt_legacy_unverified_netem_runs.txt"
+
+IMPAIRED_PROFILES = {
+    "net-delay",
+    "net-jitter",
+    "net-loss",
+}
 
 LEVELS = ("C0", "C1", "C2")
 PROFILES = ("net-ideal", "net-delay", "net-jitter", "net-loss")
@@ -30,6 +38,41 @@ RUN_PATTERN = re.compile(
     r"([A-Za-z0-9]+)$",
     re.IGNORECASE,
 )
+
+
+
+def load_legacy_run_ids():
+    if not LEGACY_INVENTORY.is_file():
+        raise FileNotFoundError(
+            f"Legacy MQTT inventory not found: {LEGACY_INVENTORY}"
+        )
+    return {
+        line.strip()
+        for line in LEGACY_INVENTORY.read_text(
+            encoding="utf-8"
+        ).splitlines()
+        if line.strip()
+    }
+
+
+LEGACY_RUN_IDS = load_legacy_run_ids()
+
+
+def read_key_value_log(path):
+    values = {}
+    if not path.is_file() or path.stat().st_size == 0:
+        return values
+
+    for line in path.read_text(
+        encoding="utf-8",
+        errors="replace",
+    ).splitlines():
+        if "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        values[key.strip()] = value.strip()
+
+    return values
 
 
 def read_csv(path):
@@ -98,8 +141,48 @@ def find_resource_files(run_id, run_dir):
     return unique
 
 
-def validate_candidate(run_dir, run_id):
+def validate_candidate(run_dir, run_id, profile):
     reasons = []
+
+    if run_id in LEGACY_RUN_IDS:
+        reasons.append("legacy_unverified_netem")
+
+    netem_path = LOGS_DIR / f"{run_id}_netem.log"
+    netem_values = {}
+
+    if profile in IMPAIRED_PROFILES:
+        netem_values = read_key_value_log(netem_path)
+
+        if not netem_values:
+            reasons.append("missing_or_empty_netem_log")
+        else:
+            if netem_values.get("run_id") != run_id:
+                reasons.append("netem_run_id_mismatch")
+
+            if (
+                netem_values.get("net_profile", "").lower()
+                != profile
+            ):
+                reasons.append("netem_profile_mismatch")
+
+            if netem_values.get("run_status") != "COMPLETED":
+                reasons.append("netem_run_not_completed")
+
+            if (
+                netem_values.get(
+                    "netem_verified_before", ""
+                ).lower()
+                != "true"
+            ):
+                reasons.append("netem_not_verified_before")
+
+            if (
+                netem_values.get(
+                    "netem_verified_after", ""
+                ).lower()
+                != "true"
+            ):
+                reasons.append("netem_not_verified_after")
 
     publisher_path = run_dir / "publisher.csv"
     receipts_path = run_dir / "gateway_receipts.csv"
@@ -174,6 +257,19 @@ def validate_candidate(run_dir, run_id):
         "resource_path": selected_resource,
         "resource_rows": len(resource_rows),
         "resource_span_s": resource_span,
+        "netem_log_path": netem_path,
+        "netem_run_status": netem_values.get("run_status", ""),
+        "netem_verified_before": netem_values.get(
+            "netem_verified_before", ""
+        ),
+        "netem_verified_after": netem_values.get(
+            "netem_verified_after", ""
+        ),
+        "provenance_class": (
+            "mqtt_v2_verified"
+            if run_id not in LEGACY_RUN_IDS
+            else "legacy_unverified_netem"
+        ),
     }
 
 
@@ -198,7 +294,11 @@ for run_dir in sorted(RUNS_DIR.iterdir()):
         "%Y%m%dT%H%M%SZ",
     )
 
-    validation = validate_candidate(run_dir, run_dir.name)
+    validation = validate_candidate(
+        run_dir,
+        run_dir.name,
+        profile,
+    )
 
     candidates[(level, profile, repeat)].append(
         {
@@ -284,6 +384,11 @@ fieldnames = [
     "resource_csv",
     "resource_rows",
     "resource_span_s",
+    "netem_log",
+    "netem_run_status",
+    "netem_verified_before",
+    "netem_verified_after",
+    "provenance_class",
 ]
 
 with OUTPUT_FILE.open(
@@ -317,6 +422,21 @@ with OUTPUT_FILE.open(
                 "resource_span_s": (
                     f"{candidate['resource_span_s']:.6f}"
                 ),
+                "netem_log": (
+                    candidate["netem_log_path"]
+                    .relative_to(ROOT)
+                    .as_posix()
+                    if candidate["netem_log_path"].is_file()
+                    else ""
+                ),
+                "netem_run_status":
+                    candidate["netem_run_status"],
+                "netem_verified_before":
+                    candidate["netem_verified_before"],
+                "netem_verified_after":
+                    candidate["netem_verified_after"],
+                "provenance_class":
+                    candidate["provenance_class"],
             }
         )
 

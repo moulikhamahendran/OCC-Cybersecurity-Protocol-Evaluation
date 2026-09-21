@@ -1,0 +1,99 @@
+services:
+
+  opcua-c0-server:
+    image: occ-opcua-smoke:local
+    container_name: occ-opcua-c0-server
+    environment:
+      OPCUA_SECURITY_LEVEL: C0
+      NET_PROFILE: NET-ideal
+      REPEAT_INDEX: "1"
+    networks:
+      - opcua_smoke
+
+  opcua-c0-client:
+    image: occ-opcua-smoke:local
+    environment:
+      OPCUA_SECURITY_LEVEL: C0
+      NET_PROFILE: NET-ideal
+      REPEAT_INDEX: "1"
+      OPCUA_ENDPOINT: opc.tcp://opcua-c0-server:4840/occ/
+    command:
+      - python
+      - -u
+      - testbed/protocols/opcua/opcua_benchmark_client.py
+      - --duration
+      - "5"
+    networks:
+      - opcua_smoke
+
+  opcua-c1-server:
+    image: occ-opcua-smoke:local
+    container_name: occ-opcua-c1-server
+    environment:
+      OPCUA_SECURITY_LEVEL: C1
+      OPCUA_USERNAME: occuser
+      OPCUA_PASSWORD: ${OPCUA_PASSWORD:?OPCUA_PASSWORD must be set}
+      NET_PROFILE: NET-ideal
+      REPEAT_INDEX: "1"
+    volumes:
+      - ../../config/opcua/certs:/app/testbed/config/opcua/certs:ro
+    networks:
+      - opcua_smoke
+
+  opcua-c1-client:
+    image: occ-opcua-smoke:local
+    environment:
+      OPCUA_SECURITY_LEVEL: C1
+      OPCUA_USERNAME: occuser
+      OPCUA_PASSWORD: ${OPCUA_PASSWORD:?OPCUA_PASSWORD must be set}
+      NET_PROFILE: NET-ideal
+      REPEAT_INDEX: "1"
+      OPCUA_ENDPOINT: opc.tcp://opcua-c1-server:4841/occ/
+    volumes:
+      - ../../config/opcua/certs:/app/testbed/config/opcua/certs:ro
+    command:
+      - python
+      - -u
+      - testbed/protocols/opcua/opcua_benchmark_client.py
+      - --duration
+      - "5"
+    networks:
+      - opcua_smoke
+
+  opcua-c2-server:
+    image: occ-opcua-smoke:local
+    container_name: occ-opcua-c2-server
+    environment:
+      OPCUA_SECURITY_LEVEL: C2
+      OPCUA_USERNAME: occuser
+      OPCUA_PASSWORD: ${OPCUA_PASSWORD:?OPCUA_PASSWORD must be set}
+      NET_PROFILE: NET-ideal
+      REPEAT_INDEX: "1"
+    volumes:
+      - ../../config/opcua/certs:/app/testbed/config/opcua/certs:ro
+    networks:
+      - opcua_smoke
+
+  opcua-c2-client:
+    image: occ-opcua-smoke:local
+    environment:
+      OPCUA_SECURITY_LEVEL: C2
+      OPCUA_USERNAME: occuser
+      OPCUA_PASSWORD: ${OPCUA_PASSWORD:?OPCUA_PASSWORD must be set}
+      NET_PROFILE: NET-ideal
+      REPEAT_INDEX: "1"
+      OPCUA_ENDPOINT: opc.tcp://opcua-c2-server:4842/occ/
+    volumes:
+      - ../../config/opcua/certs:/app/testbed/config/opcua/certs:ro
+    command:
+      - python
+      - -u
+      - testbed/protocols/opcua/opcua_benchmark_client.py
+      - --duration
+      - "5"
+    networks:
+      - opcua_smoke
+
+networks:
+  opcua_smoke:
+    driver: bridge

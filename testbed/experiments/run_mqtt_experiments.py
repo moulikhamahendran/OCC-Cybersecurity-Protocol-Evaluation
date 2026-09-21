@@ -9,6 +9,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
 
+from mqtt_netem import (
+    PROFILES as NETEM_PROFILES,
+    configure_netem,
+    qdisc_state,
+    reset_netem,
+    state_matches,
+    write_netem_log,
+)
+
 
 TESTBED_DIR = Path(__file__).resolve().parents[1]
 PROJECT_DIR = TESTBED_DIR.parent
@@ -407,12 +416,12 @@ def stop_process(
     )
 
 
-def run_single_experiment(
+def _run_single_experiment_inner(
     security_level: str,
     repeat_index: int,
     duration_seconds: float,
     net_profile: str,
-) -> None:
+) -> str:
 
     # Critical isolation guard.
     # Nothing from an earlier experiment is allowed to survive.
@@ -700,6 +709,105 @@ def run_single_experiment(
         f"network={net_profile}, "
         f"repeat={repeat_index}"
     )
+
+    return run_name
+
+
+def run_single_experiment(
+    security_level: str,
+    repeat_index: int,
+    duration_seconds: float,
+    net_profile: str,
+) -> None:
+    """
+    Configure, verify, log, and always reset MQTT NetEm
+    around one experiment.
+    """
+
+    if net_profile not in NETEM_PROFILES:
+        raise ValueError(
+            f"Unknown MQTT network profile {net_profile!r}; "
+            f"expected one of {sorted(NETEM_PROFILES)}"
+        )
+
+    started = utc_timestamp()
+    run_id = ""
+    run_status = "FAILED"
+
+    state_before = ""
+    state_after = ""
+
+    verified_before = False
+    verified_after = False
+
+    try:
+        state_before = configure_netem(net_profile)
+        verified_before = state_matches(
+            net_profile,
+            state_before,
+        )
+
+        run_id = _run_single_experiment_inner(
+            security_level=security_level,
+            repeat_index=repeat_index,
+            duration_seconds=duration_seconds,
+            net_profile=net_profile,
+        )
+
+        run_status = "COMPLETED"
+
+    finally:
+        try:
+            if use_proxy(net_profile):
+                state_after = qdisc_state(
+                    with_stats=True
+                )
+                verified_after = state_matches(
+                    net_profile,
+                    state_after,
+                )
+            else:
+                state_after = (
+                    "not applicable: direct broker path"
+                )
+                verified_after = True
+
+        except Exception as error:
+            state_after = f"UNAVAILABLE: {error}"
+            verified_after = False
+
+        reset_netem()
+
+        if not run_id:
+            run_id = (
+                f"mqtt_{security_level.lower()}_"
+                f"{net_profile.lower()}_"
+                f"repeat_{repeat_index}_"
+                f"{started}_failed_before_run_id"
+            )
+
+        write_netem_log(
+            LOGS_DIR / f"{run_id}_netem.log",
+            run_id,
+            net_profile,
+            started,
+            utc_timestamp(),
+            run_status,
+            verified_before,
+            verified_after,
+            state_before,
+            state_after,
+        )
+
+    if not (
+        verified_before
+        and verified_after
+        and run_status == "COMPLETED"
+    ):
+        raise RuntimeError(
+            "MQTT NetEm verification failed. "
+            f"Invalid run: {run_id}"
+        )
 
 
 def main() -> None:

@@ -17,7 +17,12 @@ from asyncua.crypto.security_policies import (
 
 TESTBED_DIR = Path(__file__).resolve().parents[2]
 CERT_DIR = TESTBED_DIR / "config" / "opcua" / "certs"
-RESULTS_DIR = TESTBED_DIR / "results" / "opcua"
+RESULTS_DIR = Path(
+    os.getenv(
+        "OPCUA_RESULTS_DIR",
+        str(TESTBED_DIR / "results" / "opcua"),
+    )
+)
 
 SERVER_CERT = CERT_DIR / "server_cert.der"
 CLIENT_CERT = CERT_DIR / "client_cert.der"
@@ -165,13 +170,16 @@ async def main():
         f"opc.tcp://127.0.0.1:{port}/occ/",
     )
 
-    run_id = (
-        f"opcua_{SECURITY_LEVEL.lower()}_"
-        f"{NET_PROFILE.lower()}_"
-        f"repeat_{REPEAT_INDEX}_"
-        f"{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}_"
-        f"{uuid4().hex[:8]}"
-    )
+    run_id = os.getenv("RUN_ID")
+
+    if not run_id:
+        run_id = (
+            f"opcua_{SECURITY_LEVEL.lower()}_"
+            f"{NET_PROFILE.lower()}_"
+            f"repeat_{REPEAT_INDEX}_"
+            f"{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}_"
+            f"{uuid4().hex[:8]}"
+        )
 
     print("OPC UA benchmark")
     print("Run ID:", run_id)
