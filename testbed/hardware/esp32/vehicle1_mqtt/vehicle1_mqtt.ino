@@ -18,6 +18,7 @@ unsigned long nextSendMs = 0;
 void connectWiFi() {
 
   WiFi.mode(WIFI_STA);
+  WiFi.setSleep(false);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
   Serial.print("Connecting Wi-Fi");
