@@ -241,49 +241,50 @@ def sample_process(args, elapsed_s, label, pattern):
 
 
 def read_docker_stats(container_names):
-    command = [
-        "docker",
-        "stats",
-        "--no-stream",
-        "--format",
-        "{{json .}}",
-    ]
-
-    # Ask Docker only for the containers used by this run.
-    # This avoids intermittent omissions seen when Docker Desktop
-    # scans every running container.
-    command.extend(container_names)
-
-    try:
-        result = subprocess.run(
-            command,
-            capture_output=True,
-            text=True,
-            timeout=15,
-            check=False,
-        )
-
-    except (FileNotFoundError, subprocess.TimeoutExpired):
-        return None
-
-    if result.returncode != 0:
-        return None
-
     records = []
 
-    for line in result.stdout.splitlines():
-        line = line.strip()
-
-        if not line:
-            continue
+    for container_name in container_names:
+        command = [
+            "docker",
+            "stats",
+            "--no-stream",
+            "--format",
+            "{{json .}}",
+            container_name,
+        ]
 
         try:
-            records.append(json.loads(line))
-        except json.JSONDecodeError:
+            result = subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                timeout=15,
+                check=False,
+            )
+
+        except (
+            FileNotFoundError,
+            subprocess.TimeoutExpired,
+        ):
             continue
 
-    return records
+        if result.returncode != 0:
+            continue
 
+        for line in result.stdout.splitlines():
+            line = line.strip()
+
+            if not line:
+                continue
+
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+
+            records.append(record)
+
+    return records
 
 def sample_containers(args, elapsed_s, container_targets):
     if not container_targets:
