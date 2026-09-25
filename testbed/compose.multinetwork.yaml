@@ -80,7 +80,7 @@ services:
       RUN_ID: multinetwork_c0
     command:
       - python
-      - testbed/vehicles/mqtt_publisher.py
+      - testbed/protocols/mqtt/mqtt_publisher.py
       - --duration
       - "10"
       - --rate

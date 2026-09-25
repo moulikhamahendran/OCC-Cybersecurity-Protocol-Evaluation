@@ -30,7 +30,7 @@ The configured MQTT username for C1 and C2 is `occuser`. Passwords are entered i
 The vehicle workload uses:
 
 - Python virtual environment: `~/occ-testbed/.venv`
-- Publisher: `~/occ-testbed/vehicles/mqtt_publisher.py`
+- Publisher: `~/occ-testbed/protocols/mqtt/mqtt_publisher.py`
 - Data generator: `~/occ-testbed/vehicles/data_generator.py`
 - MQTT dependency: `paho-mqtt`
 

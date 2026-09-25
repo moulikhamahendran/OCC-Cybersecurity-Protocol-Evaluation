@@ -14,7 +14,7 @@ TESTBED_DIR = Path(__file__).resolve().parents[1]
 PROJECT_DIR = TESTBED_DIR.parent
 
 GATEWAY_PATH = TESTBED_DIR / "gateway" / "mqtt_gateway.py"
-PUBLISHER_PATH = TESTBED_DIR / "vehicles" / "mqtt_publisher.py"
+PUBLISHER_PATH = TESTBED_DIR / "protocols" / "mqtt" / "mqtt_publisher.py"
 CA_CERT_PATH = TESTBED_DIR / "config" / "certs" / "ca.crt"
 
 RESULTS_DIR = TESTBED_DIR / "results"
