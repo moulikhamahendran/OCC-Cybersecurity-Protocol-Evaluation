@@ -1,5 +1,5 @@
 testbed/hardware/esp32/vehicle1_wifi_smoke/secrets.h
-testbed/hardware/esp32/vehicle1_mqtt/secrets.h
+testbed/hardware/esp32/mqtt/c0/secrets.h
 testbed/hardware/esp32/**/secrets.h
 
 # ESP32 generated/build artifacts
