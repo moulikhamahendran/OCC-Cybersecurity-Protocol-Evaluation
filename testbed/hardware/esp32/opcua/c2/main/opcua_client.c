@@ -12,9 +12,9 @@
 #include <math.h>
 #include "esp_system.h"
 
-static const char *TAG = "OPCUA_C1";
+static const char *TAG = "OPCUA_C2";
 
-#define OPCUA_ENDPOINT "opc.tcp://192.168.1.115:4841/occ/"
+#define OPCUA_ENDPOINT "opc.tcp://192.168.1.115:4842/occ/"
 
 
 /* Embedded C1 OPC UA certificates/keys */
@@ -173,8 +173,8 @@ void opcua_c0_test(void)
         return;
     }
 
-    /* C1 = Basic256Sha256 + Sign */
-    config->securityMode = UA_MESSAGESECURITYMODE_SIGN;
+    /* C2 = Basic256Sha256 + SignAndEncrypt */
+    config->securityMode = UA_MESSAGESECURITYMODE_SIGNANDENCRYPT;
 
     UA_String_clear(&config->securityPolicyUri);
     config->securityPolicyUri =
@@ -376,7 +376,7 @@ void opcua_c0_test(void)
         ((double)failed / TOTAL_SAMPLES) * 100.0;
 
     ESP_LOGI(TAG, "");
-    ESP_LOGI(TAG, "=========== C0 RESULT ===========");
+    ESP_LOGI(TAG, "=========== C2 RESULT ===========");
     ESP_LOGI(TAG, "Attempted       : %d", TOTAL_SAMPLES);
     ESP_LOGI(TAG, "Successful      : %u", successful);
     ESP_LOGI(TAG, "Failed          : %u", failed);

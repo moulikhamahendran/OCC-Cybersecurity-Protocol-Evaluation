@@ -140227,11 +140227,17 @@ UA_DateTime_nowMonotonic(void) {
 
 #include <FreeRTOS.h>
 #include <task.h>
+#include <sys/time.h>
 
 /* The current time in UTC time */
 UA_DateTime UA_DateTime_now(void) {
-    UA_DateTime microSeconds = ((UA_DateTime)xTaskGetTickCount()) * (1000000 / configTICK_RATE_HZ);
-    return ((microSeconds / 1000000) * UA_DATETIME_SEC) + ((microSeconds % 1000000) * UA_DATETIME_USEC) + UA_DATETIME_UNIX_EPOCH;
+    struct timeval tv;
+    if(gettimeofday(&tv, NULL) != 0)
+        return UA_DATETIME_UNIX_EPOCH;
+
+    return UA_DATETIME_UNIX_EPOCH +
+           ((UA_DateTime)tv.tv_sec * UA_DATETIME_SEC) +
+           ((UA_DateTime)tv.tv_usec * UA_DATETIME_USEC);
 }
 
 /* Offset between local time and UTC time */
