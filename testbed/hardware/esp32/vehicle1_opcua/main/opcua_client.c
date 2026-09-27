@@ -1,4 +1,5 @@
 #include "opcua_client.h"
+#include "secrets.h"
 
 #include "open62541.h"
 #include "esp_log.h"
@@ -9,10 +10,28 @@
 
 #include <sys/time.h>
 #include <math.h>
+#include "esp_system.h"
 
-static const char *TAG = "OPCUA_C0";
+static const char *TAG = "OPCUA_C1";
 
-#define OPCUA_ENDPOINT "opc.tcp://192.168.1.115:4840/occ/"
+#define OPCUA_ENDPOINT "opc.tcp://192.168.1.115:4841/occ/"
+
+
+/* Embedded C1 OPC UA certificates/keys */
+extern const uint8_t esp32_client_cert_der_start[]
+    asm("_binary_esp32_client_cert_der_start");
+extern const uint8_t esp32_client_cert_der_end[]
+    asm("_binary_esp32_client_cert_der_end");
+
+extern const uint8_t esp32_client_key_der_start[]
+    asm("_binary_esp32_client_key_der_start");
+extern const uint8_t esp32_client_key_der_end[]
+    asm("_binary_esp32_client_key_der_end");
+
+extern const uint8_t server_cert_der_start[]
+    asm("_binary_server_cert_der_start");
+extern const uint8_t server_cert_der_end[]
+    asm("_binary_server_cert_der_end");
 
 #define TEST_DURATION_SECONDS 60
 #define SAMPLE_RATE_HZ 10
@@ -94,7 +113,7 @@ static UA_StatusCode write_u64(
 void opcua_c0_test(void)
 {
     ESP_LOGI(TAG, "====================================");
-    ESP_LOGI(TAG, "OPC UA C0 60-SECOND HARDWARE CAMPAIGN");
+    ESP_LOGI(TAG, "OPC UA C1 60-SECOND HARDWARE CAMPAIGN");
     ESP_LOGI(TAG, "Rate: %d Hz", SAMPLE_RATE_HZ);
     ESP_LOGI(TAG, "Expected samples: %d", TOTAL_SAMPLES);
     ESP_LOGI(TAG, "====================================");
@@ -106,12 +125,90 @@ void opcua_c0_test(void)
         return;
     }
 
-    UA_ClientConfig_setDefault(
-        UA_Client_getConfig(client)
+    UA_ClientConfig *config = UA_Client_getConfig(client);
+
+    UA_ByteString client_cert = {
+        .length = (size_t)(esp32_client_cert_der_end -
+                           esp32_client_cert_der_start),
+        .data = (UA_Byte *)esp32_client_cert_der_start
+    };
+
+    UA_ByteString client_key = {
+        .length = (size_t)(esp32_client_key_der_end -
+                           esp32_client_key_der_start),
+        .data = (UA_Byte *)esp32_client_key_der_start
+    };
+
+    UA_ByteString server_cert = {
+        .length = (size_t)(server_cert_der_end -
+                           server_cert_der_start),
+        .data = (UA_Byte *)server_cert_der_start
+    };
+
+    UA_StatusCode rc;
+
+    ESP_LOGI(TAG, "HEAP before encryption: %lu",
+             (unsigned long)esp_get_free_heap_size());
+
+    rc = UA_ClientConfig_setDefaultEncryption(
+        config,
+        client_cert,
+        client_key,
+        &server_cert,
+        1,
+        NULL,
+        0
     );
 
-    UA_StatusCode rc =
-        UA_Client_connect(client, OPCUA_ENDPOINT);
+    ESP_LOGI(TAG, "HEAP after encryption: %lu",
+             (unsigned long)esp_get_free_heap_size());
+
+    if (rc != UA_STATUSCODE_GOOD) {
+        ESP_LOGE(
+            TAG,
+            "C1 encryption config failed: %s",
+            UA_StatusCode_name(rc)
+        );
+        UA_Client_delete(client);
+        return;
+    }
+
+    /* C1 = Basic256Sha256 + Sign */
+    config->securityMode = UA_MESSAGESECURITYMODE_SIGN;
+
+    UA_String_clear(&config->securityPolicyUri);
+    config->securityPolicyUri =
+        UA_STRING_ALLOC(
+            "http://opcfoundation.org/UA/SecurityPolicy#Basic256Sha256"
+        );
+
+    /* Must match ESP32 certificate URI */
+    UA_String_clear(&config->clientDescription.applicationUri);
+    config->clientDescription.applicationUri =
+        UA_STRING_ALLOC(
+            "urn:ovgu:occ:opcua:c1:esp32"
+        );
+
+    rc = UA_ClientConfig_setAuthenticationUsername(
+        config,
+        OPCUA_USERNAME,
+        OPCUA_PASSWORD
+    );
+
+    if (rc != UA_STATUSCODE_GOOD) {
+        ESP_LOGE(
+            TAG,
+            "C1 username configuration failed: %s",
+            UA_StatusCode_name(rc)
+        );
+        UA_Client_delete(client);
+        return;
+    }
+
+    ESP_LOGI(TAG, "HEAP before connect: %lu",
+             (unsigned long)esp_get_free_heap_size());
+
+    rc = UA_Client_connect(client, OPCUA_ENDPOINT);
 
     if (rc != UA_STATUSCODE_GOOD) {
         ESP_LOGE(
@@ -124,7 +221,7 @@ void opcua_c0_test(void)
         return;
     }
 
-    ESP_LOGI(TAG, "OPC UA C0 CONNECTED");
+    ESP_LOGI(TAG, "OPC UA C1 SECURE CONNECTED");
 
     unsigned successful = 0;
     unsigned failed = 0;
