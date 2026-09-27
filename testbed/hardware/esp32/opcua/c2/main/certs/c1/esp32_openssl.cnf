@@ -1,0 +1,21 @@
+[req]
+distinguished_name = dn
+x509_extensions = v3_req
+prompt = no
+
+[dn]
+C = DE
+ST = Saxony-Anhalt
+L = Magdeburg
+O = OVGU
+OU = OCC-Testbed
+CN = vehicle1-esp32
+
+[v3_req]
+basicConstraints = CA:FALSE
+keyUsage = digitalSignature, keyEncipherment
+extendedKeyUsage = clientAuth
+subjectAltName = @alt_names
+
+[alt_names]
+URI.1 = urn:ovgu:occ:opcua:c1:esp32

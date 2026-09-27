@@ -1,0 +1,4 @@
+
+# OPC UA local private keys
+main/certs/c1/*_key.pem
+main/certs/c1/*_key.der

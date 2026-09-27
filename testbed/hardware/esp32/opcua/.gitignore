@@ -1,0 +1,18 @@
+# Local credentials
+*/main/secrets.h
+
+# OPC UA private keys
+*/main/certs/**/*_key.pem
+*/main/certs/**/*_key.der
+
+# ESP-IDF/generated output
+*/build/
+*/open62541_gen/
+
+# Local debug/backup files
+*.c.*-backup
+*.c.*-current
+*.c.*-debug
+*.pre-*
+sdkconfig.*-backup
+sdkconfig.pre-*
