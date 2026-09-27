@@ -1,0 +1,5 @@
+repeat,attempted,successful,failed,duration_s,mean_rtt_ms,mean_jitter_ms,throughput_hz,loss_percent
+1,600,600,0,59.994,86.835,46.249,10.001,0.000
+2,600,600,0,60.145,93.911,56.194,9.976,0.000
+3,600,600,0,60.160,91.659,45.398,9.973,0.000
+average,1800,1800,0,60.100,90.802,49.280,9.983,0.000
