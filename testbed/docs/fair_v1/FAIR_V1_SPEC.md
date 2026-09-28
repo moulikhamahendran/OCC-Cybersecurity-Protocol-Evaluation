@@ -372,8 +372,16 @@ Current intended baseline:
 - QoS 1
 - broker/OCC path hosted on Raspberry Pi 5
 - Raspberry Pi OCC application performs the application echo
+- formal ESP32 MQTT implementation uses ESP-MQTT
+- scheduled publication uses `esp_mqtt_client_enqueue()` so broker acknowledgement handling does not block the absolute FAIR-V1 scheduler
 
-Existing PUBACK timing is diagnostic only and is not FAIR-V1 application RTT.
+For MQTT, `t_send_us` is captured immediately before `esp_mqtt_client_enqueue()`.
+
+A non-negative `message_id` returned by `esp_mqtt_client_enqueue()` is the MQTT protocol-stack submission-success boundary for `send_status` accounting. Return values `-1` and `-2` are `send_failed`. Successful enqueue does not assert that bytes have already reached the network; actual transmission is performed later in the MQTT task context.
+
+`MQTT_EVENT_PUBLISHED` with the corresponding `message_id` is recorded as a protocol-native publication acknowledgement diagnostic only. It is not the FAIR-V1 application acknowledgement and is not used for primary application RTT.
+
+The Raspberry Pi OCC application echo remains the FAIR-V1 primary application measurement endpoint.
 
 Exact broker version/configuration must be recorded in run metadata.
 
