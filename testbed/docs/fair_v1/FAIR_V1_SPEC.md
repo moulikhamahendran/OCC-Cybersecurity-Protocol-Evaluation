@@ -305,15 +305,48 @@ Handshake/setup time should be measured separately where possible.
 
 ## 16. Common Logical Payload
 
-All three protocols must carry the same logical application information.
+FAIR-V1 payload schema version:
 
+- v0.1
+
+Each protocol carries the same logical telemetry information.
 Protocol-native encoding is allowed.
 
 Artificial padding solely to force equal byte size is not allowed.
 
-Actual transmitted/application payload size must be logged where measurable.
+Actual payload/message size must be logged where measurable.
 
-EXACT LOGICAL PAYLOAD SCHEMA: UNRESOLVED - BLOCKS FREEZE
+The formal logical telemetry schema is:
+
+| Field | Type | Definition |
+|---|---|---|
+| `schema_ver` | string | Fixed value `"0.1"` |
+| `serialNumber` | string | Vehicle identity, e.g. `VM-001` |
+| `seq` | uint32 | Single FAIR-V1 sequence field; 0 through 599 |
+| `t_sched_us` | int64 | Scheduled slot time from the ESP32 monotonic clock |
+| `speed` | float32 | Benchmark telemetry field |
+| `pos_x` | float32 | Benchmark position X field |
+| `pos_y` | float32 | Benchmark position Y field |
+| `heading` | float32 | Benchmark heading field |
+| `battery_pct` | float32 | Benchmark battery percentage field |
+| `state` | enum/string | Benchmark vehicle state field |
+
+Rules:
+
+- `seq` is the only application sequence identifier used by FAIR-V1.
+- `headerId` must not be added as a second sequence field.
+- Run metadata such as `run_id`, protocol, profile, stage, environment,
+  firmware hash and toolchain information remains outside the telemetry message.
+- `t_send_us`, `t_ack_rx_us`, `t_occ_rx_us` and `t_occ_tx_us` are measurement
+  timestamps and are not additional logical telemetry fields.
+- Each protocol may use its native encoding for this logical schema.
+- No artificial payload padding is used.
+- Actual payload/message size is recorded so encoding overhead can be analysed.
+- The schema is not retroactively changed when the later tugger/ROS 2 integration
+  introduces real vehicle fields.
+- Such a change requires a new schema version and a separately labelled dataset.
+
+FREEZE BLOCKER 1 STATUS: RESOLVED
 
 ## 17. Protocol Transport Requirements
 
