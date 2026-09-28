@@ -21,3 +21,24 @@ config/opcua/certs/*
 
 # Generated DDS Security credentials
 config/dds/security/
+
+# FAIR-V1 results
+# Raw run data remains local/ignored.
+# Only directories and explicitly named authoritative artifacts are trackable.
+!results/fair_v1/
+results/fair_v1/**
+!results/fair_v1/**/
+!results/fair_v1/**/.gitkeep
+!results/fair_v1/**/*_summary.csv
+!results/fair_v1/**/*_manifest.csv
+!results/fair_v1/**/*.md
+
+# Small pre-FAIR hardware comparison evidence
+!results/hardware/
+!results/hardware/cross_protocol_pilot/
+!results/hardware/cross_protocol_pilot/*.csv
+
+# Keep other historical hardware result directories ignored
+results/hardware/**
+!results/hardware/cross_protocol_pilot/
+!results/hardware/cross_protocol_pilot/*.csv

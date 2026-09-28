@@ -8,3 +8,50 @@ testbed/hardware/esp32/vehicle1_opcua/open62541_gen/
 .venv-dds-security/
 testbed/hardware/esp32/**/build/
 testbed/hardware/esp32/dds/vehicle1/main/secrets.h
+
+# ============================================================
+# FAIR-V1 repository hygiene
+# ============================================================
+
+# Local audit/output files
+repo_full_audit.txt
+
+# macOS / Python
+.DS_Store
+**/.DS_Store
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+*.pyc
+
+# Local environments
+.venv/
+.venv-*/
+**/.venv/
+
+# Environment / credential files
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Passwords and local secrets
+**/secrets.h
+**/password_file
+**/password_file.*
+**/*_password
+**/*_password.*
+
+# Private key material — certificates may remain versioned separately
+*.key
+**/*_key.pem
+**/*_key.der
+**/private/
+
+# ESP32 build/generated output
+testbed/hardware/esp32/**/build/
+testbed/hardware/esp32/**/open62541_gen/
+
+# Mutable runtime aggregate outputs
+testbed/results/events.csv
+testbed/results/kpi_stream.csv

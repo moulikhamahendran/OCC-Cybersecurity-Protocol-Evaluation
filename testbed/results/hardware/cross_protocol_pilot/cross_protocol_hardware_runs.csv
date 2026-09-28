@@ -1,0 +1,28 @@
+protocol,security_profile,repeat,timing_metric,timing_scope,mean_timing_ms,mean_jitter_ms,throughput_msg_s,expected_messages,received_messages,loss_percent,source
+MQTT,C0,1,ACK_RTT,round_trip,37.167086466165415,40.90215254237288,8.765529115182776,600,532,11.333333333333332,esp32_c0_formal_repeat_1_20260924T181638Z.csv
+MQTT,C0,2,ACK_RTT,round_trip,38.51172038834952,48.4764280155642,8.612718637416402,600,515,14.166666666666666,esp32_c0_formal_repeat_2_20260924T181839Z.csv
+MQTT,C0,3,ACK_RTT,round_trip,28.53353202846975,28.014579322638145,9.354487902957676,600,562,6.333333333333334,esp32_c0_formal_repeat_3_20260924T182046Z.csv
+MQTT,C1,1,ACK_RTT,round_trip,37.43465067178503,45.760475,8.687804222182805,600,521,13.166666666666666,esp32_c1_formal_repeat_1_20260924T183627Z.csv
+MQTT,C1,2,ACK_RTT,round_trip,33.621042830540034,37.32493097014925,8.948032774994418,600,537,10.5,esp32_c1_formal_repeat_2_20260924T183843Z.csv
+MQTT,C1,3,ACK_RTT,round_trip,35.68436501901141,43.02408571428571,8.766598141091198,600,526,12.333333333333334,esp32_c1_formal_repeat_3_20260924T184015Z.csv
+MQTT,C2,1,ACK_RTT,round_trip,11.363921666666666,4.7775225375626045,9.990287608891428,600,600,0.0,esp32_c2_formal_repeat_1_20260924T190442Z.csv
+MQTT,C2,2,ACK_RTT,round_trip,13.725500837520938,8.162087248322148,9.94580055148048,600,597,0.5,esp32_c2_formal_repeat_2_20260924T205944Z.csv
+MQTT,C2,3,ACK_RTT,round_trip,16.098246551724138,11.36652677029361,9.6680504869597,600,580,3.3333333333333335,esp32_c2_formal_repeat_3_20260924T210159Z.csv
+OPC UA,C0,1,REQUEST_RESPONSE_RTT,round_trip,86.835,46.249,10.001,600,600,0.0,testbed/results/hardware/opcua/c0/summary.csv
+OPC UA,C0,2,REQUEST_RESPONSE_RTT,round_trip,93.911,56.194,9.976,600,600,0.0,testbed/results/hardware/opcua/c0/summary.csv
+OPC UA,C0,3,REQUEST_RESPONSE_RTT,round_trip,91.659,45.398,9.973,600,600,0.0,testbed/results/hardware/opcua/c0/summary.csv
+OPC UA,C1,1,REQUEST_RESPONSE_RTT,round_trip,84.594,31.372,10.0,600,600,0.0,testbed/results/hardware/opcua/c1/summary.csv
+OPC UA,C1,2,REQUEST_RESPONSE_RTT,round_trip,87.628,37.141,10.002,600,600,0.0,testbed/results/hardware/opcua/c1/summary.csv
+OPC UA,C1,3,REQUEST_RESPONSE_RTT,round_trip,96.537,45.886,10.0,600,600,0.0,testbed/results/hardware/opcua/c1/summary.csv
+OPC UA,C2,1,REQUEST_RESPONSE_RTT,round_trip,92.175,38.816,9.95,600,600,0.0,testbed/results/hardware/opcua/c2/summary.csv
+OPC UA,C2,2,REQUEST_RESPONSE_RTT,round_trip,89.253,28.819,9.955,600,600,0.0,testbed/results/hardware/opcua/c2/summary.csv
+OPC UA,C2,3,REQUEST_RESPONSE_RTT,round_trip,97.112,35.551,9.928,600,600,0.0,testbed/results/hardware/opcua/c2/summary.csv
+DDS,C0,1,CLOCK_CORRECTED_ONE_WAY,one_way,8.023,4.631,10.0,600,600,0.0,testbed/hardware/esp32/dds/dds_hardware_net_ideal_summary.csv
+DDS,C0,2,CLOCK_CORRECTED_ONE_WAY,one_way,7.678,4.454,10.0,600,600,0.0,testbed/hardware/esp32/dds/dds_hardware_net_ideal_summary.csv
+DDS,C0,3,CLOCK_CORRECTED_ONE_WAY,one_way,7.641,4.343,10.0,600,600,0.0,testbed/hardware/esp32/dds/dds_hardware_net_ideal_summary.csv
+DDS,C1,1,CLOCK_CORRECTED_ONE_WAY,one_way,8.54,5.681,10.0,600,600,0.0,testbed/hardware/esp32/dds/dds_hardware_net_ideal_summary.csv
+DDS,C1,2,CLOCK_CORRECTED_ONE_WAY,one_way,8.662,5.208,10.0,600,600,0.0,testbed/hardware/esp32/dds/dds_hardware_net_ideal_summary.csv
+DDS,C1,3,CLOCK_CORRECTED_ONE_WAY,one_way,8.059,5.2,10.0,600,600,0.0,testbed/hardware/esp32/dds/dds_hardware_net_ideal_summary.csv
+DDS,C2,1,CLOCK_CORRECTED_ONE_WAY,one_way,8.024,4.856,10.0,600,600,0.0,testbed/hardware/esp32/dds/dds_hardware_net_ideal_summary.csv
+DDS,C2,2,CLOCK_CORRECTED_ONE_WAY,one_way,14.581,15.966,10.0,600,600,0.0,testbed/hardware/esp32/dds/dds_hardware_net_ideal_summary.csv
+DDS,C2,3,CLOCK_CORRECTED_ONE_WAY,one_way,7.909,4.226,10.0,600,600,0.0,testbed/hardware/esp32/dds/dds_hardware_net_ideal_summary.csv

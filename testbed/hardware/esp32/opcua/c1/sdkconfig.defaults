@@ -1,0 +1,5 @@
+# FAIR-V1 common ESP32 OPC UA configuration
+# Keep protocol profiles identical except for intended security settings.
+
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=16384
+CONFIG_MAIN_TASK_STACK_SIZE=16384
