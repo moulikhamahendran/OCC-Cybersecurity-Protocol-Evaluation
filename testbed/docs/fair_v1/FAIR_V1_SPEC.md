@@ -374,14 +374,32 @@ Current intended baseline:
 - Raspberry Pi OCC application performs the application echo
 - formal telemetry topic: `fair/v1/VM-001/telemetry`
 - formal application-echo topic: `fair/v1/VM-001/echo`
-- formal ESP32 MQTT implementation uses ESP-MQTT
+- formal ESP32 MQTT implementation uses native ESP-IDF project structure and ESP-MQTT
 - scheduled publication uses `esp_mqtt_client_enqueue()` so broker acknowledgement handling does not block the absolute FAIR-V1 scheduler
+
+The previously audited Arduino `.ino` firmware using ArduinoMqttClient is pilot/non-formal code and is not the FAIR-V1 formal MQTT implementation.
 
 For MQTT, `t_send_us` is captured immediately before `esp_mqtt_client_enqueue()`.
 
-A non-negative `message_id` returned by `esp_mqtt_client_enqueue()` is the MQTT protocol-stack submission-success boundary for `send_status` accounting. Return values `-1` and `-2` are `send_failed`. Successful enqueue does not assert that bytes have already reached the network; actual transmission is performed later in the MQTT task context.
+A non-negative `message_id` returned by `esp_mqtt_client_enqueue()` is the MQTT protocol-stack submission-success boundary. For MQTT, `sent_messages` increments only for such non-negative returns. This means accepted for asynchronous protocol-stack transmission; it does not assert that bytes have already reached the network.
+
+MQTT enqueue failure classification is:
+
+- return `-1`: `send_status = send_failed`, `send_failure_reason = enqueue_error`, `mqtt_enqueue_rc = -1`
+- return `-2`: `send_status = send_failed`, `send_failure_reason = outbox_full`, `mqtt_enqueue_rc = -2`
+
+`outbox_full` does not create a new cross-protocol `send_status`; it is retained as an MQTT-specific diagnostic cause of `send_failed`.
+
+Because actual network transmission occurs later in the MQTT task context, MQTT application RTT measured from `t_send_us` can include MQTT outbox residence/queueing time in addition to transport, OCC processing, and echo-return time. This MQTT-specific API-boundary asymmetry must be reported explicitly in cross-protocol analysis and must not be described as pure wire RTT.
 
 `MQTT_EVENT_PUBLISHED` with the corresponding `message_id` is recorded as a protocol-native publication acknowledgement diagnostic only. It is not the FAIR-V1 application acknowledgement and is not used for primary application RTT.
+
+The FAIR-V1 MQTT application echo is a separate application message type and is not an instance of the FAIR-V1 telemetry schema. Its JSON object contains exactly:
+
+- `serialNumber`: copied unchanged from the received telemetry message
+- `seq`: copied unchanged from the received telemetry message
+
+The MQTT application echo does not contain `schema_ver` or any other telemetry fields.
 
 The Raspberry Pi OCC application echo remains the FAIR-V1 primary application measurement endpoint.
 
