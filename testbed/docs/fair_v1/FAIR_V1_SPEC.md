@@ -372,6 +372,8 @@ Current intended baseline:
 - QoS 1
 - broker/OCC path hosted on Raspberry Pi 5
 - Raspberry Pi OCC application performs the application echo
+- formal telemetry topic: `fair/v1/VM-001/telemetry`
+- formal application-echo topic: `fair/v1/VM-001/echo`
 - formal ESP32 MQTT implementation uses ESP-MQTT
 - scheduled publication uses `esp_mqtt_client_enqueue()` so broker acknowledgement handling does not block the absolute FAIR-V1 scheduler
 
