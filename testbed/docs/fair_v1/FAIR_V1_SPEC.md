@@ -124,6 +124,11 @@ A skipped sequence has:
 - no t_ack_rx
 - echo_status = not_applicable
 
+A `send_failed` sequence has `echo_status = not_applicable` and no `t_ack_rx_us` value.
+
+`lateness_us` is recorded for every transmitted slot (`on_time` and `late` alike),
+not only for slots classified `late`.
+
 Allowed skip_reason values:
 
 - none
@@ -210,6 +215,12 @@ Sequence numbering remains tied to the original run schedule.
 Messages whose slots pass while disconnected are classified according to the formal
 skip/failure rules rather than transmitted later in a catch-up burst.
 
+A slot whose `t_sched` elapses while disconnected is classified `skipped` with
+`skip_reason = reconnect` if no transmit call was attempted before expiry.
+
+If a transmit call was attempted and the client API returned failure, the slot is
+`send_failed` instead, regardless of connection state.
+
 A new experimental repeat starts a new run and resets sequence numbering to 0.
 
 ## 11. Formal Repeat Structure
@@ -271,11 +282,15 @@ Each valid repeat must report, where applicable:
 
 Achieved rate:
 
+`sent_messages` increments only when the protocol transmit call is issued and its
+return value indicates success. This reflects the library's return value, not
+delivery or broker/server acknowledgement.
+
 achieved_rate = sent_messages / scheduled_messages
 
-Runs below 95% achieved rate must be explicitly flagged.
-
-The exact validity consequence of this flag is not yet frozen.
+A run with `achieved_rate < 95%` is marked `FLAGGED`. A flagged run is retained
+in raw data, included in reporting, explicitly labeled, and investigated — never
+deleted or silently excluded.
 
 ## 14. Aggregate Statistics
 
@@ -369,6 +384,9 @@ Current intended baseline:
 - persistent OPC UA session
 - Raspberry Pi 5 hosts the OCC-side OPC UA service
 - application-level echo semantics must match the common FAIR boundary
+
+If subscriptions are used for the application echo, `sampling_interval = 10 ms`
+and `publishing_interval = 10 ms`, identical across C0, C1, and C2.
 
 Previous multi-operation write/read transaction timing is not accepted as
 the FAIR-V1 common latency metric.
