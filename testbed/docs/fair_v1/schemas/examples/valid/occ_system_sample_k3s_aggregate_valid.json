@@ -1,0 +1,37 @@
+{
+  "sample_id": "sample-k3s-001",
+  "run_id": "draft-run-k3s-r1",
+  "sample_time_us": 9000000,
+  "clock_domain": "pi_monotonic",
+  "sampling_scope": "service-aggregate",
+  "workload_id": "mqtt-service-aggregate",
+  "service_id": "mqtt_broker",
+  "host_id": "PI5_OCC",
+  "process_identity": null,
+  "container_identity": null,
+  "pod_identity": null,
+  "cpu_usage_cores": 0.4,
+  "cpu_capacity_cores": null,
+  "memory_used_bytes": 70000000,
+  "active_connections": 1,
+  "queue_depth": null,
+  "measurement_window_us": 1000000,
+  "aggregation_definition": "Per-metric aggregation methods recorded explicitly.",
+  "dataset_schema_version": "1.0",
+  "scope_instance_id": "mqtt-service-aggregate",
+  "metric_aggregation_methods": {
+    "cpu_usage_cores": "sum",
+    "cpu_capacity_cores": "not_applicable",
+    "memory_used_bytes": "sum",
+    "active_connections": "sum",
+    "queue_depth": "not_applicable"
+  },
+  "aggregation_member_scope": "pod",
+  "aggregation_member_ids": [
+    "mqtt-pod-a",
+    "mqtt-pod-b"
+  ],
+  "collector_name": "DRAFT-COLLECTOR",
+  "collector_version": "DRAFT-VERSION",
+  "collection_method": "DRAFT-METHOD"
+}

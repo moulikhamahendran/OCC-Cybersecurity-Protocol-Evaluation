@@ -1,0 +1,16 @@
+{
+  "event_id": "occ-event-001",
+  "run_id": "draft-run-v1-native-r1",
+  "serialNumber": "VM-001",
+  "seq": 123,
+  "protocol": "mqtt",
+  "event_type": "occ_rx",
+  "event_time_us": 8300000,
+  "clock_domain": "pi_monotonic",
+  "service_id": "fair_echo",
+  "protocol_correlation": {
+    "draft": true
+  },
+  "dataset_schema_version": "1.0",
+  "event_source_layer": "broker_plugin"
+}

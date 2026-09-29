@@ -1,0 +1,17 @@
+{
+  "event_id": "mw-event-001",
+  "run_id": "draft-run-middleware-attack-r1",
+  "event_time_us": 9000000,
+  "clock_domain": "pi_monotonic",
+  "middleware_mode": "enforce",
+  "rule_id": "rule-draft-1",
+  "target_hardware_unit_id": "ESP32_1",
+  "target_serialNumber": "VM-001",
+  "action_taken": "flag",
+  "confidence": 0.9,
+  "severity": "draft",
+  "attack_type_detected": "flood",
+  "seq": 123,
+  "recovery_detected_at_us": null,
+  "dataset_schema_version": "1.0"
+}

@@ -1,0 +1,25 @@
+{
+  "event_id": "attack-event-001",
+  "run_id": "draft-run-attack-native-r1",
+  "attack_id": "attack-001",
+  "event_type": "attack_start",
+  "event_source": "attacker",
+  "event_time_us": 3000000,
+  "clock_domain": "esp32_3_monotonic",
+  "attacker_hardware_unit_id": "ESP32_3",
+  "attacker_serialNumber": null,
+  "target_hardware_unit_ids": [
+    "ESP32_1"
+  ],
+  "target_serialNumbers": [
+    "VM-001"
+  ],
+  "protocol": "mqtt",
+  "observed_or_generated_count": null,
+  "observed_or_generated_rate_hz": 100.0,
+  "dataset_schema_version": "1.0",
+  "aligned_occ_time_us": null,
+  "aligned_clock_domain": null,
+  "alignment_method": "none",
+  "alignment_uncertainty_us": null
+}

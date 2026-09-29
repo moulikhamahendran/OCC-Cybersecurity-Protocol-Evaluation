@@ -1,0 +1,398 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fair-v1:schema:occ-system-sample:draft",
+  "title": "FAIR-V1 OCC System Sample - DRAFT",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "sample_id",
+    "run_id",
+    "sample_time_us",
+    "clock_domain",
+    "sampling_scope",
+    "workload_id",
+    "service_id",
+    "host_id",
+    "process_identity",
+    "container_identity",
+    "pod_identity",
+    "cpu_usage_cores",
+    "cpu_capacity_cores",
+    "memory_used_bytes",
+    "active_connections",
+    "queue_depth",
+    "measurement_window_us",
+    "aggregation_definition",
+    "dataset_schema_version",
+    "scope_instance_id",
+    "collector_name",
+    "collector_version",
+    "collection_method",
+    "metric_aggregation_methods",
+    "aggregation_member_scope",
+    "aggregation_member_ids"
+  ],
+  "properties": {
+    "sample_id": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "sample_time_us": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "clock_domain": {
+      "type": "string"
+    },
+    "sampling_scope": {
+      "enum": [
+        "host",
+        "process",
+        "container",
+        "pod",
+        "service-aggregate"
+      ]
+    },
+    "workload_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "service_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "host_id": {
+      "type": "string"
+    },
+    "process_identity": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "container_identity": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "pod_identity": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "cpu_usage_cores": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "CPU consumption expressed in cores over measurement_window_us."
+    },
+    "cpu_capacity_cores": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0,
+      "description": "Effective CPU capacity/limit assigned to the sampled scope. Null when no meaningful explicit capacity is available."
+    },
+    "memory_used_bytes": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "active_connections": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "queue_depth": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "measurement_window_us": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "aggregation_definition": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "dataset_schema_version": {
+      "const": "1.0"
+    },
+    "scope_instance_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identity of the exact measured scope: host, process, container, pod, or explicitly constructed service aggregate."
+    },
+    "collector_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "collector_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "collection_method": {
+      "type": "string",
+      "minLength": 1
+    },
+    "metric_aggregation_methods": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "cpu_usage_cores",
+            "cpu_capacity_cores",
+            "memory_used_bytes",
+            "active_connections",
+            "queue_depth"
+          ],
+          "properties": {
+            "cpu_usage_cores": {
+              "enum": [
+                "sum",
+                "mean",
+                "max",
+                "min",
+                "custom",
+                "not_applicable"
+              ]
+            },
+            "cpu_capacity_cores": {
+              "enum": [
+                "sum",
+                "mean",
+                "max",
+                "min",
+                "custom",
+                "not_applicable"
+              ]
+            },
+            "memory_used_bytes": {
+              "enum": [
+                "sum",
+                "mean",
+                "max",
+                "min",
+                "custom",
+                "not_applicable"
+              ]
+            },
+            "active_connections": {
+              "enum": [
+                "sum",
+                "mean",
+                "max",
+                "min",
+                "custom",
+                "not_applicable"
+              ]
+            },
+            "queue_depth": {
+              "enum": [
+                "sum",
+                "mean",
+                "max",
+                "min",
+                "custom",
+                "not_applicable"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "aggregation_member_scope": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "process",
+        "container",
+        "pod",
+        "workload",
+        "mixed",
+        null
+      ]
+    },
+    "aggregation_member_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "sampling_scope": {
+            "const": "service-aggregate"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "metric_aggregation_methods": {
+            "type": "object"
+          },
+          "aggregation_member_scope": {
+            "enum": [
+              "process",
+              "container",
+              "pod",
+              "workload",
+              "mixed"
+            ]
+          },
+          "aggregation_member_ids": {
+            "type": "array",
+            "minItems": 1
+          },
+          "aggregation_definition": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "sampling_scope": {
+            "enum": [
+              "host",
+              "process",
+              "container",
+              "pod"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "metric_aggregation_methods": {
+            "type": "null"
+          },
+          "aggregation_member_scope": {
+            "type": "null"
+          },
+          "aggregation_member_ids": {
+            "maxItems": 0
+          },
+          "aggregation_definition": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "sampling_scope": {
+            "const": "process"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "workload_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "process_identity": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "sampling_scope": {
+            "const": "container"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "workload_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "container_identity": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "sampling_scope": {
+            "const": "pod"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "workload_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "pod_identity": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  ],
+  "description": "OCC resource sample with explicit measurement scope. Host, process, container, pod, and service-aggregate samples must never be interpreted as identical scopes."
+}

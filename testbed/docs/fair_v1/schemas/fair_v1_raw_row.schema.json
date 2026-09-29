@@ -1,0 +1,375 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fair-v1:schema:raw-row:draft",
+  "title": "FAIR-V1 Raw Vehicle Row - DRAFT",
+  "description": "FAIR-V1 legitimate vehicle-side scheduled-slot row. Pi/OCC timestamps are intentionally excluded.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "dataset_schema_version",
+    "run_id",
+    "serialNumber",
+    "hardware_unit_id",
+    "vehicle_role",
+    "seq",
+    "active_vehicle_count",
+    "concurrency_mode",
+    "t_sched_us",
+    "t_send_us",
+    "t_ack_rx_us",
+    "lateness_us",
+    "send_status",
+    "send_failure_reason",
+    "echo_status",
+    "skip_reason",
+    "payload_schema_version",
+    "application_payload_size_bytes",
+    "encoded_message_size_bytes",
+    "attack_window_active",
+    "attack_id",
+    "warmup_excluded_from_latency_stats",
+    "active_attacker_count"
+  ],
+  "properties": {
+    "dataset_schema_version": {
+      "const": "1.0"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "serialNumber": {
+      "type": "string"
+    },
+    "hardware_unit_id": {
+      "type": "string"
+    },
+    "vehicle_role": {
+      "enum": [
+        "legitimate",
+        "attacker"
+      ]
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 599
+    },
+    "active_vehicle_count": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 2,
+      "description": "Active legitimate FAIR vehicles only."
+    },
+    "concurrency_mode": {
+      "enum": [
+        "single_legitimate",
+        "dual_legitimate",
+        "legitimate_plus_attacker",
+        "dual_legitimate_plus_attacker"
+      ]
+    },
+    "t_sched_us": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "t_send_us": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "t_ack_rx_us": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "lateness_us": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "send_status": {
+      "enum": [
+        "on_time",
+        "late",
+        "skipped",
+        "send_failed"
+      ]
+    },
+    "send_failure_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "echo_status": {
+      "enum": [
+        "ok",
+        "timeout",
+        "late_echo",
+        "not_applicable"
+      ]
+    },
+    "skip_reason": {
+      "enum": [
+        "none",
+        "scheduler_overrun",
+        "reconnect"
+      ]
+    },
+    "payload_schema_version": {
+      "type": "string"
+    },
+    "application_payload_size_bytes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "encoded_message_size_bytes": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "attack_window_active": {
+      "type": "boolean",
+      "description": "True when this legitimate vehicle row falls inside the planned sequence-based attack analysis window. It does not by itself prove that attacker traffic was physically observed at that exact instant."
+    },
+    "attack_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Attack configuration identifier when attack_window_active is true."
+    },
+    "warmup_excluded_from_latency_stats": {
+      "type": "boolean",
+      "description": "True only for seq 0 through 19. These rows remain included in delivery/loss/scheduling accounting."
+    },
+    "active_attacker_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "send_status": {
+            "const": "skipped"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "t_send_us": {
+            "type": "null"
+          },
+          "t_ack_rx_us": {
+            "type": "null"
+          },
+          "lateness_us": {
+            "type": "null"
+          },
+          "echo_status": {
+            "const": "not_applicable"
+          },
+          "skip_reason": {
+            "enum": [
+              "scheduler_overrun",
+              "reconnect"
+            ]
+          },
+          "send_failure_reason": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "send_status": {
+            "const": "on_time"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "t_send_us": {
+            "type": "integer"
+          },
+          "lateness_us": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "skip_reason": {
+            "const": "none"
+          },
+          "send_failure_reason": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "send_status": {
+            "const": "late"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "t_send_us": {
+            "type": "integer"
+          },
+          "lateness_us": {
+            "type": "integer",
+            "minimum": 1001
+          },
+          "skip_reason": {
+            "const": "none"
+          },
+          "send_failure_reason": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "send_status": {
+            "const": "send_failed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "t_send_us": {
+            "type": "integer"
+          },
+          "lateness_us": {
+            "type": "integer"
+          },
+          "t_ack_rx_us": {
+            "type": "null"
+          },
+          "echo_status": {
+            "const": "not_applicable"
+          },
+          "skip_reason": {
+            "const": "none"
+          },
+          "send_failure_reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "echo_status": {
+            "enum": [
+              "ok",
+              "late_echo"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "t_ack_rx_us": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "echo_status": {
+            "enum": [
+              "timeout",
+              "not_applicable"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "t_ack_rx_us": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "attack_window_active": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "attack_id": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "attack_window_active": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "attack_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "seq": {
+            "maximum": 19
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "warmup_excluded_from_latency_stats": {
+            "const": true
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "warmup_excluded_from_latency_stats": {
+            "const": false
+          }
+        }
+      }
+    }
+  ]
+}

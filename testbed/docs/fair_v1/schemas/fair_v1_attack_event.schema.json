@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fair-v1:schema:attack-event:draft",
+  "title": "FAIR-V1 Attack Event - DRAFT",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "run_id",
+    "attack_id",
+    "event_type",
+    "event_source",
+    "event_time_us",
+    "clock_domain",
+    "attacker_hardware_unit_id",
+    "attacker_serialNumber",
+    "target_hardware_unit_ids",
+    "target_serialNumbers",
+    "protocol",
+    "observed_or_generated_count",
+    "observed_or_generated_rate_hz",
+    "dataset_schema_version",
+    "aligned_occ_time_us",
+    "aligned_clock_domain",
+    "alignment_method",
+    "alignment_uncertainty_us"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "attack_id": {
+      "type": "string"
+    },
+    "event_type": {
+      "enum": [
+        "attack_start",
+        "attack_stop",
+        "attack_action",
+        "attack_summary"
+      ]
+    },
+    "event_source": {
+      "enum": [
+        "attacker",
+        "occ"
+      ]
+    },
+    "event_time_us": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "clock_domain": {
+      "type": "string"
+    },
+    "attacker_hardware_unit_id": {
+      "type": "string"
+    },
+    "attacker_serialNumber": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "target_hardware_unit_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "target_serialNumbers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "protocol": {
+      "enum": [
+        "mqtt",
+        "opcua",
+        "dds"
+      ]
+    },
+    "observed_or_generated_count": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "observed_or_generated_rate_hz": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "dataset_schema_version": {
+      "const": "1.0"
+    },
+    "aligned_occ_time_us": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "aligned_clock_domain": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "alignment_method": {
+      "enum": [
+        "none",
+        "ntp",
+        "ptp",
+        "occ_trigger",
+        "other"
+      ]
+    },
+    "alignment_uncertainty_us": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    }
+  },
+  "description": "Actual attacker/OCC-observed attack timeline event. Source-clock timing is preserved. Optional OCC-aligned timing is recorded only when an alignment method exists.",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "alignment_method": {
+            "const": "none"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "aligned_occ_time_us": {
+            "type": "null"
+          },
+          "aligned_clock_domain": {
+            "type": "null"
+          },
+          "alignment_uncertainty_us": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "alignment_method": {
+            "enum": [
+              "ntp",
+              "ptp",
+              "occ_trigger",
+              "other"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "aligned_occ_time_us": {
+            "type": "integer"
+          },
+          "aligned_clock_domain": {
+            "type": "string",
+            "minLength": 1
+          },
+          "alignment_uncertainty_us": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  ]
+}

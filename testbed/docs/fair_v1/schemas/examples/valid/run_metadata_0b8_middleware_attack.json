@@ -1,0 +1,212 @@
+{
+  "dataset_schema_version": "1.0",
+  "run_id": "draft-run-middleware-attack-r1",
+  "run_group_id": "draft-group-v1-native",
+  "campaign_id": "draft-campaign",
+  "condition_id": "mqtt-c0-native-direct",
+  "repeat_index": 1,
+  "protocol": "mqtt",
+  "security_profile": "C0",
+  "spec_version": "1.0-draft",
+  "spec_git_hash": "DRAFT-SPEC-COMMIT",
+  "payload_schema_version": "0.1",
+  "run_start_utc": "2026-09-29T12:00:00Z",
+  "occ_run_start_reference_us": 5000000,
+  "occ_clock_domain": "pi_monotonic",
+  "active_vehicle_count": 1,
+  "concurrency_mode": "legitimate_plus_attacker",
+  "participating_serial_numbers": [
+    "VM-001"
+  ],
+  "participating_hardware_unit_ids": [
+    "ESP32_1",
+    "ESP32_3"
+  ],
+  "attacker_present": true,
+  "vehicle_instances": [
+    {
+      "hardware_unit_id": "ESP32_1",
+      "serialNumber": "VM-001",
+      "vehicle_role": "legitimate",
+      "board_model": "ESP32",
+      "board_revision": null,
+      "firmware_git_commit": "DRAFT-FIRMWARE-COMMIT",
+      "firmware_build_config_identity": "DRAFT-CONFIG",
+      "firmware_artifact_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "protocol": "mqtt",
+      "security_profile": "C0",
+      "run_t0_us": 1000000,
+      "vehicle_clock_domain": "esp32_1_monotonic",
+      "network_path_id": "direct_path",
+      "clock_sync_to_occ": {
+        "method": "none",
+        "status": "unsynchronized",
+        "offset_us": null,
+        "uncertainty_us": null
+      }
+    },
+    {
+      "hardware_unit_id": "ESP32_3",
+      "serialNumber": null,
+      "vehicle_role": "attacker",
+      "board_model": "ESP32",
+      "board_revision": null,
+      "firmware_git_commit": "DRAFT-FIRMWARE-COMMIT",
+      "firmware_build_config_identity": "DRAFT-CONFIG",
+      "firmware_artifact_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "protocol": "mqtt",
+      "security_profile": "C0",
+      "run_t0_us": 1000000,
+      "vehicle_clock_domain": "esp32_3_monotonic",
+      "network_path_id": "direct_path",
+      "clock_sync_to_occ": {
+        "method": "none",
+        "status": "unsynchronized",
+        "offset_us": null,
+        "uncertainty_us": null
+      }
+    }
+  ],
+  "occ_deployment_mode": "native",
+  "occ_services": [
+    {
+      "service_id": "mqtt_broker",
+      "service_name": "mosquitto",
+      "service_role": "mqtt_broker",
+      "version": "DRAFT-VERSION",
+      "config_file_or_hash": "DRAFT-CONFIG-HASH",
+      "executable_or_runtime_identity": "mosquitto",
+      "service_manager": "systemd",
+      "service_unit": "mosquitto.service",
+      "git_commit": null,
+      "deployment_instance_ids": [
+        "native:mosquitto"
+      ]
+    },
+    {
+      "service_id": "fair_echo",
+      "service_name": "fair_mqtt_echo",
+      "service_role": "fair_application_echo",
+      "version": "DRAFT-VERSION",
+      "config_file_or_hash": "DRAFT-ECHO-CONFIG",
+      "executable_or_runtime_identity": "python",
+      "service_manager": "systemd",
+      "service_unit": "fair-mqtt-echo.service",
+      "git_commit": "DRAFT-ECHO-COMMIT",
+      "deployment_instance_ids": [
+        "native:fair_echo"
+      ]
+    },
+    {
+      "service_id": "middleware",
+      "service_name": "fair_middleware",
+      "service_role": "security_enforcement",
+      "version": "DRAFT-MW-VERSION",
+      "config_file_or_hash": "DRAFT-MW-HASH",
+      "executable_or_runtime_identity": "python",
+      "service_manager": "systemd",
+      "service_unit": "fair-middleware.service",
+      "git_commit": "DRAFT-MW-COMMIT",
+      "deployment_instance_ids": [
+        "native:middleware"
+      ]
+    }
+  ],
+  "middleware_mode": "enforce",
+  "middleware_service_id": "middleware",
+  "network_stage": "direct",
+  "network_topology_id": "direct-v1",
+  "network_topology_config_hash": "DRAFT-TOPOLOGY-HASH",
+  "routing_config_hash": null,
+  "network_segments": [
+    {
+      "segment_id": "direct_segment",
+      "segment_role": "vehicle_occ",
+      "interface_class": "wifi",
+      "addressing_identity": "draft-direct"
+    }
+  ],
+  "network_interfaces": [
+    {
+      "interface_id": "esp32_1_wifi",
+      "owner_id": "ESP32_1",
+      "interface_name": "wifi",
+      "segment_id": "direct_segment",
+      "interface_role": "vehicle"
+    },
+    {
+      "interface_id": "pi_wlan0",
+      "owner_id": "PI5_OCC",
+      "interface_name": "wlan0",
+      "segment_id": "direct_segment",
+      "interface_role": "occ"
+    }
+  ],
+  "gateway_instances": [],
+  "network_paths": [
+    {
+      "network_path_id": "direct_path",
+      "source_endpoint_id": "ESP32_1",
+      "destination_endpoint_id": "PI5_OCC",
+      "gateway_ids": [],
+      "path_config_hash": "DRAFT-PATH-HASH"
+    }
+  ],
+  "wireguard": {
+    "enabled": false,
+    "version": null,
+    "interface_name": null,
+    "interface_id": null,
+    "peer_identity": null,
+    "peer_public_key_fingerprint": null,
+    "config_hash": null,
+    "tunnel_state_at_run_start": "not_applicable",
+    "mtu": null,
+    "endpoint_role": null
+  },
+  "attack_scenarios": [
+    {
+      "attack_id": "attack-001",
+      "attack_type": "flood",
+      "attack_profile_id": "flood-draft-1",
+      "attack_config_hash": "DRAFT-ATTACK-HASH",
+      "attacker_hardware_unit_id": "ESP32_3",
+      "attacker_serialNumber": null,
+      "target_hardware_unit_ids": [
+        "ESP32_1"
+      ],
+      "target_serialNumbers": [
+        "VM-001"
+      ],
+      "configured_rate_hz": 100.0,
+      "configured_duration_us": 10000000,
+      "attack_parameters": {
+        "draft": true
+      },
+      "attacker_firmware_git_commit": "DRAFT-ATTACKER-COMMIT",
+      "attacker_firmware_artifact_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "attack_window_definition": {
+        "basis": "victim_seq_range",
+        "victim_seq_start": 200,
+        "victim_seq_end": 399
+      },
+      "attack_event_alignment_method": "none"
+    }
+  ],
+  "docker_deployment": null,
+  "container_instances": [],
+  "k3s_deployment": null,
+  "k3s_workloads": [],
+  "run_validity_status": "valid",
+  "flag_reasons": [],
+  "invalidation_reasons": [],
+  "reproducibility": {
+    "esp_idf_version": "UNRESOLVED-DRAFT",
+    "firmware_git_commit": "DRAFT-FIRMWARE-COMMIT",
+    "firmware_build_configuration_identity": "DRAFT-CONFIG",
+    "protocol_library_version": "DRAFT-LIBRARY-VERSION",
+    "raspberry_pi_software_version": "DRAFT-PI-SOFTWARE",
+    "raspberry_pi_os_environment": "DRAFT-PI-OS"
+  },
+  "active_attacker_count": 1
+}

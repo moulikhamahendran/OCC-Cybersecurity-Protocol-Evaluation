@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fair-v1:schema:middleware-event:draft",
+  "title": "FAIR-V1 Middleware Event - DRAFT",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "run_id",
+    "event_time_us",
+    "clock_domain",
+    "middleware_mode",
+    "rule_id",
+    "target_hardware_unit_id",
+    "target_serialNumber",
+    "action_taken",
+    "confidence",
+    "severity",
+    "attack_type_detected",
+    "seq",
+    "recovery_detected_at_us",
+    "dataset_schema_version"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "event_time_us": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "clock_domain": {
+      "type": "string"
+    },
+    "middleware_mode": {
+      "enum": [
+        "observe",
+        "enforce"
+      ]
+    },
+    "rule_id": {
+      "type": "string"
+    },
+    "target_hardware_unit_id": {
+      "type": "string"
+    },
+    "target_serialNumber": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "action_taken": {
+      "enum": [
+        "none",
+        "flag",
+        "block"
+      ]
+    },
+    "confidence": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "severity": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "attack_type_detected": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "seq": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 599
+    },
+    "recovery_detected_at_us": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "dataset_schema_version": {
+      "const": "1.0"
+    }
+  }
+}

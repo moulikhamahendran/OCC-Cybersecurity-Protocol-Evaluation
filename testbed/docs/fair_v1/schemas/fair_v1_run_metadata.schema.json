@@ -1,0 +1,1125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fair-v1:schema:run-metadata:draft",
+  "title": "FAIR-V1 Run Metadata - DRAFT",
+  "description": "FAIR-V1 dataset schema 1.0 freeze candidate. Schema structure is candidate-final but not yet marked FROZEN.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "dataset_schema_version",
+    "run_id",
+    "run_group_id",
+    "campaign_id",
+    "condition_id",
+    "repeat_index",
+    "protocol",
+    "security_profile",
+    "spec_version",
+    "spec_git_hash",
+    "payload_schema_version",
+    "run_start_utc",
+    "occ_run_start_reference_us",
+    "occ_clock_domain",
+    "active_vehicle_count",
+    "concurrency_mode",
+    "participating_serial_numbers",
+    "participating_hardware_unit_ids",
+    "attacker_present",
+    "vehicle_instances",
+    "occ_deployment_mode",
+    "occ_services",
+    "middleware_mode",
+    "middleware_service_id",
+    "network_stage",
+    "network_topology_id",
+    "network_topology_config_hash",
+    "routing_config_hash",
+    "network_segments",
+    "network_interfaces",
+    "gateway_instances",
+    "network_paths",
+    "wireguard",
+    "attack_scenarios",
+    "docker_deployment",
+    "container_instances",
+    "k3s_deployment",
+    "k3s_workloads",
+    "run_validity_status",
+    "flag_reasons",
+    "invalidation_reasons",
+    "reproducibility",
+    "active_attacker_count"
+  ],
+  "properties": {
+    "dataset_schema_version": {
+      "const": "1.0"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_group_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "campaign_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "condition_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repeat_index": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "protocol": {
+      "enum": [
+        "mqtt",
+        "opcua",
+        "dds"
+      ]
+    },
+    "security_profile": {
+      "enum": [
+        "C0",
+        "C1",
+        "C2"
+      ]
+    },
+    "spec_version": {
+      "type": "string"
+    },
+    "spec_git_hash": {
+      "type": "string"
+    },
+    "payload_schema_version": {
+      "type": "string"
+    },
+    "run_start_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "occ_run_start_reference_us": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "occ_clock_domain": {
+      "type": "string",
+      "minLength": 1
+    },
+    "active_vehicle_count": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 2,
+      "description": "Number of active legitimate FAIR vehicles only. Dedicated attacker nodes are not included."
+    },
+    "concurrency_mode": {
+      "enum": [
+        "single_legitimate",
+        "dual_legitimate",
+        "legitimate_plus_attacker",
+        "dual_legitimate_plus_attacker"
+      ]
+    },
+    "participating_serial_numbers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "participating_hardware_unit_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "maxItems": 3
+    },
+    "attacker_present": {
+      "type": "boolean"
+    },
+    "vehicle_instances": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "hardware_unit_id",
+          "serialNumber",
+          "vehicle_role",
+          "board_model",
+          "board_revision",
+          "firmware_git_commit",
+          "firmware_build_config_identity",
+          "firmware_artifact_sha256",
+          "protocol",
+          "security_profile",
+          "run_t0_us",
+          "vehicle_clock_domain",
+          "network_path_id",
+          "clock_sync_to_occ"
+        ],
+        "properties": {
+          "hardware_unit_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "serialNumber": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "vehicle_role": {
+            "enum": [
+              "legitimate",
+              "attacker"
+            ]
+          },
+          "board_model": {
+            "type": "string",
+            "minLength": 1
+          },
+          "board_revision": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "firmware_git_commit": {
+            "type": "string",
+            "minLength": 1
+          },
+          "firmware_build_config_identity": {
+            "type": "string",
+            "minLength": 1
+          },
+          "firmware_artifact_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{64}$"
+          },
+          "protocol": {
+            "enum": [
+              "mqtt",
+              "opcua",
+              "dds"
+            ]
+          },
+          "security_profile": {
+            "enum": [
+              "C0",
+              "C1",
+              "C2"
+            ]
+          },
+          "run_t0_us": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Absolute-schedule origin in this physical ESP32's own monotonic clock."
+          },
+          "vehicle_clock_domain": {
+            "type": "string",
+            "minLength": 1
+          },
+          "network_path_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "clock_sync_to_occ": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "method",
+              "status",
+              "offset_us",
+              "uncertainty_us"
+            ],
+            "properties": {
+              "method": {
+                "enum": [
+                  "none",
+                  "ntp",
+                  "ptp",
+                  "other"
+                ]
+              },
+              "status": {
+                "enum": [
+                  "unsynchronized",
+                  "synchronized"
+                ]
+              },
+              "offset_us": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "uncertainty_us": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0
+              }
+            },
+            "description": "Synchronization relationship between this physical ESP32 clock and the OCC/Pi clock. No cross-device subtraction is valid when status is unsynchronized."
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "vehicle_role": {
+                  "const": "legitimate"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "serialNumber": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 3
+    },
+    "occ_deployment_mode": {
+      "enum": [
+        "native",
+        "docker",
+        "k3s"
+      ]
+    },
+    "occ_services": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "service_id",
+          "service_name",
+          "service_role",
+          "version",
+          "config_file_or_hash",
+          "executable_or_runtime_identity",
+          "service_manager",
+          "service_unit",
+          "git_commit",
+          "deployment_instance_ids"
+        ],
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "service_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "service_role": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "config_file_or_hash": {
+            "type": "string",
+            "minLength": 1
+          },
+          "executable_or_runtime_identity": {
+            "type": "string",
+            "minLength": 1
+          },
+          "service_manager": {
+            "type": "string",
+            "minLength": 1
+          },
+          "service_unit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "git_commit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "deployment_instance_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "middleware_mode": {
+      "enum": [
+        "native",
+        "passthrough",
+        "observe",
+        "enforce"
+      ]
+    },
+    "middleware_service_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "network_stage": {
+      "enum": [
+        "direct",
+        "multi_network",
+        "wireguard"
+      ]
+    },
+    "network_topology_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "network_topology_config_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "routing_config_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "network_segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "segment_id",
+          "segment_role",
+          "interface_class",
+          "addressing_identity"
+        ],
+        "properties": {
+          "segment_id": {
+            "type": "string"
+          },
+          "segment_role": {
+            "type": "string"
+          },
+          "interface_class": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "addressing_identity": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "network_interfaces": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_id",
+          "owner_id",
+          "interface_name",
+          "segment_id",
+          "interface_role"
+        ],
+        "properties": {
+          "interface_id": {
+            "type": "string"
+          },
+          "owner_id": {
+            "type": "string"
+          },
+          "interface_name": {
+            "type": "string"
+          },
+          "segment_id": {
+            "type": "string"
+          },
+          "interface_role": {
+            "type": "string"
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "gateway_instances": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "gateway_id",
+          "host_id",
+          "software_version",
+          "config_hash",
+          "ingress_interface_id",
+          "egress_interface_id"
+        ],
+        "properties": {
+          "gateway_id": {
+            "type": "string"
+          },
+          "host_id": {
+            "type": "string"
+          },
+          "software_version": {
+            "type": "string"
+          },
+          "config_hash": {
+            "type": "string"
+          },
+          "ingress_interface_id": {
+            "type": "string"
+          },
+          "egress_interface_id": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "network_paths": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "network_path_id",
+          "source_endpoint_id",
+          "destination_endpoint_id",
+          "gateway_ids",
+          "path_config_hash"
+        ],
+        "properties": {
+          "network_path_id": {
+            "type": "string"
+          },
+          "source_endpoint_id": {
+            "type": "string"
+          },
+          "destination_endpoint_id": {
+            "type": "string"
+          },
+          "gateway_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "path_config_hash": {
+            "type": "string"
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "wireguard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "version",
+        "interface_name",
+        "interface_id",
+        "peer_identity",
+        "peer_public_key_fingerprint",
+        "config_hash",
+        "tunnel_state_at_run_start",
+        "mtu",
+        "endpoint_role"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "interface_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "interface_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "peer_identity": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "peer_public_key_fingerprint": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "config_hash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tunnel_state_at_run_start": {
+          "enum": [
+            "not_applicable",
+            "up",
+            "down",
+            "degraded"
+          ]
+        },
+        "mtu": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "endpoint_role": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "enabled": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "version": {
+                "type": "string",
+                "minLength": 1
+              },
+              "interface_name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "peer_identity": {
+                "type": "string",
+                "minLength": 1
+              },
+              "config_hash": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "attack_scenarios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "attack_id",
+          "attack_type",
+          "attack_profile_id",
+          "attack_config_hash",
+          "attacker_hardware_unit_id",
+          "attacker_serialNumber",
+          "target_hardware_unit_ids",
+          "target_serialNumbers",
+          "configured_rate_hz",
+          "configured_duration_us",
+          "attack_parameters",
+          "attacker_firmware_git_commit",
+          "attacker_firmware_artifact_sha256",
+          "attack_window_definition",
+          "attack_event_alignment_method"
+        ],
+        "properties": {
+          "attack_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "attack_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "attack_profile_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "attack_config_hash": {
+            "type": "string",
+            "minLength": 1
+          },
+          "attacker_hardware_unit_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "attacker_serialNumber": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "target_hardware_unit_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "target_serialNumbers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          },
+          "configured_rate_hz": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "configured_duration_us": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "attack_parameters": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "attacker_firmware_git_commit": {
+            "type": "string",
+            "minLength": 1
+          },
+          "attacker_firmware_artifact_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{64}$"
+          },
+          "attack_window_definition": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "basis",
+              "victim_seq_start",
+              "victim_seq_end"
+            ],
+            "properties": {
+              "basis": {
+                "const": "victim_seq_range",
+                "description": "FAIR-V1 attack analysis windows are defined using legitimate vehicle sequence slots rather than subtraction of independent ESP32 clocks."
+              },
+              "victim_seq_start": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 599
+              },
+              "victim_seq_end": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 599
+              }
+            }
+          },
+          "attack_event_alignment_method": {
+            "enum": [
+              "none",
+              "ntp",
+              "ptp",
+              "occ_trigger",
+              "other"
+            ],
+            "description": "Method, if any, used to align actual attacker event timestamps to the OCC clock. This is separate from the sequence-based analysis window."
+          }
+        }
+      }
+    },
+    "docker_deployment": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "docker_version",
+            "compose_version",
+            "compose_file_hash",
+            "project_name"
+          ],
+          "properties": {
+            "docker_version": {
+              "type": "string"
+            },
+            "compose_version": {
+              "type": "string"
+            },
+            "compose_file_hash": {
+              "type": "string"
+            },
+            "project_name": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "container_instances": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "container_instance_id",
+          "service_id",
+          "compose_service_name",
+          "image_name",
+          "image_tag",
+          "image_digest",
+          "container_config_hash",
+          "network_mode",
+          "resource_limits"
+        ],
+        "properties": {
+          "container_instance_id": {
+            "type": "string"
+          },
+          "service_id": {
+            "type": "string"
+          },
+          "compose_service_name": {
+            "type": "string"
+          },
+          "image_name": {
+            "type": "string"
+          },
+          "image_tag": {
+            "type": "string"
+          },
+          "image_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-fA-F]{64}$"
+          },
+          "container_config_hash": {
+            "type": "string"
+          },
+          "network_mode": {
+            "type": "string"
+          },
+          "resource_limits": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    "k3s_deployment": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "k3s_version",
+            "cluster_id",
+            "namespace",
+            "manifests_hash"
+          ],
+          "properties": {
+            "k3s_version": {
+              "type": "string"
+            },
+            "cluster_id": {
+              "type": "string"
+            },
+            "namespace": {
+              "type": "string"
+            },
+            "manifests_hash": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "k3s_workloads": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workload_id",
+          "service_id",
+          "workload_kind",
+          "workload_name",
+          "image_name",
+          "image_tag",
+          "image_digest",
+          "desired_replicas",
+          "ready_replicas_at_run_start",
+          "workload_config_hash",
+          "pod_restart_count_at_run_start",
+          "pod_restart_count_at_run_end"
+        ],
+        "properties": {
+          "workload_id": {
+            "type": "string"
+          },
+          "service_id": {
+            "type": "string"
+          },
+          "workload_kind": {
+            "type": "string"
+          },
+          "workload_name": {
+            "type": "string"
+          },
+          "image_name": {
+            "type": "string"
+          },
+          "image_tag": {
+            "type": "string"
+          },
+          "image_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-fA-F]{64}$"
+          },
+          "desired_replicas": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "ready_replicas_at_run_start": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "workload_config_hash": {
+            "type": "string"
+          },
+          "pod_restart_count_at_run_start": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "pod_restart_count_at_run_end": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "run_validity_status": {
+      "enum": [
+        "valid",
+        "flagged",
+        "invalid"
+      ],
+      "description": "Formal validity classification. Exact scientific invalidation criteria are defined by FAIR_V1_SPEC.md; raw data are retained for all three states."
+    },
+    "flag_reasons": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "invalidation_reasons": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "reproducibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "esp_idf_version",
+        "firmware_git_commit",
+        "firmware_build_configuration_identity",
+        "protocol_library_version",
+        "raspberry_pi_software_version",
+        "raspberry_pi_os_environment"
+      ],
+      "properties": {
+        "esp_idf_version": {
+          "type": "string"
+        },
+        "firmware_git_commit": {
+          "type": "string"
+        },
+        "firmware_build_configuration_identity": {
+          "type": "string"
+        },
+        "protocol_library_version": {
+          "type": "string"
+        },
+        "raspberry_pi_software_version": {
+          "type": "string"
+        },
+        "raspberry_pi_os_environment": {
+          "type": "string"
+        }
+      }
+    },
+    "active_attacker_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Number of active dedicated attacker/rogue nodes."
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "occ_deployment_mode": {
+            "const": "docker"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "docker_deployment": {
+            "type": "object"
+          },
+          "container_instances": {
+            "type": "array",
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "occ_deployment_mode": {
+            "const": "k3s"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "k3s_deployment": {
+            "type": "object"
+          },
+          "k3s_workloads": {
+            "type": "array",
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "run_validity_status": {
+            "const": "valid"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "flag_reasons": {
+            "maxItems": 0
+          },
+          "invalidation_reasons": {
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "run_validity_status": {
+            "const": "flagged"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "flag_reasons": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "run_validity_status": {
+            "const": "invalid"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "invalidation_reasons": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}
