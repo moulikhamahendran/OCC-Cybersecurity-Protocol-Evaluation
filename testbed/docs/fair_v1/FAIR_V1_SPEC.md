@@ -32,19 +32,27 @@ must never be pooled into one formal dataset.
 
 Formal FAIR-V1 roles:
 
-- ESP32 = Vehicle
-- Raspberry Pi 5 = OCC
+- ESP32 #1 = Vehicle 1 / legitimate vehicle
+- ESP32 #2 = Vehicle 2 / legitimate vehicle
+- ESP32 #3 = dedicated attacker / rogue / stress vehicle
+- Raspberry Pi 5 = only formal OCC
 - Mac = development, coding, flashing, setup, and offline analysis only
 
 The Mac is not the formal OCC endpoint.
 
-Formal Vehicle 1 baseline uses one physical ESP32 across MQTT, OPC UA, and DDS
-to avoid board-to-board variation.
+Vehicle 1, Vehicle 2, and the attacker vehicle are mandatory parts of the
+planned FAIR-V1 hardware campaign.
 
-Additional boards are reserved for later stages:
+Formal Vehicle 1 baseline uses ESP32 #1 across MQTT, OPC UA, and DDS to avoid
+protocol comparisons being affected by board-to-board variation.
 
-- ESP32 #2 = Vehicle 2
-- ESP32 #3 = attacker / rogue node / stress source / spare
+Vehicle 2 must first be validated as a standalone legitimate vehicle and then
+used concurrently with Vehicle 1 for mandatory multi-vehicle experiments.
+
+ESP32 #3 is reserved for controlled attacker / rogue / stress scenarios.
+It must not contribute ordinary legitimate baseline performance data and its
+traffic must remain explicitly distinguishable from Vehicle 1 and Vehicle 2
+traffic.
 
 ## 4. Experimental Stages
 
@@ -52,15 +60,22 @@ FAIR-V1 work is separated into stages.
 
 Baseline order:
 
-1. Direct Pi 5 OCC baseline
-2. Baseline attack experiments
-3. Vehicle 2 / multi-vehicle experiments
-4. Multi-network experiments
-5. WireGuard experiments
-6. OCC middleware experiments
-7. K3s experiments
-8. Selected attack reruns under K3s
-9. Dashboard / final integration
+1. Direct Pi 5 OCC baseline using Vehicle 1 (host-native; MQTT, OPC UA, and
+   DDS OCC-side services run directly on the Raspberry Pi 5, not containerized)
+2. Dockerized OCC comparison (containerized OCC services, separately labelled,
+   not mixed with native-baseline results)
+3. Vehicle 2 standalone replication
+4. Vehicle 1 + Vehicle 2 legitimate multi-vehicle experiments
+5. Vehicle 3 attacker / rogue-vehicle validation
+6. Native hardware attack experiments using Vehicle 3 as the attacker where
+   applicable
+7. Multi-network experiments
+8. WireGuard experiments
+9. OCC middleware experiments
+10. Vehicle 3 attack reruns with middleware detection / enforcement
+11. K3s experiments
+12. Selected Vehicle 3 attack reruns under K3s
+13. Dashboard / final integration
 
 Baseline protocol comparison must not mix measurements from later stages.
 
@@ -528,6 +543,26 @@ The actual active ESP-IDF toolchain version for formal builds must be verified
 before the specification is frozen.
 
 FORMAL ESP-IDF VERSION: UNRESOLVED - BLOCKS FREEZE
+
+Every run records OCC deployment mode: `native | docker | k3s`.
+
+For `native` deployment mode, the broker/service version, its configuration
+file or configuration-file hash, and the OS-level service-management method
+(for example, a systemd unit) must be recorded in run metadata with the same
+reproducibility rigor as container metadata. Native deployment is not exempt
+from configuration versioning.
+
+For `docker` deployment mode, record:
+
+- container image/tag
+- image digest where available
+- Docker/Compose version
+- compose/configuration hash
+
+For `k3s` deployment mode, additionally record:
+
+- K3s version
+- deployment/manifests hash
 
 ## 21. Required Run Metadata
 
