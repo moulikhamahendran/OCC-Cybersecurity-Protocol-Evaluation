@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CycloneDDS>
+  <Domain id="any">
+    <Security>
+      <Authentication>
+        <Library
+          initFunction="init_authentication"
+          finalizeFunction="finalize_authentication"
+          path="/opt/cyclonedds/lib/libdds_security_auth.so"/>
+        <IdentityCA>file:/workspace/testbed/config/dds/security/identity_ca_cert.pem</IdentityCA>
+        <IdentityCertificate>file:/workspace/testbed/config/dds/security/publisher_cert.pem</IdentityCertificate>
+        <PrivateKey>file:/workspace/testbed/config/dds/security/private/publisher_key.pem</PrivateKey>
+      </Authentication>
+
+      <Cryptographic>
+        <Library
+          initFunction="init_crypto"
+          finalizeFunction="finalize_crypto"
+          path="/opt/cyclonedds/lib/libdds_security_crypto.so"/>
+      </Cryptographic>
+
+      <AccessControl>
+        <Library
+          initFunction="init_access_control"
+          finalizeFunction="finalize_access_control"
+          path="/opt/cyclonedds/lib/libdds_security_ac.so"/>
+        <PermissionsCA>file:/workspace/testbed/config/dds/security/permissions_ca_cert.pem</PermissionsCA>
+        <Governance>file:/workspace/testbed/config/dds/security/governance_c2.p7s</Governance>
+        <Permissions>file:/workspace/testbed/config/dds/security/permissions_publisher.p7s</Permissions>
+      </AccessControl>
+    </Security>
+  </Domain>
+</CycloneDDS>

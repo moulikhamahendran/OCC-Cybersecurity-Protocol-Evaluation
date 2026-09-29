@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CycloneDDS>
+  <Domain id="any">
+    <Security>
+      <Authentication>
+        <Library
+          initFunction="init_authentication"
+          finalizeFunction="finalize_authentication"
+          path="/Users/moulikham/.local/cyclonedds-11.0.1-security/lib/libdds_security_auth.dylib"/>
+        <IdentityCA>file:/Users/moulikham/Documents/GitHub/OCC-Cybersecurity-Protocol-Evaluation/testbed/config/dds/security/identity_ca_cert.pem</IdentityCA>
+        <IdentityCertificate>file:/Users/moulikham/Documents/GitHub/OCC-Cybersecurity-Protocol-Evaluation/testbed/config/dds/security/subscriber_cert.pem</IdentityCertificate>
+        <PrivateKey>file:/Users/moulikham/Documents/GitHub/OCC-Cybersecurity-Protocol-Evaluation/testbed/config/dds/security/private/subscriber_key.pem</PrivateKey>
+      </Authentication>
+
+      <Cryptographic>
+        <Library
+          initFunction="init_crypto"
+          finalizeFunction="finalize_crypto"
+          path="/Users/moulikham/.local/cyclonedds-11.0.1-security/lib/libdds_security_crypto.dylib"/>
+      </Cryptographic>
+
+      <AccessControl>
+        <Library
+          initFunction="init_access_control"
+          finalizeFunction="finalize_access_control"
+          path="/Users/moulikham/.local/cyclonedds-11.0.1-security/lib/libdds_security_ac.dylib"/>
+        <PermissionsCA>file:/Users/moulikham/Documents/GitHub/OCC-Cybersecurity-Protocol-Evaluation/testbed/config/dds/security/permissions_ca_cert.pem</PermissionsCA>
+        <Governance>file:/Users/moulikham/Documents/GitHub/OCC-Cybersecurity-Protocol-Evaluation/testbed/config/dds/security/governance_c2.p7s</Governance>
+        <Permissions>file:/Users/moulikham/Documents/GitHub/OCC-Cybersecurity-Protocol-Evaluation/testbed/config/dds/security/permissions_subscriber.p7s</Permissions>
+      </AccessControl>
+    </Security>
+  </Domain>
+</CycloneDDS>
