@@ -405,9 +405,11 @@ MQTT enqueue failure classification is:
 
 `outbox_full` does not create a new cross-protocol `send_status`; it is retained as an MQTT-specific diagnostic cause of `send_failed`.
 
-Because actual network transmission occurs later in the MQTT task context, MQTT application RTT measured from `t_send_us` can include MQTT outbox residence/queueing time in addition to transport, OCC processing, and echo-return time. This MQTT-specific API-boundary asymmetry must be reported explicitly in cross-protocol analysis and must not be described as pure wire RTT.
+Because `esp_mqtt_client_enqueue()` stores the MQTT PUBLISH in the internal outbox and actual network transmission occurs later in the MQTT task context, MQTT application RTT measured from `t_send_us` can include MQTT outbox residence/queueing time in addition to transport, OCC processing, and echo-return time. This MQTT-specific API-boundary asymmetry must be reported explicitly in cross-protocol analysis and must not be described as pure wire RTT.
 
-`MQTT_EVENT_PUBLISHED` with the corresponding `message_id` is recorded as a protocol-native publication acknowledgement diagnostic only. It is not the FAIR-V1 application acknowledgement and is not used for primary application RTT.
+No verified application-visible ESP-MQTT API boundary exposes the actual instant at which the queued PUBLISH bytes are transmitted on the network. FAIR-V1 therefore does not define or use an MQTT actual-wire-transmit timestamp.
+
+`MQTT_EVENT_PUBLISHED` with the corresponding `message_id` may be retained as a protocol-native publication-event diagnostic. It is not the FAIR-V1 application acknowledgement and is not used for primary application RTT.
 
 The FAIR-V1 MQTT application echo is a separate application message type and is not an instance of the FAIR-V1 telemetry schema. Its JSON object contains exactly:
 
@@ -416,9 +418,34 @@ The FAIR-V1 MQTT application echo is a separate application message type and is 
 
 The MQTT application echo does not contain `schema_ver` or any other telemetry fields.
 
-The Raspberry Pi OCC application echo remains the FAIR-V1 primary application measurement endpoint.
+The MQTT OCC-side timestamp boundaries are:
 
-Exact broker version/configuration must be recorded in run metadata.
+- `t_occ_rx_us`: captured immediately on entry to the Raspberry Pi FAIR MQTT echo application's Paho `on_message` callback for the received telemetry message
+- `t_occ_tx_us`: captured immediately before that FAIR echo application calls Paho `client.publish()` for the application echo
+
+`t_occ_tx_us` is an application-submission timestamp. It is not a network-wire timestamp; Paho may transmit or queue the QoS 1 publication according to its internal outbound state.
+
+On the ESP32 echo-receive path, `MQTT_EVENT_DATA` may be delivered in multiple fragments for one MQTT message. The formal application echo must therefore be reassembled using the ESP-MQTT event length/offset information.
+
+For a completed echo payload, a candidate receive-completion timestamp is captured immediately after the final fragment has been copied such that:
+
+`current_data_offset + data_len == total_data_len`
+
+This candidate timestamp is captured before JSON decoding. It becomes the formal `t_ack_rx_us` only if the completed echo is successfully decoded and both `serialNumber` and `seq` match the outstanding FAIR-V1 telemetry message. A malformed, unrelated, duplicate, or non-matching message does not become `t_ack_rx_us` for that telemetry transaction.
+
+The resulting MQTT FAIR-V1 primary application timing chain is:
+
+`t_send_us -> t_occ_rx_us -> t_occ_tx_us -> t_ack_rx_us`
+
+Primary MQTT application RTT remains:
+
+`application_rtt_us = t_ack_rx_us - t_send_us`
+
+Both RTT endpoints are measured in the ESP32 monotonic clock domain. Pi OCC timestamps are diagnostic/provenance timestamps and are not subtracted from ESP32 timestamps unless explicit cross-device clock synchronization has been established and quantified.
+
+The Raspberry Pi FAIR MQTT echo application remains the FAIR-V1 primary application measurement endpoint.
+
+Exact broker version/configuration and Paho MQTT version must be recorded in run metadata.
 
 ### OPC UA
 
