@@ -449,35 +449,106 @@ Exact broker version/configuration and Paho MQTT version must be recorded in run
 
 ### OPC UA
 
-Current intended baseline:
+Formal baseline:
 
 - persistent OPC UA session
 - Raspberry Pi 5 hosts the OCC-side OPC UA service
-- application-level echo semantics must match the common FAIR boundary
+- ESP32 uses the bundled open62541 client
+- the FAIR application transaction is one OPC UA Method request/response
+- the previous multi-operation write/read transaction is pilot/non-formal and
+  is not accepted as the FAIR-V1 common application RTT
 
-If subscriptions are used for the application echo, `sampling_interval = 10 ms`
-and `publishing_interval = 10 ms`, identical across C0, C1, and C2.
+The formal OCC method is conceptually `SubmitTelemetry`.
 
-Previous multi-operation write/read transaction timing is not accepted as
-the FAIR-V1 common latency metric.
+The request carries the FAIR-V1 payload-v0.1 logical telemetry fields.
 
-EXACT OPC UA ECHO MECHANISM: UNRESOLVED - BLOCKS FREEZE
+The successful method response carries the correlation identity required to
+validate the transaction:
+
+- `serialNumber`
+- `seq`
+
+Formal timestamp boundaries are:
+
+- `t_send_us`: ESP32 monotonic time captured immediately before submission of
+  the asynchronous OPC UA Method call
+- `t_occ_rx_us`: Raspberry Pi OCC monotonic time captured at entry to the
+  asyncua Method callback, after the OPC UA stack has delivered the request to
+  the FAIR application
+- `t_occ_tx_us`: Raspberry Pi OCC monotonic time captured immediately before
+  the FAIR Method callback returns/submits the application response
+- `t_ack_rx_us`: candidate ESP32 monotonic time captured when the completed
+  asynchronous Method response becomes application-visible; it becomes the
+  accepted acknowledgement timestamp only after the returned
+  `(serialNumber, seq)` correlation values match the outstanding transaction
+
+The FAIR application RTT remains:
+
+`t_ack_rx_us - t_send_us`
+
+Cross-device one-way subtraction is not used unless clock synchronization has
+been separately established and quantified.
+
+The same Method transaction and timestamp semantics apply in C0, C1, and C2.
+
+EXACT OPC UA ECHO MECHANISM: RESOLVED
 
 ### DDS
 
-Formal baseline requires DDS semantics rather than treating raw UDP feeder timing
-as the formal DDS cross-protocol latency measurement.
+The existing ESP32 raw-UDP `vehicle1_dds_feeder` implementation is retained as
+pilot hardware work only. It must not be relabelled or reused as the formal
+FAIR-V1 DDS implementation or as formal DDS latency data.
 
-Required QoS intent:
+Formal FAIR-V1 DDS hardware route:
+
+ESP32 FAIR vehicle
+-> Micro XRCE-DDS Client
+-> UDP transport using reliable XRCE application streams
+-> Micro XRCE-DDS Agent on Raspberry Pi 5
+-> Fast DDS domain
+-> Raspberry Pi OCC DDS application
+
+The ESP32 remains the same formal Vehicle 1 hardware used for MQTT, OPC UA,
+and DDS.
+
+The formal application transaction uses a DDS-XRCE request/reply pattern with a
+Raspberry Pi OCC application replier.
+
+The request carries the FAIR-V1 payload-v0.1 logical telemetry fields.
+
+The reply carries at least:
+
+- `serialNumber`
+- `seq`
+
+The ESP32 accepts a reply as the FAIR application acknowledgement only after
+the correlation values match the outstanding transaction.
+
+The common FAIR timestamp semantics remain authoritative:
+
+- ESP32 `t_send_us` is captured immediately before the formal XRCE application
+  request submission boundary
+- OCC `t_occ_rx_us` is captured when the complete request becomes visible to
+  the Raspberry Pi FAIR DDS application
+- OCC `t_occ_tx_us` is captured immediately before the FAIR DDS application
+  submits the matching reply
+- ESP32 `t_ack_rx_us` is the candidate receive-completion time for the matching
+  application reply and is accepted only after correlation succeeds
+
+Required application delivery intent:
 
 - RELIABLE
 
-Formal DDS communication should use controlled unicast peers where supported.
+The ESP32-to-Agent transport is controlled unicast UDP.
 
-Multicast discovery traffic should not become an uncontrolled experimental variable.
+Uncontrolled multicast discovery must not become an experimental variable.
+
+The exact Micro XRCE-DDS, Agent, and Fast DDS versions used by the formal
+implementation must be recorded in run metadata and frozen with the reference
+implementation before formal results are produced.
 
 EXACT ESP32 DDS IMPLEMENTATION / LIBRARY / TRANSPORT PATH:
-UNRESOLVED - BLOCKS FREEZE
+RESOLVED
 
 ## 18. Security Profiles
 
@@ -518,22 +589,48 @@ C2:
 
 ### DDS
 
+DDS uses the formal Micro XRCE-DDS Client -> Agent -> Fast DDS architecture.
+
 C0:
-- no DDS Security
+- XRCE Client-to-Agent path uses the formal UDP/XRCE transport
+- Fast DDS Security disabled
 
 C1:
-- authentication/access control
-- SIGN protection
+- XRCE Client-to-Agent path remains the same formal UDP/XRCE transport
+- Fast DDS participant authentication enabled
+- Fast DDS access control enabled
+- Fast DDS SIGN protection enabled on the DDS-domain side
+- no claim of DDS-Security protection for the ESP32-to-Agent XRCE leg
 
 C2:
-- authentication/access control
-- ENCRYPT protection
+- XRCE Client-to-Agent path remains the same formal UDP/XRCE transport
+- Fast DDS participant authentication enabled
+- Fast DDS access control enabled
+- Fast DDS ENCRYPT protection enabled on the DDS-domain side
+- no claim of end-to-end DDS-Security encryption for the ESP32-to-Agent XRCE leg
 
-These are protocol-native controls and are not automatically assumed to provide
-identical cryptographic semantics.
+The security profiles are protocol-native experimental configurations.
+
+C0, C1, and C2 indicate increasing protection within each protocol; they do not
+assert identical cryptographic mechanisms, identical security guarantees, or
+equal cryptographic strength across MQTT, OPC UA, and DDS.
+
+In particular:
+
+- MQTT C1 uses identity/access credentials without TLS
+- OPC UA C1 uses Basic256Sha256 with Sign
+- DDS C1 uses authentication/access control and SIGN protection on the
+  DDS-domain side of the XRCE Agent architecture
+
+Therefore C1 results compare the performance overhead of each protocol's
+defined intermediate security profile. They must not be interpreted as a
+comparison under cryptographically equivalent protection.
+
+The DDS XRCE architecture-induced security boundary is an explicit forced
+asymmetry and must be disclosed in analysis and reporting.
 
 C1 CROSS-PROTOCOL SECURITY EQUIVALENCE / FORCED ASYMMETRY:
-UNRESOLVED - BLOCKS FREEZE
+RESOLVED - DOCUMENTED FORCED ASYMMETRY
 
 ## 19. Network Controls
 
@@ -566,10 +663,31 @@ Formal run metadata must record:
 
 Current OPC UA C0/C1/C2 sdkconfig semantic values have been normalized.
 
-The actual active ESP-IDF toolchain version for formal builds must be verified
-before the specification is frozen.
+Formal ESP32 build toolchain:
 
-FORMAL ESP-IDF VERSION: UNRESOLVED - BLOCKS FREEZE
+- ESP-IDF `v5.5.5`
+- target `esp32`
+- architecture `Xtensa`
+- compiler `xtensa-esp32-elf-gcc 14.2.0`
+  (`crosstool-NG esp-14.2.0_20260121`)
+- ESP-IDF Python environment verified with Python `3.12.7`
+
+Compatibility verification under ESP-IDF v5.5.5 passed for:
+
+- OPC UA C0
+- OPC UA C1
+- OPC UA C2
+- the retained pilot DDS feeder project
+
+The pilot DDS feeder build pass proves ESP-IDF compatibility of that existing
+project only; it does not qualify the UDP feeder as the formal DDS implementation.
+
+The formal Micro XRCE-DDS implementation must use this same ESP-IDF v5.5.5
+toolchain unless a later incompatibility is discovered before reference-
+implementation freeze. Any required toolchain change after FAIR specification
+freeze is a methodology/reproducibility change and must be explicitly reviewed.
+
+FORMAL ESP-IDF VERSION: RESOLVED - ESP-IDF v5.5.5
 
 Every run records OCC deployment mode: `native | docker | k3s`.
 
@@ -592,6 +710,32 @@ For `k3s` deployment mode, additionally record:
 - deployment/manifests hash
 
 ## 21. Required Run Metadata
+
+FAIR-V1 dataset/logging schema version `1.0` is the frozen logging contract.
+
+The formal logging artifacts are:
+
+- `fair_v1_run_metadata.schema.json`
+- `fair_v1_raw_row.schema.json`
+- `fair_v1_occ_message_event.schema.json`
+- `fair_v1_mqtt_echo.schema.json`
+- `fair_v1_middleware_event.schema.json`
+- `fair_v1_occ_system_sample.schema.json`
+- `fair_v1_attack_event.schema.json`
+
+The logical telemetry payload schema is versioned separately from these dataset
+schemas.
+
+Vehicle raw-row identity/correlation uses:
+
+`(run_id, serialNumber, seq)`
+
+OCC event correlation must preserve the same run, vehicle, and sequence
+identity.
+
+Clock-domain semantics defined by the frozen dataset/logging schemas remain
+authoritative; cross-device timestamps must not be subtracted unless explicit
+clock synchronization has been established and quantified.
 
 Each formal run must record at least:
 
@@ -643,6 +787,66 @@ A rerun creates a new run identifier and new output.
 
 Formal runs must never overwrite previous formal runs.
 
+### Formal run validity classification
+
+The dataset-level validity state is exactly one of:
+
+- `valid`
+- `flagged`
+- `invalid`
+
+Classification order is:
+
+1. Evaluate formal invalidation criteria.
+2. If one or more invalidation criteria apply, classify the run `invalid`.
+3. Otherwise, if `achieved_rate < 95%`, classify the run `flagged`.
+4. Otherwise classify the run `valid`.
+
+A run is `invalid` when the intended experimental condition cannot be
+scientifically reconstructed or the required FAIR measurement record is not
+usable because of a methodological, configuration, or instrumentation failure.
+
+Invalidation conditions include:
+
+- wrong FAIR specification, payload-schema, or dataset-schema version used
+- wrong protocol, security profile, network condition, deployment mode, or
+  other frozen experimental condition
+- wrong firmware/build configuration for the declared condition
+- missing or corrupted mandatory logging artifact
+- missing mandatory reproducibility metadata required to identify the run
+- failure of the vehicle logger to produce the required 600 scheduled-slot
+  records for a nominal 60-second run
+- timestamp/clock instrumentation failure that makes required FAIR timing fields
+  unusable
+- an uncontrolled setup change that makes the declared experimental condition
+  false or non-reconstructable
+
+The following are measured protocol/system outcomes and do not by themselves
+invalidate a correctly instrumented run:
+
+- `late`
+- `skipped`
+- `send_failed`
+- `timeout`
+- `late_echo`
+- reconnect events
+- delivery loss
+- reduced achieved rate
+- attack-induced degradation in an attack experiment
+
+Skipped slots still require their scheduled-slot raw row. Therefore fewer than
+600 raw scheduled-slot records is a logging/instrumentation failure, whereas
+600 rows containing skipped slots is a valid measurement record.
+
+A `flagged` run remains part of the formal dataset and reporting, is explicitly
+labelled and investigated, and is never silently excluded.
+
+All `invalid` and `flagged` raw data remain preserved.
+
+Any rerun receives a new `run_id`.
+
+FORMAL RUN INVALIDATION / FLAGGING RULES: RESOLVED
+
 ## 24. Git Reproducibility
 
 Every formal run must record the Git commit hash used to generate it.
@@ -665,15 +869,20 @@ Baseline and attack datasets must remain separate.
 
 ## 26. Freeze Blockers
 
-The following items must be explicitly resolved before SPEC_STATUS may become FROZEN:
+Step 1 methodology blocker status:
 
-1. Exact common logical payload schema
-2. Exact OPC UA application echo mechanism
-3. Exact ESP32 DDS implementation/library/transport path
-4. C1 cross-protocol security equivalence or documented forced asymmetry
-5. Formal ESP-IDF/toolchain version
-6. Exact formal run invalidation criteria
+1. Exact common logical payload schema - RESOLVED
+2. Exact OPC UA application echo mechanism - RESOLVED
+3. Exact ESP32 DDS implementation/library/transport path - RESOLVED
+4. C1 cross-protocol security equivalence or documented forced asymmetry -
+   RESOLVED AS DOCUMENTED FORCED ASYMMETRY
+5. Formal ESP-IDF/toolchain version - RESOLVED AS ESP-IDF v5.5.5
+6. Exact formal run invalidation criteria - RESOLVED
 
-Until all six are resolved:
+All Step 1 methodology blockers are resolved.
 
-SPEC_STATUS remains DRAFT - NOT FROZEN.
+SPEC_STATUS remains DRAFT - NOT FROZEN until the Step 2 final consistency review
+is completed successfully.
+
+No formal benchmark implementation result may override these methodology
+definitions before the specification is frozen.
