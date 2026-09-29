@@ -1,0 +1,10 @@
+idf_component_register(
+    SRCS
+        "main.c"
+        "fair_opcua_profile.c"
+    INCLUDE_DIRS
+        "."
+    REQUIRES
+        fair_opcua_common
+        open62541lib
+)

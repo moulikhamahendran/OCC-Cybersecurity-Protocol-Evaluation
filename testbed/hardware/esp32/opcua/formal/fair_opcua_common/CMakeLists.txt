@@ -1,0 +1,18 @@
+idf_component_register(
+    SRCS
+        "fair_opcua_transport.c"
+        "fair_opcua_benchmark.c"
+        "fair_opcua_network.c"
+    INCLUDE_DIRS
+        "include"
+    REQUIRES
+        fair_v1_core
+        open62541lib
+        esp_timer
+        esp_event
+        esp_wifi
+        esp_netif
+        nvs_flash
+        freertos
+        log
+)

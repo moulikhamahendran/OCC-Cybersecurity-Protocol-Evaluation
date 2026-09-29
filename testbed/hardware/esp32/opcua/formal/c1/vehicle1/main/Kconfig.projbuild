@@ -1,0 +1,60 @@
+menu "FAIR-V1 Formal OPC UA Vehicle 1"
+
+config FAIR_WIFI_SSID
+    string "Wi-Fi SSID"
+    default ""
+
+config FAIR_WIFI_PASSWORD
+    string "Wi-Fi password"
+    default ""
+
+config FAIR_SNTP_SERVER
+    string "SNTP server for secure profiles"
+    default ""
+
+config FAIR_OPCUA_ENDPOINT
+    string "Formal OPC UA endpoint URL"
+    default ""
+
+config FAIR_OPCUA_USERNAME
+    string "OPC UA username"
+    default ""
+
+config FAIR_OPCUA_PASSWORD
+    string "OPC UA password"
+    default ""
+
+config FAIR_RUN_ID
+    string "FAIR run ID"
+    default ""
+
+config FAIR_REPEAT_INDEX
+    int "FAIR repeat index"
+    range 1 5
+    default 1
+
+config FAIR_WORKLOAD_SPEED
+    string "FAIR workload speed"
+    default ""
+
+config FAIR_WORKLOAD_POS_X
+    string "FAIR workload pos_x"
+    default ""
+
+config FAIR_WORKLOAD_POS_Y
+    string "FAIR workload pos_y"
+    default ""
+
+config FAIR_WORKLOAD_HEADING
+    string "FAIR workload heading"
+    default ""
+
+config FAIR_WORKLOAD_BATTERY_PCT
+    string "FAIR workload battery_pct"
+    default ""
+
+config FAIR_WORKLOAD_STATE
+    string "FAIR workload state"
+    default ""
+
+endmenu
