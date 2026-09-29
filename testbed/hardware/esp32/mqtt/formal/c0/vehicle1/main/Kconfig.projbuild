@@ -1,0 +1,79 @@
+menu "FAIR-V1 MQTT Vehicle 1"
+
+config FAIR_WIFI_SSID
+    string "Wi-Fi SSID"
+    default ""
+
+config FAIR_WIFI_PASSWORD
+    string "Wi-Fi password"
+    default ""
+
+config FAIR_SNTP_SERVER
+    string "SNTP server for TLS profile"
+    default ""
+    help
+        Required at runtime for C2.
+        Leave empty for compile-only builds.
+
+config FAIR_MQTT_BROKER_URI
+    string "MQTT broker URI"
+    default ""
+    help
+        C0/C1 use mqtt://
+        C2 uses mqtts://
+
+config FAIR_MQTT_USERNAME
+    string "MQTT username"
+    default ""
+    help
+        Required for C1 and C2.
+        Keep generated sdkconfig local.
+
+config FAIR_MQTT_PASSWORD
+    string "MQTT password"
+    default ""
+    help
+        Required for C1 and C2.
+        Keep generated sdkconfig local.
+
+config FAIR_MQTT_CA_CERT_PEM
+    string "MQTT CA certificate PEM"
+    default ""
+    help
+        Required for C2 runtime.
+        Keep deployment material out of committed sdkconfig.
+
+config FAIR_RUN_ID
+    string "FAIR run ID"
+    default ""
+
+config FAIR_REPEAT_INDEX
+    int "FAIR repeat index"
+    range 1 5
+    default 1
+
+config FAIR_WORKLOAD_SPEED
+    string "FAIR workload speed"
+    default ""
+
+config FAIR_WORKLOAD_POS_X
+    string "FAIR workload pos_x"
+    default ""
+
+config FAIR_WORKLOAD_POS_Y
+    string "FAIR workload pos_y"
+    default ""
+
+config FAIR_WORKLOAD_HEADING
+    string "FAIR workload heading"
+    default ""
+
+config FAIR_WORKLOAD_BATTERY_PCT
+    string "FAIR workload battery_pct"
+    default ""
+
+config FAIR_WORKLOAD_STATE
+    string "FAIR workload state"
+    default ""
+
+endmenu

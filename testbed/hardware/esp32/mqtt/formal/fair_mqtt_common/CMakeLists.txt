@@ -1,0 +1,20 @@
+idf_component_register(
+    SRCS
+        "fair_mqtt_codec.c"
+        "fair_mqtt_transport.c"
+        "fair_mqtt_benchmark.c"
+        "fair_mqtt_network.c"
+    INCLUDE_DIRS
+        "include"
+    REQUIRES
+        fair_v1_core
+        mqtt
+        json
+        esp_timer
+        esp_event
+        esp_wifi
+        esp_netif
+        nvs_flash
+        freertos
+        log
+)
