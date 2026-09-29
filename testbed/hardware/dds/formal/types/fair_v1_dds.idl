@@ -1,0 +1,21 @@
+struct FairV1Telemetry
+{
+    string schema_ver;
+    string serialNumber;
+    unsigned long seq;
+    long long t_sched_us;
+
+    float speed;
+    float pos_x;
+    float pos_y;
+    float heading;
+    float battery_pct;
+
+    string state;
+};
+
+struct FairV1Echo
+{
+    string serialNumber;
+    unsigned long seq;
+};
