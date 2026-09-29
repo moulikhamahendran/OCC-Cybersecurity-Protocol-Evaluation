@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:fair-v1:schema:mqtt-echo:draft",
-  "title": "FAIR-V1 MQTT Echo - DRAFT",
+  "$id": "urn:fair-v1:schema:mqtt-echo:1.0",
+  "title": "FAIR-V1 MQTT Echo",
   "type": "object",
   "additionalProperties": false,
   "required": [

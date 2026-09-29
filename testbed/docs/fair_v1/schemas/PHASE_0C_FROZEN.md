@@ -1,6 +1,6 @@
-# FAIR-V1 Dataset Schema 1.0 - Freeze Candidate
+# FAIR-V1 Dataset/Logging Schema 1.0 - FROZEN
 
-STATUS: FREEZE CANDIDATE - NOT FROZEN
+STATUS: FROZEN
 
 Candidate logging artifacts:
 
@@ -37,3 +37,25 @@ Before changing status to FROZEN:
 
 Methodology blockers may remain only where the existing schema already has a
 stable representation and no field-definition change is required.
+
+## Freeze decision
+
+Dataset/logging schema version 1.0 is frozen.
+
+The following artifacts form the frozen logging contract:
+
+1. fair_v1_run_metadata.schema.json
+2. fair_v1_raw_row.schema.json
+3. fair_v1_occ_message_event.schema.json
+4. fair_v1_mqtt_echo.schema.json
+5. fair_v1_middleware_event.schema.json
+6. fair_v1_occ_system_sample.schema.json
+7. fair_v1_attack_event.schema.json
+
+Any later structural field change or change in field semantics requires a
+dataset/logging schema version bump.
+
+The telemetry payload remains independently versioned at payload schema 0.1.
+
+The FAIR methodology/specification is NOT frozen by this action. Remaining
+methodology blockers are resolved separately before FAIR_V1_SPEC.md is frozen.

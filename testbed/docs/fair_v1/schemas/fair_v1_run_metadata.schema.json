@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:fair-v1:schema:run-metadata:draft",
-  "title": "FAIR-V1 Run Metadata - DRAFT",
-  "description": "FAIR-V1 dataset schema 1.0 freeze candidate. Schema structure is candidate-final but not yet marked FROZEN.",
+  "$id": "urn:fair-v1:schema:run-metadata:1.0",
+  "title": "FAIR-V1 Run Metadata",
+  "description": "FAIR-V1 dataset/logging schema version 1.0. FROZEN.",
   "type": "object",
   "additionalProperties": false,
   "required": [

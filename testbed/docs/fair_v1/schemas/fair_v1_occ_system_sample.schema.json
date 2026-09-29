@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:fair-v1:schema:occ-system-sample:draft",
-  "title": "FAIR-V1 OCC System Sample - DRAFT",
+  "$id": "urn:fair-v1:schema:occ-system-sample:1.0",
+  "title": "FAIR-V1 OCC System Sample",
   "type": "object",
   "additionalProperties": false,
   "required": [

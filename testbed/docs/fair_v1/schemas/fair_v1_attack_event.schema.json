@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:fair-v1:schema:attack-event:draft",
-  "title": "FAIR-V1 Attack Event - DRAFT",
+  "$id": "urn:fair-v1:schema:attack-event:1.0",
+  "title": "FAIR-V1 Attack Event",
   "type": "object",
   "additionalProperties": false,
   "required": [

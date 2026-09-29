@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:fair-v1:schema:raw-row:draft",
-  "title": "FAIR-V1 Raw Vehicle Row - DRAFT",
+  "$id": "urn:fair-v1:schema:raw-row:1.0",
+  "title": "FAIR-V1 Raw Vehicle Row",
   "description": "FAIR-V1 legitimate vehicle-side scheduled-slot row. Pi/OCC timestamps are intentionally excluded.",
   "type": "object",
   "additionalProperties": false,

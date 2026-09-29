@@ -1,3 +1,16 @@
+# HISTORICAL FAIR-V1 Dataset Schema Design Log
+
+STATUS: SUPERSEDED BY FROZEN DATASET/LOGGING SCHEMA 1.0
+
+This file preserves the Phase 0A/0B/0C design history. Earlier OPEN,
+UNRESOLVED, candidate, and draft statements in this file are historical and
+must not be interpreted as the current schema status.
+
+The authoritative machine-readable logging contract is the frozen set of
+`fair_v1_*.schema.json` files together with `PHASE_0C_FROZEN.md`.
+
+---
+
 # FAIR-V1 Dataset and Logging Schema Draft
 
 STATUS: DRAFT - NOT FROZEN
