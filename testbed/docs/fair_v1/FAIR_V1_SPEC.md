@@ -1,6 +1,7 @@
 # FAIR-V1 Benchmark Specification
 
-SPEC_STATUS: DRAFT - NOT FROZEN
+SPEC_STATUS: FROZEN
+SPEC_VERSION: 1.0
 
 ## 1. Authority
 
@@ -881,8 +882,12 @@ Step 1 methodology blocker status:
 
 All Step 1 methodology blockers are resolved.
 
-SPEC_STATUS remains DRAFT - NOT FROZEN until the Step 2 final consistency review
-is completed successfully.
+STEP 2 FINAL CONSISTENCY REVIEW: PASS
+
+All Step 1 methodology blockers are resolved and the Step 2 consistency review
+completed with zero failures and zero warnings.
+
+SPEC_STATUS is FROZEN at FAIR specification version 1.0.
 
 No formal benchmark implementation result may override these methodology
 definitions before the specification is frozen.
