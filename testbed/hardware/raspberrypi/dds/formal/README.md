@@ -21,4 +21,8 @@ Security mapping:
 - C1: DDS-domain authentication/access control with SIGN.
 - C2: DDS-domain authentication/access control with ENCRYPT.
 
-DDS Security is not claimed to protect the ESP32-Agent XRCE/UDP leg. Secure Agent-side participant XML expects runtime assets under `/opt/fair-v1/dds/security/`. The OCC process reuses the repository's CycloneDDS Python stack as an interoperable full-DDS participant; Fast DDS Agent <-> CycloneDDS and C1/C2 security interoperability are deliberately verified in Step 9, not claimed by the Step 8 build.
+DDS Security is not claimed to protect the ESP32-Agent XRCE/UDP leg. Secure Agent-side participant XML expects runtime assets under `/opt/fair-v1/dds/security/`.
+
+The canonical FAIR-V1 OCC DDS runtime uses the Fast DDS C++ implementation under `fastdds_occ/` for C0, C1, and C2. This keeps the OCC full-DDS participant on the same Fast DDS implementation used on the Agent-side DDS domain while preserving the frozen FAIR-V1 topics, types, QoS, timing boundaries, and security-profile definitions.
+
+The previous CycloneDDS Python OCC implementation and CycloneDDS-generated Python types are retained in the repository as legacy/reference artifacts. They are not the canonical formal OCC runtime. The change to Fast DDS was made after secure Fast DDS Agent <-> CycloneDDS OCC interoperability blocked the C1/C2 path; the Fast DDS OCC path was subsequently validated end-to-end. DDS Security still applies only to the DDS-domain side and does not protect the ESP32-Agent XRCE/UDP leg.
