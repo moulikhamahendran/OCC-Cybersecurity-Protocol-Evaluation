@@ -1,19 +1,15 @@
 #!/usr/bin/env python3
 import argparse,time
 from cyclonedds.domain import DomainParticipant
-from cyclonedds.idl import IdlStruct
-from cyclonedds.idl.types import float32,int64,uint32
-from cyclonedds.listener import Listener
+from cyclonedds.core import Listener
+from cyclonedds.internal import InvalidSample
 from cyclonedds.pub import DataWriter
 from cyclonedds.qos import Policy,Qos
 from cyclonedds.sub import DataReader
 from cyclonedds.topic import Topic
 from cyclonedds.util import duration
 from fair_dds_occ_core import Telemetry,EventLogger,FairDdsOccCore,ECHO_TOPIC,TELEMETRY_TOPIC,now_us
-class FairV1Telemetry(IdlStruct,typename="FairV1Telemetry"):
-    schema_ver:str; serialNumber:str; seq:uint32; t_sched_us:int64; speed:float32; pos_x:float32; pos_y:float32; heading:float32; battery_pct:float32; state:str
-class FairV1Echo(IdlStruct,typename="FairV1Echo"):
-    serialNumber:str; seq:uint32
+from fair_v1_dds_generated_loader import FairV1Telemetry, FairV1Echo
 class EchoWriterAdapter:
     def __init__(self,w): self.w=w
     def write(self,e): self.w.write(FairV1Echo(serialNumber=e.serialNumber,seq=e.seq))
@@ -26,7 +22,10 @@ def main():
     tt=Topic(dp,TELEMETRY_TOPIC,FairV1Telemetry,qos=qos); et=Topic(dp,ECHO_TOPIC,FairV1Echo,qos=qos); ew=DataWriter(dp,et,qos=qos); adapter=EchoWriterAdapter(ew)
     def on_data_available(reader):
         t_occ_rx_us=now_us()
-        for s in reader.take(N=32): core.process(convert(s),adapter,t_occ_rx_us=t_occ_rx_us)
+        for s in reader.take(N=32):
+            if isinstance(s, InvalidSample):
+                continue
+            core.process(convert(s),adapter,t_occ_rx_us=t_occ_rx_us)
     listener=Listener(on_data_available=on_data_available); reader=DataReader(dp,tt,qos=qos,listener=listener)
     print("FAIR-V1 DDS OCC application ready",flush=True)
     try:

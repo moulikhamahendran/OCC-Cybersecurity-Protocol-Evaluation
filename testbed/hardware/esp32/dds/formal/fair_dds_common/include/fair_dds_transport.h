@@ -10,7 +10,10 @@
 #define FAIR_DDS_SECURITY_C1 1
 #define FAIR_DDS_SECURITY_C2 2
 #define FAIR_DDS_XRCE_STREAM_BUFFER_BYTES 4096U
-#define FAIR_DDS_XRCE_STREAM_HISTORY 4U
+#define FAIR_DDS_XRCE_STREAM_HISTORY 8U
+#define FAIR_DDS_ENQUEUE_ERR_MUTEX_TIMEOUT (-11)
+#define FAIR_DDS_ENQUEUE_ERR_STREAM_REJECTED (-12)
+#define FAIR_DDS_ENQUEUE_ERR_SLOT_MARK_FAILED (-13)
 typedef void (*fair_dds_echo_callback_t)(void *context, uint32_t seq, int64_t t_ack_rx_us);
 typedef struct {
     uxrUDPTransport udp_transport;

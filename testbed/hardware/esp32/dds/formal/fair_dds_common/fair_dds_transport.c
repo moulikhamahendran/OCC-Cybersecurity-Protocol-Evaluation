@@ -61,7 +61,7 @@ static bool create_entities(fair_dds_transport_t *t)
     t->telemetry_writer_id=uxr_object_id(1,UXR_DATAWRITER_ID);
     t->echo_reader_id=uxr_object_id(1,UXR_DATAREADER_ID);
     uint16_t req[7]={0};
-    char xml[4096];
+    static char xml[4096];
     if (t->security_level==FAIR_DDS_SECURITY_C0){
         req[0]=uxr_buffer_create_participant_bin(&t->session,t->reliable_out,participant,0U,"FAIR_V1_XRCE_VM001_C0",UXR_REPLACE);
     } else {
@@ -115,7 +115,7 @@ static void session_task(void *arg)
             if (t->session_created) (void)uxr_run_session_timeout(&t->session,1);
             xSemaphoreGive(t->session_mutex);
         }
-        vTaskDelay(pdMS_TO_TICKS(1));
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
     if (t) t->session_task=NULL;
     vTaskDelete(NULL);
@@ -167,7 +167,7 @@ int fair_dds_transport_enqueue_slot(fair_dds_transport_t *t,fair_v1_slot_t *slot
 {
     if (!t||!slot||!data||len<=0||!t->session_mutex) return -1;
     if (xSemaphoreTake(t->session_mutex,pdMS_TO_TICKS(20))!=pdTRUE){
-        int64_t ts=esp_timer_get_time(); (void)fair_v1_slot_mark_send_result(slot,ts,false); return -1;
+        int64_t ts=esp_timer_get_time(); (void)fair_v1_slot_mark_send_result(slot,ts,false); return FAIR_DDS_ENQUEUE_ERR_MUTEX_TIMEOUT;
     }
     if (!t->session_created||!t->entities_ready){
         int64_t ts=esp_timer_get_time(); (void)fair_v1_slot_mark_send_result(slot,ts,false); xSemaphoreGive(t->session_mutex); return -2;
@@ -177,8 +177,8 @@ int fair_dds_transport_enqueue_slot(fair_dds_transport_t *t,fair_v1_slot_t *slot
     const bool marked=fair_v1_slot_mark_send_result(slot,t_send_us,queued);
     if (queued) uxr_flash_output_streams(&t->session);
     xSemaphoreGive(t->session_mutex);
-    if (!marked) return -1;
-    return queued ? 0 : -1;
+    if (!marked) return FAIR_DDS_ENQUEUE_ERR_SLOT_MARK_FAILED;
+    return queued ? 0 : FAIR_DDS_ENQUEUE_ERR_STREAM_REJECTED;
 }
 
 void fair_dds_transport_stop(fair_dds_transport_t *t)

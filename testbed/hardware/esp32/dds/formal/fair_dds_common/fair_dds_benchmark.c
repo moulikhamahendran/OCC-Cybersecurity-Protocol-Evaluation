@@ -292,6 +292,24 @@ static const char *fair_dds_failure_reason(
         return "not_ready";
     }
 
+    if (
+        dds_enqueue_rc == FAIR_DDS_ENQUEUE_ERR_MUTEX_TIMEOUT
+    ) {
+        return "session_mutex_timeout";
+    }
+
+    if (
+        dds_enqueue_rc == FAIR_DDS_ENQUEUE_ERR_STREAM_REJECTED
+    ) {
+        return "stream_enqueue_rejected";
+    }
+
+    if (
+        dds_enqueue_rc == FAIR_DDS_ENQUEUE_ERR_SLOT_MARK_FAILED
+    ) {
+        return "slot_mark_failed";
+    }
+
     return "none";
 }
 
@@ -524,6 +542,9 @@ static void fair_dds_emit_raw_rows(
                 "true" :
                 "false"
         );
+
+        /* Post-run evidence output only: allow IDLE0 to run. */
+        vTaskDelay(1);
     }
 
     ESP_LOGI(
