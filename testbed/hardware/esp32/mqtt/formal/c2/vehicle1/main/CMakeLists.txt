@@ -5,4 +5,6 @@ idf_component_register(
         "."
     REQUIRES
         fair_mqtt_common
+    EMBED_TXTFILES
+        "fair_v1_c2_ca.crt"
 )

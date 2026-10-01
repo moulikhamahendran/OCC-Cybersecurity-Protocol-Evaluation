@@ -524,6 +524,13 @@ static void fair_mqtt_emit_raw_rows(
                 "true" :
                 "false"
         );
+
+        /*
+         * Post-run reporting only:
+         * allow IDLE0 to run while dumping FAIR_RAW rows.
+         * Measurement timestamps are already frozen above.
+         */
+        vTaskDelay(1);
     }
 
     ESP_LOGI(

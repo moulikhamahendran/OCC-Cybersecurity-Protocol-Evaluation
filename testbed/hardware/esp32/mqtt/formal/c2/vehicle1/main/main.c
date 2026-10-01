@@ -13,6 +13,11 @@
 #include "fair_mqtt_transport.h"
 #include "fair_mqtt_benchmark.h"
 
+#if FAIR_MQTT_PROFILE_USE_TLS
+extern const char fair_v1_c2_ca_crt_start[]
+    asm("_binary_fair_v1_c2_ca_crt_start");
+#endif
+
 static const char *TAG =
     "FAIR_MQTT_MAIN";
 
@@ -192,7 +197,7 @@ void app_main(void)
 
 #if FAIR_MQTT_PROFILE_USE_TLS
     if (
-        strlen(CONFIG_FAIR_MQTT_CA_CERT_PEM) == 0U ||
+        fair_v1_c2_ca_crt_start[0] == '\0' ||
         strlen(CONFIG_FAIR_SNTP_SERVER) == 0U
     ) {
         ESP_LOGE(
@@ -282,7 +287,7 @@ void app_main(void)
                 CONFIG_FAIR_MQTT_PASSWORD,
 
             .ca_certificate_pem =
-                CONFIG_FAIR_MQTT_CA_CERT_PEM,
+                fair_v1_c2_ca_crt_start,
         };
 
     err =
