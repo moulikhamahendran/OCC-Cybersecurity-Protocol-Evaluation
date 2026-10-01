@@ -23,7 +23,7 @@ void app_main(void)
     if(!workload(&cfg)){ ESP_LOGW(TAG,"FAIR workload not configured; refusing runtime"); return; }
     esp_err_t err=fair_dds_network_connect(CONFIG_FAIR_WIFI_SSID,CONFIG_FAIR_WIFI_PASSWORD,pdMS_TO_TICKS(30000));
     if(err!=ESP_OK){ ESP_LOGE(TAG,"Wi-Fi failed: %s",esp_err_to_name(err)); return; }
-    fair_dds_transport_t t;
+    static fair_dds_transport_t t;
     if(!fair_dds_transport_init(&t,CONFIG_FAIR_DDS_AGENT_IP,CONFIG_FAIR_DDS_AGENT_PORT,"VM-001",FAIR_DDS_SECURITY_LEVEL)){ ESP_LOGE(TAG,"transport init failed"); return; }
     if(!fair_dds_transport_start(&t)){ ESP_LOGE(TAG,"XRCE startup failed"); fair_dds_transport_stop(&t); return; }
     err=fair_dds_benchmark_run(&t,&cfg);
