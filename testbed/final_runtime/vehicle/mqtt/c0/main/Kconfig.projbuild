@@ -1,0 +1,30 @@
+menu "OCC MQTT Runtime C0"
+
+config OCC_WIFI_SSID
+    string "Wi-Fi SSID"
+    default ""
+
+config OCC_WIFI_PASSWORD
+    string "Wi-Fi password"
+    default ""
+
+config OCC_MQTT_BROKER_URI
+    string "OCC MQTT broker URI"
+    default "mqtt://occ-pi.local:1883"
+    help
+        Vehicle-facing MQTT broker address.
+        This is configuration, not hardcoded application logic.
+
+config OCC_VEHICLE_ID
+    string "Vehicle identity"
+    default "VM-001"
+
+config OCC_RUNTIME_PERIOD_MS
+    int "Operational telemetry period in milliseconds"
+    range 50 60000
+    default 100
+    help
+        100 ms = 10 Hz.
+        This is operational telemetry, not the formal FAIR scheduler.
+
+endmenu

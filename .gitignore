@@ -65,3 +65,9 @@ testbed/hardware/esp32/**/formal/**/sdkconfig.old
 
 # Final-runtime machine-local configuration
 testbed/final_runtime/config/system.local.json
+
+# ESP32 final-runtime generated/local configuration
+testbed/final_runtime/vehicle/**/build/
+testbed/final_runtime/vehicle/**/build-*/
+testbed/final_runtime/vehicle/**/sdkconfig
+testbed/final_runtime/vehicle/**/sdkconfig.old
