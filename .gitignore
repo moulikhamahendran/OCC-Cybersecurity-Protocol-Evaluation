@@ -62,3 +62,6 @@ testbed/hardware/esp32/**/build-*/
 # Formal ESP-IDF generated local configuration
 testbed/hardware/esp32/**/formal/**/sdkconfig
 testbed/hardware/esp32/**/formal/**/sdkconfig.old
+
+# Final-runtime machine-local configuration
+testbed/final_runtime/config/system.local.json

@@ -16,7 +16,7 @@
 - [x] Pi MQTT echo audited
 
 ## Phase 2 — MQTT C0 golden path
-- [ ] central runtime configuration
+- [x] central runtime configuration
 - [ ] configurable vehicle identity
 - [ ] stable OCC addressing
 - [ ] Pi MQTT broker automatic startup
