@@ -138,17 +138,197 @@ send_vehicle_profile() {
 }
 
 
+STATUS_LISTENER_PID=""
+STATUS_FILE=""
+
+start_vehicle_status_listener() {
+    local active_profile="$1"
+
+    STATUS_FILE="$(mktemp /tmp/occ-mqtt-status.XXXXXX)"
+    local topic="occ/runtime/${VEHICLE_ID}/status"
+
+    case "${active_profile}" in
+        C0)
+            mosquitto_sub \
+                -h 127.0.0.1 \
+                -p 1883 \
+                -q 1 \
+                -t "${topic}" \
+                >"${STATUS_FILE}" 2>/dev/null &
+            ;;
+
+        C1)
+            load_mqtt_env || return 1
+
+            mosquitto_sub \
+                -h occ-pi.local \
+                -p 1884 \
+                -u "${OCC_MQTT_USERNAME}" \
+                -P "${OCC_MQTT_PASSWORD}" \
+                -q 1 \
+                -t "${topic}" \
+                >"${STATUS_FILE}" 2>/dev/null &
+            ;;
+
+        C2)
+            load_mqtt_env || return 1
+
+            if [[
+                -z "${OCC_MQTT_CA_FILE:-}" ||
+                ! -r "${OCC_MQTT_CA_FILE}"
+            ]]; then
+                echo "[FAIL] C2 CA certificate is unavailable."
+                return 1
+            fi
+
+            mosquitto_sub \
+                -h occ-pi.local \
+                -p 8883 \
+                --cafile "${OCC_MQTT_CA_FILE}" \
+                -u "${OCC_MQTT_USERNAME}" \
+                -P "${OCC_MQTT_PASSWORD}" \
+                -q 1 \
+                -t "${topic}" \
+                >"${STATUS_FILE}" 2>/dev/null &
+            ;;
+
+        *)
+            echo "[FAIL] Cannot listen on unknown profile: ${active_profile}"
+            return 1
+            ;;
+    esac
+
+    STATUS_LISTENER_PID=$!
+
+    sleep 1
+
+    if ! kill -0 "${STATUS_LISTENER_PID}" 2>/dev/null; then
+        echo "[FAIL] Vehicle status listener did not start."
+        rm -f "${STATUS_FILE}"
+        STATUS_FILE=""
+        STATUS_LISTENER_PID=""
+        return 1
+    fi
+}
+
+
+stop_vehicle_status_listener() {
+    if [[ -n "${STATUS_LISTENER_PID}" ]]; then
+        kill "${STATUS_LISTENER_PID}" 2>/dev/null || true
+        wait "${STATUS_LISTENER_PID}" 2>/dev/null || true
+        STATUS_LISTENER_PID=""
+    fi
+}
+
+
+status_file_has_online_profile() {
+    local target_profile="$1"
+
+    python3 - \
+        "${STATUS_FILE}" \
+        "${VEHICLE_ID}" \
+        "${target_profile}" <<'PY_STATUS'
+import json
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+vehicle_id = sys.argv[2]
+profile = sys.argv[3]
+
+if not path.exists():
+    raise SystemExit(1)
+
+for raw in path.read_text(errors="replace").splitlines():
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        continue
+
+    if (
+        data.get("vehicle_id") == vehicle_id
+        and data.get("active_profile") == profile
+        and data.get("result") == "online"
+    ):
+        raise SystemExit(0)
+
+raise SystemExit(1)
+PY_STATUS
+}
+
+
+wait_for_vehicle_online() {
+    local target_profile="$1"
+    local attempt
+
+    echo
+    echo "Waiting for ${VEHICLE_ID} online status..."
+
+    for attempt in $(seq 1 20); do
+        if status_file_has_online_profile "${target_profile}"; then
+            echo "[OK] ${VEHICLE_ID} reports ${target_profile} online"
+            return 0
+        fi
+
+        sleep 1
+    done
+
+    echo "[FAIL] ${VEHICLE_ID} did not report ${target_profile} online"
+    return 1
+}
+
+
+verify_occ_connection() {
+    local target_profile="$1"
+    local port
+    local pid
+
+    case "${target_profile}" in
+        C0) port=1883 ;;
+        C1) port=1884 ;;
+        C2) port=8883 ;;
+        *)
+            echo "[FAIL] Unknown profile for OCC verification."
+            return 1
+            ;;
+    esac
+
+    pid="$(
+        systemctl show \
+            --property=MainPID \
+            --value \
+            "${SERVICE}"
+    )"
+
+    if [[
+        -z "${pid}" ||
+        "${pid}" == "0"
+    ]]; then
+        echo "[FAIL] ${SERVICE} has no running PID."
+        return 1
+    fi
+
+    if ss -tnp | \
+        grep -F "pid=${pid}," | \
+        grep -qE ":${port}[[:space:]]"
+    then
+        echo "[OK] Pi OCC verified on port ${port}"
+        return 0
+    fi
+
+    echo "[FAIL] Pi OCC PID ${pid} is not connected to port ${port}"
+    return 1
+}
+
+
+
 coordinated_profile_switch() {
     local target_profile="$1"
     local active_profile
+    local vehicle_verified=false
+    local occ_verified=false
 
     active_profile="$(current_profile)"
-
-    if [[ "${active_profile}" == "${target_profile}" ]]; then
-        echo
-        echo "[OK] MQTT ${target_profile} is already selected."
-        return 0
-    fi
 
     echo
     echo "================================="
@@ -157,20 +337,81 @@ coordinated_profile_switch() {
     echo "${VEHICLE_ID}: ${active_profile} -> ${target_profile}"
     echo "Pi OCC   : ${active_profile} -> ${target_profile}"
 
-    send_vehicle_profile "${target_profile}" || return 1
+    if [[ "${active_profile}" == "${target_profile}" ]]; then
+        echo
+        echo "Profile already selected; verifying current state..."
+
+        verify_occ_connection "${target_profile}" || return 1
+
+        echo
+        echo "MQTT PROFILE STATE: OCC VERIFIED"
+        echo "Vehicle profile verification requires a fresh vehicle status."
+        return 0
+    fi
+
+    start_vehicle_status_listener "${active_profile}" || return 1
+
+    if ! send_vehicle_profile "${target_profile}"; then
+        stop_vehicle_status_listener
+        rm -f "${STATUS_FILE}"
+        STATUS_FILE=""
+        return 1
+    fi
 
     echo
     echo "Waiting for ${VEHICLE_ID} to save profile and restart..."
     sleep 2
 
-    apply_profile "${target_profile}" || return 1
+    if ! apply_profile "${target_profile}"; then
+        stop_vehicle_status_listener
+        rm -f "${STATUS_FILE}"
+        STATUS_FILE=""
+        return 1
+    fi
+
+    if wait_for_vehicle_online "${target_profile}"; then
+        vehicle_verified=true
+    fi
+
+    stop_vehicle_status_listener
+
+    if verify_occ_connection "${target_profile}"; then
+        occ_verified=true
+    fi
+
+    rm -f "${STATUS_FILE}"
+    STATUS_FILE=""
 
     echo
-    echo "[OK] Coordinated switch initiated"
-    echo "Vehicle target : ${target_profile}"
-    echo "OCC profile    : $(current_profile)"
-}
+    echo "================================="
+    echo " MQTT SWITCH RESULT"
+    echo "================================="
 
+    if [[ "${vehicle_verified}" == true ]]; then
+        echo "${VEHICLE_ID}: ${target_profile} VERIFIED"
+    else
+        echo "${VEHICLE_ID}: ${target_profile} NOT VERIFIED"
+    fi
+
+    if [[ "${occ_verified}" == true ]]; then
+        echo "Pi OCC   : ${target_profile} VERIFIED"
+    else
+        echo "Pi OCC   : ${target_profile} NOT VERIFIED"
+    fi
+
+    if [[
+        "${vehicle_verified}" == true &&
+        "${occ_verified}" == true
+    ]]; then
+        echo
+        echo "MQTT PROFILE SWITCH: SUCCESS"
+        return 0
+    fi
+
+    echo
+    echo "MQTT PROFILE SWITCH: VERIFICATION FAILED"
+    return 1
+}
 
 apply_profile() {
     local profile="$1"
