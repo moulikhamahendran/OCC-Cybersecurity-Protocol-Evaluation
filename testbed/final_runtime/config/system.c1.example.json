@@ -1,0 +1,19 @@
+{
+  "runtime_mode": "operational",
+  "occ": {
+    "hostname": "occ-pi.local"
+  },
+  "mqtt": {
+    "security_profile": "C1",
+    "broker_host": "occ-pi.local",
+    "port": 1884,
+    "qos": 1,
+    "topic_root": "fair/v1"
+  },
+  "vehicles": [
+    {
+      "serial_number": "VM-001",
+      "enabled": true
+    }
+  ]
+}

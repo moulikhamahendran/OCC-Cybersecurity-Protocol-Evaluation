@@ -1,0 +1,38 @@
+menu "OCC MQTT Selectable Runtime"
+
+config OCC_MQTT_DEFAULT_PROFILE
+    string "Default MQTT security profile"
+    default "C2"
+    help
+        Initial profile used when no runtime profile exists in NVS.
+        Valid values: C0, C1, C2.
+
+config OCC_MQTT_C0_BROKER_URI
+    string "MQTT C0 broker URI"
+    default "mqtt://occ-pi.local:1883"
+
+config OCC_MQTT_C1_BROKER_URI
+    string "MQTT C1 broker URI"
+    default "mqtt://occ-pi.local:1884"
+
+config OCC_MQTT_C2_BROKER_URI
+    string "MQTT C2 broker URI"
+    default "mqtts://occ-pi.local:8883"
+
+config OCC_SNTP_SERVER
+    string "SNTP server for C2 TLS certificate validation"
+    default "occ-pi.local"
+
+config OCC_VEHICLE_ID
+    string "Vehicle identity"
+    default "VM-001"
+
+config OCC_RUNTIME_PERIOD_MS
+    int "Operational telemetry period in milliseconds"
+    range 50 60000
+    default 100
+    help
+        100 ms = 10 Hz.
+        Operational runtime only; does not change the frozen FAIR benchmark.
+
+endmenu
