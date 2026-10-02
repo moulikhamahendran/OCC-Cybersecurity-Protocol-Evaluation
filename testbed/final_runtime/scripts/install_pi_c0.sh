@@ -134,11 +134,9 @@ install \
 
 systemctl daemon-reload
 
-echo "[8/8] Starting services"
+echo "[8/8] Starting OCC runtime service"
 
-systemctl enable mosquitto
-systemctl restart mosquitto
-
+# Existing FAIR-V1 Mosquitto is intentionally left untouched.
 systemctl enable occ-mqtt
 systemctl restart occ-mqtt
 
