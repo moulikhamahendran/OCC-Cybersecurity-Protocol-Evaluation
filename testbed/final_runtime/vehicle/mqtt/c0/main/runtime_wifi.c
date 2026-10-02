@@ -166,7 +166,7 @@ static esp_err_t initialise_nvs(void)
 }
 
 
-static esp_err_t start_saved_wifi(void)
+static esp_err_t initialise_wifi_driver(void)
 {
     esp_netif_t *sta =
         esp_netif_create_default_wifi_sta();
@@ -175,19 +175,30 @@ static esp_err_t start_saved_wifi(void)
         return ESP_FAIL;
     }
 
+    /*
+     * SoftAP provisioning requires an AP netif as well.
+     * The same firmware later switches to normal STA-only
+     * operation after provisioning.
+     */
+    esp_netif_t *ap =
+        esp_netif_create_default_wifi_ap();
+
+    if (ap == NULL) {
+        return ESP_FAIL;
+    }
+
     wifi_init_config_t wifi_cfg =
         WIFI_INIT_CONFIG_DEFAULT();
 
+    return esp_wifi_init(
+        &wifi_cfg
+    );
+}
+
+
+static esp_err_t start_saved_wifi(void)
+{
     esp_err_t err =
-        esp_wifi_init(
-            &wifi_cfg
-        );
-
-    if (err != ESP_OK) {
-        return err;
-    }
-
-    err =
         esp_wifi_set_mode(
             WIFI_MODE_STA
         );
@@ -304,6 +315,28 @@ esp_err_t occ_runtime_wifi_connect_or_provision(void)
             wifi_event_handler,
             NULL
         )
+    );
+
+    /*
+     * Wi-Fi must be initialized before asking the
+     * provisioning manager whether credentials exist.
+     */
+    err =
+        initialise_wifi_driver();
+
+    if (err != ESP_OK) {
+        ESP_LOGE(
+            TAG,
+            "Wi-Fi driver initialization failed: %s",
+            esp_err_to_name(err)
+        );
+
+        return err;
+    }
+
+    ESP_LOGI(
+        TAG,
+        "Wi-Fi driver initialized"
     );
 
     wifi_prov_mgr_config_t prov_config = {
