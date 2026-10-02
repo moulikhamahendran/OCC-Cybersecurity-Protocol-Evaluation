@@ -1,7 +1,7 @@
 {
   "runtime_mode": "operational",
   "occ": {
-    "hostname": "occ.local"
+    "hostname": "occ-pi.local"
   },
   "mqtt": {
     "security_profile": "C0",

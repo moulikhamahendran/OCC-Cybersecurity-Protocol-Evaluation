@@ -109,14 +109,19 @@ else
     echo "[INFO] Existing system.json preserved."
 fi
 
-echo "[6/8] Installing Mosquitto C0 configuration"
+echo "[6/8] Reusing existing FAIR-V1 Mosquitto configuration"
 
-install \
-    -o root \
-    -g root \
-    -m 0644 \
-    "${RUNTIME_SOURCE}/deployment/mosquitto/occ-c0.conf" \
-    "${MOSQUITTO_CONFIG}"
+if ! systemctl is-active --quiet mosquitto; then
+    echo "[FAIL] Existing mosquitto.service is not active."
+    exit 1
+fi
+
+if ! ss -lnt | grep -qE '[:.]1883[[:space:]]'; then
+    echo "[FAIL] Existing MQTT C0 listener on port 1883 was not found."
+    exit 1
+fi
+
+echo "[OK] Existing MQTT C0 broker found on port 1883"
 
 echo "[7/8] Installing OCC systemd service"
 

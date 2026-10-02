@@ -22,7 +22,7 @@ class RuntimeConfigTests(unittest.TestCase):
 
         self.assertEqual(
             config.occ_hostname,
-            "occ.local",
+            "occ-pi.local",
         )
 
         self.assertEqual(
