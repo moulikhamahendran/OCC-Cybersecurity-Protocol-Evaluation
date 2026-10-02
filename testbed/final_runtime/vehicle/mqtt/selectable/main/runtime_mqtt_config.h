@@ -1,9 +1,12 @@
 #pragma once
 
+#include <stddef.h>
+
 #include "esp_err.h"
 
 #define OCC_MQTT_USERNAME_MAX_LEN 64
 #define OCC_MQTT_PASSWORD_MAX_LEN 128
+#define OCC_VEHICLE_ID_MAX_LEN 64
 
 typedef enum {
     OCC_MQTT_PROFILE_C0 = 0,
@@ -15,6 +18,21 @@ typedef struct {
     char username[OCC_MQTT_USERNAME_MAX_LEN];
     char password[OCC_MQTT_PASSWORD_MAX_LEN];
 } occ_mqtt_credentials_t;
+
+
+/*
+ * Runtime vehicle identity.
+ *
+ * Stored in NVS namespace "occ_runtime" under "vehicle_id".
+ */
+esp_err_t occ_vehicle_id_load(
+    char *vehicle_id,
+    size_t vehicle_id_size
+);
+
+esp_err_t occ_vehicle_id_save(
+    const char *vehicle_id
+);
 
 
 /*

@@ -45,6 +45,8 @@ static volatile bool s_control_subscribed = false;
 static int s_echo_sub_msg_id = -1;
 static int s_control_sub_msg_id = -1;
 
+static char s_vehicle_id[OCC_VEHICLE_ID_MAX_LEN];
+
 static char s_telemetry_topic[TOPIC_BUFFER_BYTES];
 static char s_echo_topic[TOPIC_BUFFER_BYTES];
 static char s_control_topic[TOPIC_BUFFER_BYTES];
@@ -147,7 +149,7 @@ static void handle_complete_echo(void)
         serial->valuestring != NULL &&
         strcmp(
             serial->valuestring,
-            CONFIG_OCC_VEHICLE_ID
+            s_vehicle_id
         ) == 0 &&
         cJSON_IsNumber(seq) &&
         seq->valuedouble >= 0.0;
@@ -481,7 +483,7 @@ static void publish_profile_status(
             "\"requested_profile\":\"%s\","
             "\"result\":\"%s\""
             "}",
-            CONFIG_OCC_VEHICLE_ID,
+            s_vehicle_id,
             occ_mqtt_profile_to_string(
                 s_mqtt_profile
             ),
@@ -648,7 +650,7 @@ static bool build_topics(void)
             s_telemetry_topic,
             sizeof(s_telemetry_topic),
             "fair/v1/%s/telemetry",
-            CONFIG_OCC_VEHICLE_ID
+            s_vehicle_id
         );
 
     int echo_len =
@@ -656,7 +658,7 @@ static bool build_topics(void)
             s_echo_topic,
             sizeof(s_echo_topic),
             "fair/v1/%s/echo",
-            CONFIG_OCC_VEHICLE_ID
+            s_vehicle_id
         );
 
     int control_len =
@@ -664,7 +666,7 @@ static bool build_topics(void)
             s_control_topic,
             sizeof(s_control_topic),
             "occ/runtime/%s/control",
-            CONFIG_OCC_VEHICLE_ID
+            s_vehicle_id
         );
 
     int status_len =
@@ -672,7 +674,7 @@ static bool build_topics(void)
             s_status_topic,
             sizeof(s_status_topic),
             "occ/runtime/%s/status",
-            CONFIG_OCC_VEHICLE_ID
+            s_vehicle_id
         );
 
     return
@@ -715,7 +717,7 @@ static int build_payload(
         "\"battery_pct\":100.0,"
         "\"state\":\"IDLE\""
         "}",
-        CONFIG_OCC_VEHICLE_ID,
+        s_vehicle_id,
         seq,
         t_source_us
     );
@@ -729,31 +731,6 @@ void app_main(void)
         "OCC MQTT selectable operational runtime starting"
     );
 
-    ESP_LOGI(
-        TAG,
-        "vehicle=%s period_ms=%d",
-        CONFIG_OCC_VEHICLE_ID,
-        CONFIG_OCC_RUNTIME_PERIOD_MS
-    );
-
-    if (strlen(CONFIG_OCC_VEHICLE_ID) == 0U) {
-        ESP_LOGE(
-            TAG,
-            "vehicle identity missing"
-        );
-
-        return;
-    }
-
-    if (!build_topics()) {
-        ESP_LOGE(
-            TAG,
-            "MQTT topic construction failed"
-        );
-
-        return;
-    }
-
     esp_err_t err =
         occ_runtime_wifi_connect_or_provision();
 
@@ -762,6 +739,81 @@ void app_main(void)
             TAG,
             "Wi-Fi provisioning/connect failed: %s",
             esp_err_to_name(err)
+        );
+
+        return;
+    }
+
+    err =
+        occ_vehicle_id_load(
+            s_vehicle_id,
+            sizeof(s_vehicle_id)
+        );
+
+    if (err != ESP_OK) {
+        ESP_LOGW(
+            TAG,
+            "No saved vehicle identity; using default=%s",
+            CONFIG_OCC_VEHICLE_ID
+        );
+
+        const int vehicle_id_len =
+            snprintf(
+                s_vehicle_id,
+                sizeof(s_vehicle_id),
+                "%s",
+                CONFIG_OCC_VEHICLE_ID
+            );
+
+        if (
+            vehicle_id_len <= 0 ||
+            vehicle_id_len >=
+                (int)sizeof(s_vehicle_id)
+        ) {
+            ESP_LOGE(
+                TAG,
+                "Default vehicle identity is invalid"
+            );
+
+            return;
+        }
+
+        err =
+            occ_vehicle_id_save(
+                s_vehicle_id
+            );
+
+        if (err != ESP_OK) {
+            ESP_LOGE(
+                TAG,
+                "Failed to save default vehicle identity: %s",
+                esp_err_to_name(err)
+            );
+
+            return;
+        }
+    }
+
+    if (s_vehicle_id[0] == '\0') {
+        ESP_LOGE(
+            TAG,
+            "vehicle identity missing"
+        );
+
+        return;
+    }
+
+    ESP_LOGI(
+        TAG,
+        "vehicle=%s period_ms=%d",
+        s_vehicle_id,
+        CONFIG_OCC_RUNTIME_PERIOD_MS
+    );
+
+    if (!build_topics()) {
+        ESP_LOGE(
+            TAG,
+            "MQTT topic construction failed"
         );
 
         return;

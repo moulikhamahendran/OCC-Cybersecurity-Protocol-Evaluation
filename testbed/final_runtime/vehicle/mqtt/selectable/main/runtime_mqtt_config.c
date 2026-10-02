@@ -9,6 +9,101 @@
 #define OCC_MQTT_USERNAME_KEY     "mqtt_user"
 #define OCC_MQTT_PASSWORD_KEY     "mqtt_pass"
 #define OCC_MQTT_PROFILE_KEY      "mqtt_profile"
+#define OCC_VEHICLE_ID_KEY        "vehicle_id"
+
+
+esp_err_t occ_vehicle_id_load(
+    char *vehicle_id,
+    size_t vehicle_id_size
+)
+{
+    if (
+        vehicle_id == NULL ||
+        vehicle_id_size == 0U
+    ) {
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    vehicle_id[0] = '\0';
+
+    nvs_handle_t handle;
+
+    esp_err_t err =
+        nvs_open(
+            OCC_RUNTIME_NVS_NAMESPACE,
+            NVS_READONLY,
+            &handle
+        );
+
+    if (err != ESP_OK) {
+        return err;
+    }
+
+    size_t stored_len = vehicle_id_size;
+
+    err =
+        nvs_get_str(
+            handle,
+            OCC_VEHICLE_ID_KEY,
+            vehicle_id,
+            &stored_len
+        );
+
+    nvs_close(handle);
+
+    if (err != ESP_OK) {
+        vehicle_id[0] = '\0';
+        return err;
+    }
+
+    if (vehicle_id[0] == '\0') {
+        return ESP_ERR_INVALID_STATE;
+    }
+
+    return ESP_OK;
+}
+
+
+esp_err_t occ_vehicle_id_save(
+    const char *vehicle_id
+)
+{
+    if (
+        vehicle_id == NULL ||
+        vehicle_id[0] == '\0' ||
+        strlen(vehicle_id) >= OCC_VEHICLE_ID_MAX_LEN
+    ) {
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    nvs_handle_t handle;
+
+    esp_err_t err =
+        nvs_open(
+            OCC_RUNTIME_NVS_NAMESPACE,
+            NVS_READWRITE,
+            &handle
+        );
+
+    if (err != ESP_OK) {
+        return err;
+    }
+
+    err =
+        nvs_set_str(
+            handle,
+            OCC_VEHICLE_ID_KEY,
+            vehicle_id
+        );
+
+    if (err == ESP_OK) {
+        err = nvs_commit(handle);
+    }
+
+    nvs_close(handle);
+
+    return err;
+}
 
 
 const char *occ_mqtt_profile_to_string(
