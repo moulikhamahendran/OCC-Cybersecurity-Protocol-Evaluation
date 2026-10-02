@@ -1,0 +1,9 @@
+[v3_req]
+basicConstraints = CA:FALSE
+keyUsage = digitalSignature,keyEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = occ-pi
+DNS.2 = occ-pi.local

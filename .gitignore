@@ -71,3 +71,5 @@ testbed/final_runtime/vehicle/**/build/
 testbed/final_runtime/vehicle/**/build-*/
 testbed/final_runtime/vehicle/**/sdkconfig
 testbed/final_runtime/vehicle/**/sdkconfig.old
+**/mqtt.env
+**/passwd-fair-v1
