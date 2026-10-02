@@ -2,6 +2,7 @@ idf_component_register(
     SRCS
         "main.c"
         "runtime_wifi.c"
+        "runtime_mqtt_config.c"
 
     INCLUDE_DIRS
         "."
