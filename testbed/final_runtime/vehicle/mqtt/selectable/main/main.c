@@ -66,6 +66,8 @@ static volatile bool s_profile_change_pending = false;
 static volatile occ_mqtt_profile_t s_requested_profile =
     OCC_MQTT_PROFILE_C2;
 
+static bool s_runtime_status_published = false;
+
 
 static void reset_echo_reassembly(void)
 {
@@ -609,6 +611,7 @@ static void mqtt_event_handler(
             s_control_subscribed = false;
             s_echo_sub_msg_id = -1;
             s_control_sub_msg_id = -1;
+            s_runtime_status_published = false;
 
             reset_echo_reassembly();
             reset_control_reassembly();
@@ -1002,6 +1005,27 @@ void app_main(void)
     uint32_t waiting_log_counter = 0U;
 
     while (true) {
+        if (
+            s_mqtt_connected &&
+            s_control_subscribed &&
+            !s_runtime_status_published
+        ) {
+            publish_profile_status(
+                "online",
+                s_mqtt_profile
+            );
+
+            ESP_LOGI(
+                TAG,
+                "runtime status online profile=%s",
+                occ_mqtt_profile_to_string(
+                    s_mqtt_profile
+                )
+            );
+
+            s_runtime_status_published = true;
+        }
+
         if (s_profile_change_pending) {
             const occ_mqtt_profile_t requested_profile =
                 s_requested_profile;
