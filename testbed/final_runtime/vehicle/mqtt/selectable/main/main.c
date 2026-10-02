@@ -28,6 +28,8 @@ extern const char fair_v1_c2_ca_crt_start[]
 #define TOPIC_BUFFER_BYTES 128
 #define PAYLOAD_BUFFER_BYTES 384
 #define ECHO_BUFFER_BYTES 192
+#define CONTROL_BUFFER_BYTES 192
+#define STATUS_BUFFER_BYTES 192
 
 static const char *TAG = "OCC_MQTT_RUNTIME";
 
@@ -38,9 +40,15 @@ static occ_mqtt_profile_t s_mqtt_profile;
 
 static volatile bool s_mqtt_connected = false;
 static volatile bool s_echo_subscribed = false;
+static volatile bool s_control_subscribed = false;
+
+static int s_echo_sub_msg_id = -1;
+static int s_control_sub_msg_id = -1;
 
 static char s_telemetry_topic[TOPIC_BUFFER_BYTES];
 static char s_echo_topic[TOPIC_BUFFER_BYTES];
+static char s_control_topic[TOPIC_BUFFER_BYTES];
+static char s_status_topic[TOPIC_BUFFER_BYTES];
 
 static char s_echo_buffer[ECHO_BUFFER_BYTES];
 static size_t s_echo_expected_len = 0U;
@@ -48,6 +56,15 @@ static size_t s_echo_received_len = 0U;
 static bool s_echo_active = false;
 
 static uint64_t s_echo_count = 0U;
+
+static char s_control_buffer[CONTROL_BUFFER_BYTES];
+static size_t s_control_expected_len = 0U;
+static size_t s_control_received_len = 0U;
+static bool s_control_active = false;
+
+static volatile bool s_profile_change_pending = false;
+static volatile occ_mqtt_profile_t s_requested_profile =
+    OCC_MQTT_PROFILE_C2;
 
 
 static void reset_echo_reassembly(void)
@@ -57,6 +74,16 @@ static void reset_echo_reassembly(void)
     s_echo_active = false;
     s_echo_buffer[0] = '\0';
 }
+
+
+static void reset_control_reassembly(void)
+{
+    s_control_expected_len = 0U;
+    s_control_received_len = 0U;
+    s_control_active = false;
+    s_control_buffer[0] = '\0';
+}
+
 
 
 static bool topic_matches(
@@ -153,8 +180,6 @@ static void handle_echo_fragment(
     }
 
     if (event->current_data_offset == 0) {
-        reset_echo_reassembly();
-
         if (
             !topic_matches(
                 event->topic,
@@ -164,6 +189,8 @@ static void handle_echo_fragment(
         ) {
             return;
         }
+
+        reset_echo_reassembly();
 
         if (
             event->total_data_len <= 0 ||
@@ -242,6 +269,259 @@ static void handle_echo_fragment(
 }
 
 
+static void handle_complete_control(void)
+{
+    cJSON *root =
+        cJSON_ParseWithLength(
+            s_control_buffer,
+            s_control_received_len
+        );
+
+    if (root == NULL) {
+        ESP_LOGW(
+            TAG,
+            "invalid control JSON"
+        );
+
+        return;
+    }
+
+    const cJSON *command =
+        cJSON_GetObjectItemCaseSensitive(
+            root,
+            "command"
+        );
+
+    const cJSON *profile =
+        cJSON_GetObjectItemCaseSensitive(
+            root,
+            "profile"
+        );
+
+    if (
+        !cJSON_IsString(command) ||
+        command->valuestring == NULL ||
+        strcmp(
+            command->valuestring,
+            "set_profile"
+        ) != 0 ||
+        !cJSON_IsString(profile) ||
+        profile->valuestring == NULL
+    ) {
+        ESP_LOGW(
+            TAG,
+            "unsupported control command"
+        );
+
+        cJSON_Delete(root);
+        return;
+    }
+
+    occ_mqtt_profile_t requested_profile;
+
+    esp_err_t err =
+        occ_mqtt_profile_from_string(
+            profile->valuestring,
+            &requested_profile
+        );
+
+    if (err != ESP_OK) {
+        ESP_LOGW(
+            TAG,
+            "invalid requested MQTT profile"
+        );
+
+        cJSON_Delete(root);
+        return;
+    }
+
+    if (s_profile_change_pending) {
+        ESP_LOGW(
+            TAG,
+            "profile change already pending"
+        );
+
+        cJSON_Delete(root);
+        return;
+    }
+
+    s_requested_profile = requested_profile;
+    s_profile_change_pending = true;
+
+    ESP_LOGI(
+        TAG,
+        "profile change requested current=%s requested=%s",
+        occ_mqtt_profile_to_string(
+            s_mqtt_profile
+        ),
+        occ_mqtt_profile_to_string(
+            requested_profile
+        )
+    );
+
+    cJSON_Delete(root);
+}
+
+
+static void handle_control_fragment(
+    esp_mqtt_event_handle_t event
+)
+{
+    if (event == NULL) {
+        return;
+    }
+
+    if (event->current_data_offset == 0) {
+        if (
+            !topic_matches(
+                event->topic,
+                event->topic_len,
+                s_control_topic
+            )
+        ) {
+            return;
+        }
+
+        reset_control_reassembly();
+
+        if (
+            event->total_data_len <= 0 ||
+            event->total_data_len >=
+                (int)sizeof(s_control_buffer)
+        ) {
+            ESP_LOGW(
+                TAG,
+                "control message too large total=%d",
+                event->total_data_len
+            );
+
+            return;
+        }
+
+        s_control_expected_len =
+            (size_t)event->total_data_len;
+
+        s_control_active = true;
+    }
+
+    if (!s_control_active) {
+        return;
+    }
+
+    if (
+        event->current_data_offset < 0 ||
+        event->data_len < 0
+    ) {
+        reset_control_reassembly();
+        return;
+    }
+
+    const size_t offset =
+        (size_t)event->current_data_offset;
+
+    const size_t fragment_len =
+        (size_t)event->data_len;
+
+    if (
+        offset != s_control_received_len ||
+        offset + fragment_len >
+            s_control_expected_len ||
+        offset + fragment_len >=
+            sizeof(s_control_buffer)
+    ) {
+        ESP_LOGW(
+            TAG,
+            "invalid control fragment"
+        );
+
+        reset_control_reassembly();
+        return;
+    }
+
+    memcpy(
+        s_control_buffer + offset,
+        event->data,
+        fragment_len
+    );
+
+    s_control_received_len += fragment_len;
+
+    if (
+        s_control_received_len !=
+        s_control_expected_len
+    ) {
+        return;
+    }
+
+    s_control_buffer[s_control_received_len] =
+        '\0';
+
+    handle_complete_control();
+
+    reset_control_reassembly();
+}
+
+
+static void publish_profile_status(
+    const char *result,
+    occ_mqtt_profile_t requested_profile
+)
+{
+    char status[STATUS_BUFFER_BYTES];
+
+    const int status_len =
+        snprintf(
+            status,
+            sizeof(status),
+            "{"
+            "\"vehicle_id\":\"%s\","
+            "\"active_profile\":\"%s\","
+            "\"requested_profile\":\"%s\","
+            "\"result\":\"%s\""
+            "}",
+            CONFIG_OCC_VEHICLE_ID,
+            occ_mqtt_profile_to_string(
+                s_mqtt_profile
+            ),
+            occ_mqtt_profile_to_string(
+                requested_profile
+            ),
+            result
+        );
+
+    if (
+        status_len <= 0 ||
+        status_len >=
+            (int)sizeof(status)
+    ) {
+        ESP_LOGW(
+            TAG,
+            "status payload construction failed"
+        );
+
+        return;
+    }
+
+    const int msg_id =
+        esp_mqtt_client_publish(
+            s_client,
+            s_status_topic,
+            status,
+            status_len,
+            OCC_MQTT_QOS,
+            0
+        );
+
+    if (msg_id < 0) {
+        ESP_LOGW(
+            TAG,
+            "profile status publish failed"
+        );
+    }
+}
+
+
+
 static void mqtt_event_handler(
     void *handler_args,
     esp_event_base_t base,
@@ -261,36 +541,77 @@ static void mqtt_event_handler(
         case MQTT_EVENT_CONNECTED:
             s_mqtt_connected = true;
             s_echo_subscribed = false;
+            s_control_subscribed = false;
 
             ESP_LOGI(
                 TAG,
                 "MQTT connected"
             );
 
-            esp_mqtt_client_subscribe(
-                s_client,
-                s_echo_topic,
-                OCC_MQTT_QOS
-            );
+            s_echo_sub_msg_id =
+                esp_mqtt_client_subscribe(
+                    s_client,
+                    s_echo_topic,
+                    OCC_MQTT_QOS
+                );
+
+            s_control_sub_msg_id =
+                esp_mqtt_client_subscribe(
+                    s_client,
+                    s_control_topic,
+                    OCC_MQTT_QOS
+                );
+
+            if (
+                s_echo_sub_msg_id < 0 ||
+                s_control_sub_msg_id < 0
+            ) {
+                ESP_LOGE(
+                    TAG,
+                    "MQTT subscription request failed"
+                );
+            }
 
             break;
 
         case MQTT_EVENT_SUBSCRIBED:
-            s_echo_subscribed = true;
+            if (
+                event->msg_id ==
+                s_echo_sub_msg_id
+            ) {
+                s_echo_subscribed = true;
 
-            ESP_LOGI(
-                TAG,
-                "echo subscription active topic=%s",
-                s_echo_topic
-            );
+                ESP_LOGI(
+                    TAG,
+                    "echo subscription active topic=%s",
+                    s_echo_topic
+                );
+            }
+
+            if (
+                event->msg_id ==
+                s_control_sub_msg_id
+            ) {
+                s_control_subscribed = true;
+
+                ESP_LOGI(
+                    TAG,
+                    "control subscription active topic=%s",
+                    s_control_topic
+                );
+            }
 
             break;
 
         case MQTT_EVENT_DISCONNECTED:
             s_mqtt_connected = false;
             s_echo_subscribed = false;
+            s_control_subscribed = false;
+            s_echo_sub_msg_id = -1;
+            s_control_sub_msg_id = -1;
 
             reset_echo_reassembly();
+            reset_control_reassembly();
 
             ESP_LOGW(
                 TAG,
@@ -301,6 +622,7 @@ static void mqtt_event_handler(
 
         case MQTT_EVENT_DATA:
             handle_echo_fragment(event);
+            handle_control_fragment(event);
             break;
 
         case MQTT_EVENT_ERROR:
@@ -334,13 +656,35 @@ static bool build_topics(void)
             CONFIG_OCC_VEHICLE_ID
         );
 
+    int control_len =
+        snprintf(
+            s_control_topic,
+            sizeof(s_control_topic),
+            "occ/runtime/%s/control",
+            CONFIG_OCC_VEHICLE_ID
+        );
+
+    int status_len =
+        snprintf(
+            s_status_topic,
+            sizeof(s_status_topic),
+            "occ/runtime/%s/status",
+            CONFIG_OCC_VEHICLE_ID
+        );
+
     return
         telemetry_len > 0 &&
         telemetry_len <
             (int)sizeof(s_telemetry_topic) &&
         echo_len > 0 &&
         echo_len <
-            (int)sizeof(s_echo_topic);
+            (int)sizeof(s_echo_topic) &&
+        control_len > 0 &&
+        control_len <
+            (int)sizeof(s_control_topic) &&
+        status_len > 0 &&
+        status_len <
+            (int)sizeof(s_status_topic);
 }
 
 
@@ -658,6 +1002,77 @@ void app_main(void)
     uint32_t waiting_log_counter = 0U;
 
     while (true) {
+        if (s_profile_change_pending) {
+            const occ_mqtt_profile_t requested_profile =
+                s_requested_profile;
+
+            s_profile_change_pending = false;
+
+            if (
+                requested_profile ==
+                s_mqtt_profile
+            ) {
+                ESP_LOGI(
+                    TAG,
+                    "requested profile already active: %s",
+                    occ_mqtt_profile_to_string(
+                        requested_profile
+                    )
+                );
+
+                publish_profile_status(
+                    "already_active",
+                    requested_profile
+                );
+            } else {
+                esp_err_t profile_err =
+                    occ_mqtt_profile_save(
+                        requested_profile
+                    );
+
+                if (profile_err != ESP_OK) {
+                    ESP_LOGE(
+                        TAG,
+                        "failed to save requested profile: %s",
+                        esp_err_to_name(
+                            profile_err
+                        )
+                    );
+
+                    publish_profile_status(
+                        "save_failed",
+                        requested_profile
+                    );
+                } else {
+                    ESP_LOGI(
+                        TAG,
+                        "profile saved; switching %s -> %s",
+                        occ_mqtt_profile_to_string(
+                            s_mqtt_profile
+                        ),
+                        occ_mqtt_profile_to_string(
+                            requested_profile
+                        )
+                    );
+
+                    publish_profile_status(
+                        "switching",
+                        requested_profile
+                    );
+
+                    /*
+                     * Give the QoS1 status message time to leave
+                     * the client before the controlled restart.
+                     */
+                    vTaskDelay(
+                        pdMS_TO_TICKS(750)
+                    );
+
+                    esp_restart();
+                }
+            }
+        }
+
         if (
             s_mqtt_connected &&
             s_echo_subscribed
