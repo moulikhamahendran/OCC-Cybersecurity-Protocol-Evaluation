@@ -1,0 +1,30 @@
+[Unit]
+Description=OCC Final Runtime MQTT Adapter
+After=network-online.target mosquitto.service
+Wants=network-online.target
+Requires=mosquitto.service
+
+[Service]
+Type=simple
+User=occ-runtime
+Group=occ-runtime
+
+WorkingDirectory=/opt/occ-final-runtime
+
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONUNBUFFERED=1
+
+ExecStart=/opt/occ-final-runtime/.venv/bin/python \
+    /opt/occ-final-runtime/occ/mqtt/mqtt_occ.py \
+    --config /etc/occ-final-runtime/system.json
+
+Restart=always
+RestartSec=2
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target
