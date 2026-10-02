@@ -5,6 +5,7 @@ set -euo pipefail
 CONFIG="/etc/occ-final-runtime/system.json"
 MQTT_ENV="/etc/occ-final-runtime/mqtt.env"
 SERVICE="occ-mqtt"
+VEHICLE_ID="${OCC_VEHICLE_ID:-VM-001}"
 
 require_root() {
     if [[ "${EUID}" -ne 0 ]]; then
@@ -29,6 +30,147 @@ data = json.loads(path.read_text())
 print(data.get("mqtt", {}).get("security_profile", "UNKNOWN"))
 PY
 }
+
+load_mqtt_env() {
+    if [[ ! -r "${MQTT_ENV}" ]]; then
+        echo "[FAIL] ${MQTT_ENV} is not readable."
+        return 1
+    fi
+
+    # shellcheck disable=SC1090
+    source "${MQTT_ENV}"
+
+    if [[
+        -z "${OCC_MQTT_USERNAME:-}" ||
+        -z "${OCC_MQTT_PASSWORD:-}"
+    ]]; then
+        echo "[FAIL] MQTT credentials are missing."
+        return 1
+    fi
+}
+
+
+send_vehicle_profile() {
+    local target_profile="$1"
+    local active_profile
+    local topic
+    local payload
+
+    active_profile="$(current_profile)"
+    topic="occ/runtime/${VEHICLE_ID}/control"
+
+    payload="$(
+        printf \
+            '{"command":"set_profile","profile":"%s"}' \
+            "${target_profile}"
+    )"
+
+    echo
+    echo "Vehicle : ${VEHICLE_ID}"
+    echo "Current : ${active_profile}"
+    echo "Target  : ${target_profile}"
+    echo
+
+    case "${active_profile}" in
+        C0)
+            if ! mosquitto_pub \
+                -h 127.0.0.1 \
+                -p 1883 \
+                -q 1 \
+                -t "${topic}" \
+                -m "${payload}"
+            then
+                echo "[FAIL] Could not send C0 control command."
+                return 1
+            fi
+            ;;
+
+        C1)
+            load_mqtt_env || return 1
+
+            if ! mosquitto_pub \
+                -h occ-pi.local \
+                -p 1884 \
+                -u "${OCC_MQTT_USERNAME}" \
+                -P "${OCC_MQTT_PASSWORD}" \
+                -q 1 \
+                -t "${topic}" \
+                -m "${payload}"
+            then
+                echo "[FAIL] Could not send C1 control command."
+                return 1
+            fi
+            ;;
+
+        C2)
+            load_mqtt_env || return 1
+
+            if [[
+                -z "${OCC_MQTT_CA_FILE:-}" ||
+                ! -r "${OCC_MQTT_CA_FILE}"
+            ]]; then
+                echo "[FAIL] C2 CA certificate is unavailable."
+                return 1
+            fi
+
+            if ! mosquitto_pub \
+                -h occ-pi.local \
+                -p 8883 \
+                --cafile "${OCC_MQTT_CA_FILE}" \
+                -u "${OCC_MQTT_USERNAME}" \
+                -P "${OCC_MQTT_PASSWORD}" \
+                -q 1 \
+                -t "${topic}" \
+                -m "${payload}"
+            then
+                echo "[FAIL] Could not send C2 control command."
+                return 1
+            fi
+            ;;
+
+        *)
+            echo "[FAIL] Unknown current profile: ${active_profile}"
+            return 1
+            ;;
+    esac
+
+    echo "[OK] ${target_profile} command sent to ${VEHICLE_ID}"
+}
+
+
+coordinated_profile_switch() {
+    local target_profile="$1"
+    local active_profile
+
+    active_profile="$(current_profile)"
+
+    if [[ "${active_profile}" == "${target_profile}" ]]; then
+        echo
+        echo "[OK] MQTT ${target_profile} is already selected."
+        return 0
+    fi
+
+    echo
+    echo "================================="
+    echo " MQTT COORDINATED SWITCH"
+    echo "================================="
+    echo "${VEHICLE_ID}: ${active_profile} -> ${target_profile}"
+    echo "Pi OCC   : ${active_profile} -> ${target_profile}"
+
+    send_vehicle_profile "${target_profile}" || return 1
+
+    echo
+    echo "Waiting for ${VEHICLE_ID} to save profile and restart..."
+    sleep 2
+
+    apply_profile "${target_profile}" || return 1
+
+    echo
+    echo "[OK] Coordinated switch initiated"
+    echo "Vehicle target : ${target_profile}"
+    echo "OCC profile    : $(current_profile)"
+}
+
 
 apply_profile() {
     local profile="$1"
@@ -193,9 +335,9 @@ menu() {
         read -r -p "> " choice
 
         case "${choice}" in
-            1) apply_profile C0 ;;
-            2) apply_profile C1 ;;
-            3) apply_profile C2 ;;
+            1) coordinated_profile_switch C0 ;;
+            2) coordinated_profile_switch C1 ;;
+            3) coordinated_profile_switch C2 ;;
             4) systemctl start "${SERVICE}" ;;
             5) systemctl stop "${SERVICE}" ;;
             6) systemctl restart "${SERVICE}" ;;
