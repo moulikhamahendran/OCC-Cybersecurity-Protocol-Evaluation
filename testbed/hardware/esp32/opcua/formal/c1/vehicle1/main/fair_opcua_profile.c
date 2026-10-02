@@ -169,6 +169,14 @@ UA_Client *fair_opcua_profile_create_client(
         return NULL;
     }
 
+    /*
+     * FAIR-V1 embedded OPC UA connection buffer.
+     * Matches the open62541 LWIP static network buffer
+     * and avoids a 64 KiB dynamic allocation on ESP32.
+     */
+    config->localConnectionConfig.sendBufferSize = 8192U;
+    config->localConnectionConfig.recvBufferSize = 8192U;
+
 #endif
 
     return client;

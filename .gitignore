@@ -55,3 +55,10 @@ testbed/hardware/esp32/**/open62541_gen/
 # Mutable runtime aggregate outputs
 testbed/results/events.csv
 testbed/results/kpi_stream.csv
+
+# ESP-IDF named build directories
+testbed/hardware/esp32/**/build-*/
+
+# Formal ESP-IDF generated local configuration
+testbed/hardware/esp32/**/formal/**/sdkconfig
+testbed/hardware/esp32/**/formal/**/sdkconfig.old
