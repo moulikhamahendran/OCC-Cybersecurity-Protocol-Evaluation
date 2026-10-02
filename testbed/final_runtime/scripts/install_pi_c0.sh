@@ -147,7 +147,7 @@ echo "Pi hostname:"
 hostname
 
 echo
-echo "For the planned vehicle address occ.local,"
-echo "the Pi hostname should eventually be 'occ'."
+echo "Vehicle-facing OCC address:"
+echo "occ-pi.local"
 echo
 echo "Run the health check next."

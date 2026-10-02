@@ -18,14 +18,14 @@
 ## Phase 2 — MQTT C0 golden path
 - [x] central runtime configuration
 - [ ] configurable vehicle identity
-- [ ] stable OCC addressing
-- [ ] Pi MQTT broker automatic startup
-- [ ] Pi OCC MQTT service automatic startup
+- [x] stable OCC addressing
+- [x] Pi MQTT broker automatic startup
+- [x] Pi OCC MQTT service automatic startup
 - [ ] Vehicle 1 automatic Wi-Fi connection
 - [ ] Vehicle 1 automatic MQTT connection
 - [ ] continuous operational telemetry
 - [ ] automatic reconnect
-- [ ] health check
+- [x] health check
 - [ ] repeated cold-start proof
 
 ## Phase 3 — MQTT C1
