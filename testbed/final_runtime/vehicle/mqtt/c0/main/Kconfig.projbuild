@@ -1,13 +1,5 @@
 menu "OCC MQTT Runtime C0"
 
-config OCC_WIFI_SSID
-    string "Wi-Fi SSID"
-    default ""
-
-config OCC_WIFI_PASSWORD
-    string "Wi-Fi password"
-    default ""
-
 config OCC_MQTT_BROKER_URI
     string "OCC MQTT broker URI"
     default "mqtt://occ-pi.local:1883"

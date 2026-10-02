@@ -16,7 +16,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "fair_mqtt_network.h"
+#include "runtime_wifi.h"
 
 
 #define OCC_MQTT_QOS 1
@@ -383,17 +383,6 @@ void app_main(void)
     );
 
     if (
-        strlen(CONFIG_OCC_WIFI_SSID) == 0U
-    ) {
-        ESP_LOGE(
-            TAG,
-            "Wi-Fi is not configured"
-        );
-
-        return;
-    }
-
-    if (
         strlen(CONFIG_OCC_MQTT_BROKER_URI) == 0U ||
         strlen(CONFIG_OCC_VEHICLE_ID) == 0U
     ) {
@@ -415,29 +404,15 @@ void app_main(void)
     }
 
     esp_err_t err =
-        fair_mqtt_network_connect(
-            CONFIG_OCC_WIFI_SSID,
-            CONFIG_OCC_WIFI_PASSWORD,
-            pdMS_TO_TICKS(30000)
-        );
+        occ_runtime_wifi_connect_or_provision();
 
     if (err != ESP_OK) {
         ESP_LOGE(
             TAG,
-            "initial Wi-Fi connection failed: %s",
+            "Wi-Fi provisioning/connect failed: %s",
             esp_err_to_name(err)
         );
 
-        ESP_LOGW(
-            TAG,
-            "restarting in 5 seconds"
-        );
-
-        vTaskDelay(
-            pdMS_TO_TICKS(5000)
-        );
-
-        esp_restart();
         return;
     }
 

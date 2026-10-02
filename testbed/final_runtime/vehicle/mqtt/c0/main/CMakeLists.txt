@@ -1,7 +1,7 @@
 idf_component_register(
     SRCS
         "main.c"
-        "fair_mqtt_network.c"
+        "runtime_wifi.c"
 
     INCLUDE_DIRS
         "."
@@ -13,6 +13,7 @@ idf_component_register(
         esp_event
         esp_netif
         nvs_flash
+        wifi_provisioning
         esp_timer
         lwip
 )
