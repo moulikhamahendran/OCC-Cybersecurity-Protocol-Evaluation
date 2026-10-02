@@ -68,6 +68,9 @@ static volatile bool s_profile_change_pending = false;
 static volatile occ_mqtt_profile_t s_requested_profile =
     OCC_MQTT_PROFILE_C2;
 
+static volatile bool s_vehicle_id_change_pending = false;
+static char s_requested_vehicle_id[OCC_VEHICLE_ID_MAX_LEN];
+
 static bool s_runtime_status_published = false;
 
 
@@ -273,6 +276,42 @@ static void handle_echo_fragment(
 }
 
 
+static bool vehicle_id_is_valid(
+    const char *vehicle_id
+)
+{
+    if (
+        vehicle_id == NULL ||
+        vehicle_id[0] == '\0'
+    ) {
+        return false;
+    }
+
+    const size_t len = strlen(vehicle_id);
+
+    if (len >= OCC_VEHICLE_ID_MAX_LEN) {
+        return false;
+    }
+
+    for (size_t i = 0U; i < len; ++i) {
+        const char c = vehicle_id[i];
+
+        const bool allowed =
+            (c >= 'A' && c <= 'Z') ||
+            (c >= 'a' && c <= 'z') ||
+            (c >= '0' && c <= '9') ||
+            c == '-' ||
+            c == '_';
+
+        if (!allowed) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
 static void handle_complete_control(void)
 {
     cJSON *root =
@@ -296,76 +335,176 @@ static void handle_complete_control(void)
             "command"
         );
 
-    const cJSON *profile =
-        cJSON_GetObjectItemCaseSensitive(
-            root,
-            "profile"
-        );
-
     if (
         !cJSON_IsString(command) ||
-        command->valuestring == NULL ||
-        strcmp(
-            command->valuestring,
-            "set_profile"
-        ) != 0 ||
-        !cJSON_IsString(profile) ||
-        profile->valuestring == NULL
+        command->valuestring == NULL
     ) {
         ESP_LOGW(
             TAG,
-            "unsupported control command"
+            "control command missing"
         );
 
         cJSON_Delete(root);
         return;
     }
 
-    occ_mqtt_profile_t requested_profile;
+    if (
+        strcmp(
+            command->valuestring,
+            "set_profile"
+        ) == 0
+    ) {
+        const cJSON *profile =
+            cJSON_GetObjectItemCaseSensitive(
+                root,
+                "profile"
+            );
 
-    esp_err_t err =
-        occ_mqtt_profile_from_string(
-            profile->valuestring,
-            &requested_profile
-        );
+        if (
+            !cJSON_IsString(profile) ||
+            profile->valuestring == NULL
+        ) {
+            ESP_LOGW(
+                TAG,
+                "requested MQTT profile missing"
+            );
 
-    if (err != ESP_OK) {
-        ESP_LOGW(
+            cJSON_Delete(root);
+            return;
+        }
+
+        occ_mqtt_profile_t requested_profile;
+
+        esp_err_t err =
+            occ_mqtt_profile_from_string(
+                profile->valuestring,
+                &requested_profile
+            );
+
+        if (err != ESP_OK) {
+            ESP_LOGW(
+                TAG,
+                "invalid requested MQTT profile"
+            );
+
+            cJSON_Delete(root);
+            return;
+        }
+
+        if (
+            s_profile_change_pending ||
+            s_vehicle_id_change_pending
+        ) {
+            ESP_LOGW(
+                TAG,
+                "runtime configuration change already pending"
+            );
+
+            cJSON_Delete(root);
+            return;
+        }
+
+        s_requested_profile = requested_profile;
+        s_profile_change_pending = true;
+
+        ESP_LOGI(
             TAG,
-            "invalid requested MQTT profile"
+            "profile change requested current=%s requested=%s",
+            occ_mqtt_profile_to_string(
+                s_mqtt_profile
+            ),
+            occ_mqtt_profile_to_string(
+                requested_profile
+            )
         );
 
         cJSON_Delete(root);
         return;
     }
 
-    if (s_profile_change_pending) {
-        ESP_LOGW(
+    if (
+        strcmp(
+            command->valuestring,
+            "set_vehicle_id"
+        ) == 0
+    ) {
+        const cJSON *vehicle_id =
+            cJSON_GetObjectItemCaseSensitive(
+                root,
+                "vehicle_id"
+            );
+
+        if (
+            !cJSON_IsString(vehicle_id) ||
+            vehicle_id->valuestring == NULL ||
+            !vehicle_id_is_valid(
+                vehicle_id->valuestring
+            )
+        ) {
+            ESP_LOGW(
+                TAG,
+                "invalid requested vehicle identity"
+            );
+
+            cJSON_Delete(root);
+            return;
+        }
+
+        if (
+            s_profile_change_pending ||
+            s_vehicle_id_change_pending
+        ) {
+            ESP_LOGW(
+                TAG,
+                "runtime configuration change already pending"
+            );
+
+            cJSON_Delete(root);
+            return;
+        }
+
+        const int written =
+            snprintf(
+                s_requested_vehicle_id,
+                sizeof(s_requested_vehicle_id),
+                "%s",
+                vehicle_id->valuestring
+            );
+
+        if (
+            written <= 0 ||
+            written >=
+                (int)sizeof(s_requested_vehicle_id)
+        ) {
+            ESP_LOGW(
+                TAG,
+                "requested vehicle identity too long"
+            );
+
+            cJSON_Delete(root);
+            return;
+        }
+
+        s_vehicle_id_change_pending = true;
+
+        ESP_LOGI(
             TAG,
-            "profile change already pending"
+            "vehicle identity change requested current=%s requested=%s",
+            s_vehicle_id,
+            s_requested_vehicle_id
         );
 
         cJSON_Delete(root);
         return;
     }
 
-    s_requested_profile = requested_profile;
-    s_profile_change_pending = true;
-
-    ESP_LOGI(
+    ESP_LOGW(
         TAG,
-        "profile change requested current=%s requested=%s",
-        occ_mqtt_profile_to_string(
-            s_mqtt_profile
-        ),
-        occ_mqtt_profile_to_string(
-            requested_profile
-        )
+        "unsupported control command"
     );
 
     cJSON_Delete(root);
 }
-
 
 static void handle_control_fragment(
     esp_mqtt_event_handle_t event
@@ -524,6 +663,63 @@ static void publish_profile_status(
     }
 }
 
+
+
+static void publish_vehicle_id_status(
+    const char *result,
+    const char *requested_vehicle_id
+)
+{
+    char status[STATUS_BUFFER_BYTES];
+
+    const int status_len =
+        snprintf(
+            status,
+            sizeof(status),
+            "{"
+            "\"vehicle_id\":\"%s\","
+            "\"active_profile\":\"%s\","
+            "\"requested_vehicle_id\":\"%s\","
+            "\"result\":\"%s\""
+            "}",
+            s_vehicle_id,
+            occ_mqtt_profile_to_string(
+                s_mqtt_profile
+            ),
+            requested_vehicle_id,
+            result
+        );
+
+    if (
+        status_len <= 0 ||
+        status_len >=
+            (int)sizeof(status)
+    ) {
+        ESP_LOGW(
+            TAG,
+            "vehicle identity status construction failed"
+        );
+
+        return;
+    }
+
+    const int msg_id =
+        esp_mqtt_client_publish(
+            s_client,
+            s_status_topic,
+            status,
+            status_len,
+            OCC_MQTT_QOS,
+            0
+        );
+
+    if (msg_id < 0) {
+        ESP_LOGW(
+            TAG,
+            "vehicle identity status publish failed"
+        );
+    }
+}
 
 
 static void mqtt_event_handler(
@@ -1076,6 +1272,91 @@ void app_main(void)
             );
 
             s_runtime_status_published = true;
+        }
+
+        if (s_vehicle_id_change_pending) {
+            char requested_vehicle_id[
+                OCC_VEHICLE_ID_MAX_LEN
+            ];
+
+            const int copied =
+                snprintf(
+                    requested_vehicle_id,
+                    sizeof(requested_vehicle_id),
+                    "%s",
+                    s_requested_vehicle_id
+                );
+
+            s_vehicle_id_change_pending = false;
+
+            if (
+                copied <= 0 ||
+                copied >=
+                    (int)sizeof(requested_vehicle_id)
+            ) {
+                ESP_LOGE(
+                    TAG,
+                    "pending vehicle identity is invalid"
+                );
+            } else if (
+                strcmp(
+                    requested_vehicle_id,
+                    s_vehicle_id
+                ) == 0
+            ) {
+                ESP_LOGI(
+                    TAG,
+                    "requested vehicle identity already active: %s",
+                    requested_vehicle_id
+                );
+
+                publish_vehicle_id_status(
+                    "vehicle_id_already_active",
+                    requested_vehicle_id
+                );
+            } else {
+                esp_err_t vehicle_id_err =
+                    occ_vehicle_id_save(
+                        requested_vehicle_id
+                    );
+
+                if (vehicle_id_err != ESP_OK) {
+                    ESP_LOGE(
+                        TAG,
+                        "failed to save requested vehicle identity: %s",
+                        esp_err_to_name(
+                            vehicle_id_err
+                        )
+                    );
+
+                    publish_vehicle_id_status(
+                        "vehicle_id_save_failed",
+                        requested_vehicle_id
+                    );
+                } else {
+                    ESP_LOGI(
+                        TAG,
+                        "vehicle identity saved; switching %s -> %s",
+                        s_vehicle_id,
+                        requested_vehicle_id
+                    );
+
+                    publish_vehicle_id_status(
+                        "vehicle_id_switching",
+                        requested_vehicle_id
+                    );
+
+                    /*
+                     * Give the QoS1 status message time to leave
+                     * before rebuilding identity-derived topics.
+                     */
+                    vTaskDelay(
+                        pdMS_TO_TICKS(750)
+                    );
+
+                    esp_restart();
+                }
+            }
         }
 
         if (s_profile_change_pending) {
