@@ -21,6 +21,8 @@ from mqtt_occ import (
     decode_fair_payload,
 )
 
+from runtime_payload import decode_runtime_payload
+
 
 CONFIG = (
     HERE.parent.parent
@@ -65,6 +67,30 @@ class MqttOccTests(unittest.TestCase):
                 json.dumps(echo).encode("utf-8")
             )
         )
+
+    def test_continuous_runtime_payload(self):
+        payload = {
+            "schema_ver": "runtime-1.0",
+            "serialNumber": "VM-001",
+            "seq": 12345,
+            "t_source_us": 987654321,
+            "speed": 0.5,
+            "pos_x": 1.0,
+            "pos_y": 2.0,
+            "heading": 0.0,
+            "battery_pct": 95.0,
+            "state": "IDLE",
+        }
+
+        decoded = decode_runtime_payload(
+            json.dumps(payload).encode("utf-8")
+        )
+
+        self.assertEqual(
+            decoded,
+            payload,
+        )
+
 
     def test_registry_tracks_vehicle(self):
         config = load_runtime_config(CONFIG)

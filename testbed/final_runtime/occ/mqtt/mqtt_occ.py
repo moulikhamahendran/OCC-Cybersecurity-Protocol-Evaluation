@@ -18,6 +18,7 @@ if str(CORE) not in sys.path:
     sys.path.insert(0, str(CORE))
 
 from config import load_runtime_config, mqtt_topics
+from runtime_payload import decode_runtime_payload
 
 
 PAYLOAD_SCHEMA_VERSION = "0.1"
@@ -233,7 +234,7 @@ class MqttOccService:
         if expected_serial is None:
             return
 
-        payload = decode_fair_payload(
+        payload = decode_runtime_payload(
             message.payload
         )
 
