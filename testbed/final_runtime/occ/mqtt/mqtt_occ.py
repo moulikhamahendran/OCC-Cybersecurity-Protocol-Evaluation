@@ -301,7 +301,7 @@ class MqttOccService:
         )
 
     def run(self):
-        host = self.config.occ_hostname
+        host = self.config.mqtt.broker_host
         port = self.config.mqtt.port
 
         print(

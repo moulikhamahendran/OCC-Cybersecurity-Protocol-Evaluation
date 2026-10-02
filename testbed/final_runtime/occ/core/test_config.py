@@ -31,6 +31,11 @@ class RuntimeConfigTests(unittest.TestCase):
         )
 
         self.assertEqual(
+            config.mqtt.broker_host,
+            "127.0.0.1",
+        )
+
+        self.assertEqual(
             config.mqtt.port,
             1883,
         )

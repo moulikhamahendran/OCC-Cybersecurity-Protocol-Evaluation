@@ -10,6 +10,7 @@ from pathlib import Path
 @dataclass(frozen=True)
 class MqttConfig:
     security_profile: str
+    broker_host: str
     port: int
     qos: int
     topic_root: str
@@ -74,6 +75,11 @@ def load_runtime_config(path):
             "mqtt.security_profile must be C0, C1, or C2"
         )
 
+    broker_host = _require_nonempty_string(
+        mqtt_raw.get("broker_host"),
+        "mqtt.broker_host",
+    )
+
     port = mqtt_raw.get("port")
     if not isinstance(port, int) or isinstance(port, bool):
         raise ValueError("mqtt.port must be an integer")
@@ -137,6 +143,7 @@ def load_runtime_config(path):
         occ_hostname=occ_hostname,
         mqtt=MqttConfig(
             security_profile=security_profile,
+            broker_host=broker_host,
             port=port,
             qos=qos,
             topic_root=topic_root,
