@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import ssl
 from pathlib import Path
 import sys
 import time
@@ -301,6 +303,64 @@ class MqttOccService:
             f"publish_rc={info.rc}"
         )
 
+    def configure_security(self):
+        profile = self.config.mqtt.security_profile
+
+        if profile == "C0":
+            return
+
+        username = os.environ.get(
+            "OCC_MQTT_USERNAME",
+            "",
+        )
+
+        password = os.environ.get(
+            "OCC_MQTT_PASSWORD",
+            "",
+        )
+
+        if not username or not password:
+            raise RuntimeError(
+                f"MQTT {profile} requires "
+                "OCC_MQTT_USERNAME and OCC_MQTT_PASSWORD"
+            )
+
+        self.client.username_pw_set(
+            username,
+            password,
+        )
+
+        if profile == "C1":
+            return
+
+        if profile != "C2":
+            raise RuntimeError(
+                f"unsupported MQTT security profile: {profile}"
+            )
+
+        ca_file = os.environ.get(
+            "OCC_MQTT_CA_FILE",
+            "",
+        )
+
+        if not ca_file:
+            raise RuntimeError(
+                "MQTT C2 requires OCC_MQTT_CA_FILE"
+            )
+
+        if not Path(ca_file).is_file():
+            raise RuntimeError(
+                f"MQTT C2 CA file not found: {ca_file}"
+            )
+
+        self.client.tls_set(
+            ca_certs=ca_file,
+            cert_reqs=ssl.CERT_REQUIRED,
+            tls_version=ssl.PROTOCOL_TLS_CLIENT,
+        )
+
+        self.client.tls_insecure_set(False)
+
     def run(self):
         host = self.config.mqtt.broker_host
         port = self.config.mqtt.port
@@ -311,6 +371,8 @@ class MqttOccService:
             f"port={port} "
             f"profile={self.config.mqtt.security_profile}"
         )
+
+        self.configure_security()
 
         self.client.connect(
             host,
@@ -341,12 +403,6 @@ def main():
     config = load_runtime_config(
         args.config
     )
-
-    if config.mqtt.security_profile != "C0":
-        raise SystemExit(
-            "current final-runtime implementation "
-            "supports MQTT C0 only"
-        )
 
     service = MqttOccService(config)
     service.run()

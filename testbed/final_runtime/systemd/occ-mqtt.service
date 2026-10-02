@@ -13,6 +13,7 @@ WorkingDirectory=/opt/occ-final-runtime
 
 Environment=PYTHONDONTWRITEBYTECODE=1
 Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=-/etc/occ-final-runtime/mqtt.env
 
 ExecStart=/opt/occ-final-runtime/.venv/bin/python \
     /opt/occ-final-runtime/occ/mqtt/mqtt_occ.py \

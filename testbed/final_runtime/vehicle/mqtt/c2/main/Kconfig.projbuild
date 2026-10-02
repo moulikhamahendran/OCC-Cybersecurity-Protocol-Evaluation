@@ -1,0 +1,29 @@
+menu "OCC MQTT Runtime C1"
+
+config OCC_SNTP_SERVER
+    string "SNTP server for TLS certificate validation"
+    default "occ-pi.local"
+    help
+        Time source required before MQTT C2 TLS validation.
+        Override for networks using a local NTP server.
+
+config OCC_MQTT_BROKER_URI
+    string "OCC MQTT broker URI"
+    default "mqtts://occ-pi.local:8883"
+    help
+        Vehicle-facing MQTT broker address.
+        This is configuration, not hardcoded application logic.
+
+config OCC_VEHICLE_ID
+    string "Vehicle identity"
+    default "VM-001"
+
+config OCC_RUNTIME_PERIOD_MS
+    int "Operational telemetry period in milliseconds"
+    range 50 60000
+    default 100
+    help
+        100 ms = 10 Hz.
+        This is operational telemetry, not the formal FAIR scheduler.
+
+endmenu
