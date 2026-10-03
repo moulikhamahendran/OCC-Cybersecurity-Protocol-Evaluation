@@ -429,7 +429,7 @@ class MqttOccService:
 
         if payload is None:
             print(
-                f"[OCC] rejected malformed FAIR payload "
+                f"[OCC] rejected malformed runtime payload "
                 f"topic={message.topic}"
             )
             return
