@@ -917,6 +917,28 @@ cat {shlex.quote(remote_service_log)}
 
             print()
             print(
+                "===== FORMAL RUN METADATA ====="
+            )
+
+            command(
+                [
+                    sys.executable,
+                    REPO
+                    / "testbed"
+                    / "tools"
+                    / "fair_v1"
+                    / "finalize_mqtt_run_metadata.py",
+                    "--run-dir",
+                    run_dir,
+                    "--config",
+                    args.config.expanduser(),
+                    "--pi",
+                    args.pi,
+                ]
+            )
+
+            print()
+            print(
                 "===== GROUP-2 CAPTURE CHECK ====="
             )
             print(
