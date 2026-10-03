@@ -71,6 +71,8 @@ static volatile occ_mqtt_profile_t s_requested_profile =
 static volatile bool s_vehicle_id_change_pending = false;
 static char s_requested_vehicle_id[OCC_VEHICLE_ID_MAX_LEN];
 
+static volatile bool s_credentials_clear_pending = false;
+
 static bool s_runtime_status_published = false;
 
 
@@ -393,7 +395,8 @@ static void handle_complete_control(void)
 
         if (
             s_profile_change_pending ||
-            s_vehicle_id_change_pending
+            s_vehicle_id_change_pending ||
+            s_credentials_clear_pending
         ) {
             ESP_LOGW(
                 TAG,
@@ -452,7 +455,8 @@ static void handle_complete_control(void)
 
         if (
             s_profile_change_pending ||
-            s_vehicle_id_change_pending
+            s_vehicle_id_change_pending ||
+            s_credentials_clear_pending
         ) {
             ESP_LOGW(
                 TAG,
@@ -492,6 +496,47 @@ static void handle_complete_control(void)
             "vehicle identity change requested current=%s requested=%s",
             s_vehicle_id,
             s_requested_vehicle_id
+        );
+
+        cJSON_Delete(root);
+        return;
+    }
+
+    if (
+        strcmp(
+            command->valuestring,
+            "clear_mqtt_credentials"
+        ) == 0
+    ) {
+        if (s_mqtt_profile != OCC_MQTT_PROFILE_C2) {
+            ESP_LOGW(
+                TAG,
+                "MQTT credential reset rejected: C2 required"
+            );
+
+            cJSON_Delete(root);
+            return;
+        }
+
+        if (
+            s_profile_change_pending ||
+            s_vehicle_id_change_pending ||
+            s_credentials_clear_pending
+        ) {
+            ESP_LOGW(
+                TAG,
+                "runtime configuration change already pending"
+            );
+
+            cJSON_Delete(root);
+            return;
+        }
+
+        s_credentials_clear_pending = true;
+
+        ESP_LOGI(
+            TAG,
+            "MQTT credential reprovisioning requested"
         );
 
         cJSON_Delete(root);
@@ -717,6 +762,60 @@ static void publish_vehicle_id_status(
         ESP_LOGW(
             TAG,
             "vehicle identity status publish failed"
+        );
+    }
+}
+
+
+static void publish_credentials_status(
+    const char *result
+)
+{
+    char status[STATUS_BUFFER_BYTES];
+
+    const int status_len =
+        snprintf(
+            status,
+            sizeof(status),
+            "{"
+            "\"vehicle_id\":\"%s\","
+            "\"active_profile\":\"%s\","
+            "\"result\":\"%s\""
+            "}",
+            s_vehicle_id,
+            occ_mqtt_profile_to_string(
+                s_mqtt_profile
+            ),
+            result
+        );
+
+    if (
+        status_len <= 0 ||
+        status_len >=
+            (int)sizeof(status)
+    ) {
+        ESP_LOGW(
+            TAG,
+            "credential status construction failed"
+        );
+
+        return;
+    }
+
+    const int msg_id =
+        esp_mqtt_client_publish(
+            s_client,
+            s_status_topic,
+            status,
+            status_len,
+            OCC_MQTT_QOS,
+            0
+        );
+
+    if (msg_id < 0) {
+        ESP_LOGW(
+            TAG,
+            "credential status publish failed"
         );
     }
 }
@@ -1369,6 +1468,46 @@ void app_main(void)
 
                     esp_restart();
                 }
+            }
+        }
+
+        if (s_credentials_clear_pending) {
+            s_credentials_clear_pending = false;
+
+            esp_err_t credentials_err =
+                occ_mqtt_credentials_clear();
+
+            if (credentials_err != ESP_OK) {
+                ESP_LOGE(
+                    TAG,
+                    "failed to clear MQTT credentials: %s",
+                    esp_err_to_name(
+                        credentials_err
+                    )
+                );
+
+                publish_credentials_status(
+                    "credentials_clear_failed"
+                );
+            } else {
+                ESP_LOGI(
+                    TAG,
+                    "MQTT credentials cleared; entering reprovisioning"
+                );
+
+                publish_credentials_status(
+                    "credentials_cleared_reprovisioning"
+                );
+
+                /*
+                 * Give the QoS1 status message time to leave
+                 * before restarting into provisioning mode.
+                 */
+                vTaskDelay(
+                    pdMS_TO_TICKS(750)
+                );
+
+                esp_restart();
             }
         }
 

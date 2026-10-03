@@ -33,6 +33,9 @@ ACL_C0="/etc/mosquitto/acl-c0"
 ACL_C1="/etc/mosquitto/acl-c1"
 ACL_C2="/etc/mosquitto/acl-c2"
 
+MOSQUITTO_PASSWORD_FILE="/etc/mosquitto/passwd-fair-v1"
+VEHICLE_USER_REGISTRY="${CONFIG_ROOT}/mqtt-vehicle-users"
+
 C2_CERT_ROOT="/etc/mosquitto/certs/fair-v1-c2"
 C2_CA="${C2_CERT_ROOT}/ca.crt"
 C2_CERT="${C2_CERT_ROOT}/server.crt"
@@ -270,6 +273,75 @@ install     -o root     -g mosquitto     -m 0640     "${RUNTIME_SOURCE}/deployme
 install     -o root     -g mosquitto     -m 0640     "${RUNTIME_SOURCE}/deployment/mosquitto/acl-c1"     "${ACL_C1}"
 
 install     -o root     -g mosquitto     -m 0640     "${RUNTIME_SOURCE}/deployment/mosquitto/acl-c2"     "${ACL_C2}"
+
+#
+# Operational vehicle credentials are runtime state.
+#
+# Passwords/hashes remain in Mosquitto's protected password
+# database and are never stored in the repository.
+# This registry contains usernames only.
+#
+if [[ ! -f "${VEHICLE_USER_REGISTRY}" ]]; then
+    install \
+        -o root \
+        -g occ-runtime \
+        -m 0640 \
+        /dev/null \
+        "${VEHICLE_USER_REGISTRY}"
+else
+    chown root:occ-runtime "${VEHICLE_USER_REGISTRY}"
+    chmod 0640 "${VEHICLE_USER_REGISTRY}"
+fi
+
+if [[ ! -f "${MOSQUITTO_PASSWORD_FILE}" ]]; then
+    echo "[FAIL] Mosquitto password database is missing:"
+    echo "       ${MOSQUITTO_PASSWORD_FILE}"
+    exit 1
+fi
+
+while IFS= read -r raw_user || [[ -n "${raw_user}" ]]
+do
+    user="${raw_user%%#*}"
+
+    # Trim leading/trailing whitespace.
+    user="${user#"${user%%[![:space:]]*}"}"
+    user="${user%"${user##*[![:space:]]}"}"
+
+    if [[ -z "${user}" ]]; then
+        continue
+    fi
+
+    if [[ ! "${user}" =~ ^[A-Za-z0-9._-]+$ ]]; then
+        echo "[FAIL] Invalid MQTT vehicle username:"
+        echo "       ${user}"
+        exit 1
+    fi
+
+    if ! awk \
+        -F: \
+        -v user="${user}" \
+        '$1 == user { found = 1 }
+         END { exit(found ? 0 : 1) }' \
+        "${MOSQUITTO_PASSWORD_FILE}"
+    then
+        echo "[FAIL] Registered MQTT vehicle user"
+        echo "       does not exist in password database:"
+        echo "       ${user}"
+        exit 1
+    fi
+
+    printf \
+        '\n# Registered operational vehicle credential\nuser %s\ntopic readwrite occ/runtime/C1/#\n' \
+        "${user}" \
+        >> "${ACL_C1}"
+
+    printf \
+        '\n# Registered operational vehicle credential\nuser %s\ntopic readwrite occ/runtime/C2/#\n' \
+        "${user}" \
+        >> "${ACL_C2}"
+
+    echo "[OK] Operational MQTT vehicle user enabled: ${user}"
+done < "${VEHICLE_USER_REGISTRY}"
 
 ensure_acl_reference()
 {

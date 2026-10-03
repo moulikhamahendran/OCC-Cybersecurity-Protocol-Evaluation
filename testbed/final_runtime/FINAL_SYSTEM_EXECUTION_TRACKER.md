@@ -17,36 +17,48 @@
 
 ## Phase 2 — MQTT C0 golden path
 - [x] central runtime configuration
-- [ ] configurable vehicle identity
+- [x] configurable vehicle identity
 - [x] stable OCC addressing
 - [x] Pi MQTT broker automatic startup
 - [x] Pi OCC MQTT service automatic startup
-- [ ] Vehicle 1 automatic Wi-Fi connection
-- [ ] Vehicle 1 automatic MQTT connection
-- [ ] continuous operational telemetry
-- [ ] automatic reconnect
+- [x] Vehicle 1 automatic Wi-Fi connection
+- [x] Vehicle 1 automatic MQTT connection
+- [x] continuous operational telemetry
+- [x] automatic reconnect
 - [x] health check
-- [ ] repeated cold-start proof
+- [x] repeated cold-start proof
 
 ## Phase 3 — MQTT C1
-- [ ] authentication
-- [ ] positive test
-- [ ] negative authentication test
-- [ ] cold-start proof
+- [x] authentication
+- [x] positive test
+- [x] negative authentication test
+- [x] cold-start proof
 
 ## Phase 4 — MQTT C2
-- [ ] TLS
-- [ ] certificate validation
-- [ ] authentication
-- [ ] positive test
-- [ ] negative TLS/auth tests
-- [ ] cold-start proof
+- [x] TLS
+- [x] certificate validation
+- [x] authentication
+- [x] positive test
+- [x] negative TLS/auth tests
+- [x] cold-start proof
 
 ## Phase 5 — Vehicle 2
-- [ ] same firmware architecture
-- [ ] VM-002 identity/config
-- [ ] separate credentials
-- [ ] simultaneous VM-001 + VM-002
+- [x] same firmware architecture
+- [x] VM-002 identity/config
+- [x] separate credentials
+- [x] simultaneous VM-001 + VM-002
+
+## MQTT Phase 2–5 acceptance evidence
+
+- C0, C1 and C2 operational MQTT runtime proven on Raspberry Pi 5 + ESP32.
+- VM-001 and VM-002 run simultaneously with persistent independent identities.
+- VM-002 uses independent broker account `vm002`; password is runtime secret and is not stored in Git.
+- VM-002 credential reprovisioning preserves Wi-Fi, vehicle identity and active MQTT profile.
+- C2 uses verified TLS to `occ-pi.local:8883`.
+- Negative authentication and TLS hostname-validation tests passed.
+- OCC service restart, Mosquitto restart and Raspberry Pi reboot recovery passed.
+- ESP32 cold-start/reconnect and persistent profile/identity behavior passed.
+- Frozen `fair/v1/#` benchmark namespace and definitions remain unchanged.
 
 ## Phase 6 — Benchmark / Metrics
 - [ ] formal benchmark trigger

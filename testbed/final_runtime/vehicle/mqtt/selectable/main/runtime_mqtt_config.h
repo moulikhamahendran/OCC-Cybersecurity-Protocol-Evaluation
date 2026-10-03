@@ -77,3 +77,12 @@ esp_err_t occ_mqtt_credentials_save(
     const char *username,
     const char *password
 );
+
+
+/*
+ * Remove only MQTT credentials from NVS.
+ *
+ * Wi-Fi configuration, vehicle identity and MQTT profile
+ * are intentionally preserved.
+ */
+esp_err_t occ_mqtt_credentials_clear(void);

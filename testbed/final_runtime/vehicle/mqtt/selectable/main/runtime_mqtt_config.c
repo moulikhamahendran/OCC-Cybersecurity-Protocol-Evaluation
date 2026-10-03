@@ -371,3 +371,54 @@ esp_err_t occ_mqtt_credentials_save(
 
     return err;
 }
+
+
+esp_err_t occ_mqtt_credentials_clear(void)
+{
+    nvs_handle_t handle;
+
+    esp_err_t err =
+        nvs_open(
+            OCC_RUNTIME_NVS_NAMESPACE,
+            NVS_READWRITE,
+            &handle
+        );
+
+    if (err != ESP_OK) {
+        return err;
+    }
+
+    esp_err_t username_err =
+        nvs_erase_key(
+            handle,
+            OCC_MQTT_USERNAME_KEY
+        );
+
+    if (
+        username_err != ESP_OK &&
+        username_err != ESP_ERR_NVS_NOT_FOUND
+    ) {
+        nvs_close(handle);
+        return username_err;
+    }
+
+    esp_err_t password_err =
+        nvs_erase_key(
+            handle,
+            OCC_MQTT_PASSWORD_KEY
+        );
+
+    if (
+        password_err != ESP_OK &&
+        password_err != ESP_ERR_NVS_NOT_FOUND
+    ) {
+        nvs_close(handle);
+        return password_err;
+    }
+
+    err = nvs_commit(handle);
+
+    nvs_close(handle);
+
+    return err;
+}
