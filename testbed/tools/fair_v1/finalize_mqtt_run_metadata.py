@@ -211,6 +211,16 @@ def get_remote_facts(pi):
 
 
 def validate_metadata(path):
+    try:
+        from jsonschema import (
+            Draft202012Validator,
+        )
+    except ModuleNotFoundError as exc:
+        raise SystemExit(
+            "jsonschema is required in the "
+            "active Python environment."
+        ) from exc
+
     schema = json.loads(
         SCHEMA.read_text(
             encoding="utf-8"
@@ -223,66 +233,10 @@ def validate_metadata(path):
         )
     )
 
-    try:
-        from jsonschema import (
-            Draft202012Validator,
-        )
-
-        Draft202012Validator(
-            schema
-        ).validate(
-            metadata
-        )
-
-        return
-
-    except ModuleNotFoundError:
-        pass
-
-    candidates = [
-        "/opt/anaconda3/bin/python3",
-        shutil.which("python3"),
-    ]
-
-    validator_code = r'''
-import json
-import sys
-from jsonschema import Draft202012Validator
-
-schema = json.load(open(sys.argv[1]))
-data = json.load(open(sys.argv[2]))
-
-Draft202012Validator(schema).validate(data)
-'''
-
-    for candidate in candidates:
-        if (
-            not candidate
-            or not Path(candidate).exists()
-            or Path(candidate).resolve()
-            == Path(sys.executable).resolve()
-        ):
-            continue
-
-        result = subprocess.run(
-            [
-                candidate,
-                "-c",
-                validator_code,
-                str(SCHEMA),
-                str(path),
-            ],
-            check=False,
-        )
-
-        if result.returncode == 0:
-            return
-
-    raise SystemExit(
-        "Metadata created but JSON Schema "
-        "validation could not be executed. "
-        "Install jsonschema in the active "
-        "Python environment."
+    Draft202012Validator(
+        schema
+    ).validate(
+        metadata
     )
 
 
@@ -428,6 +382,21 @@ def main():
 
     invalidation_reasons = []
     flag_reasons = []
+
+    run_start_utc = status.get(
+        "run_start_utc"
+    )
+
+    if not run_start_utc:
+        invalidation_reasons.append(
+            "actual_run_start_utc_not_captured"
+        )
+
+        run_start_utc = (
+            parse_run_start_utc(
+                run_id
+            )
+        )
 
     if (
         status.get(
@@ -634,9 +603,7 @@ def main():
             "0.1",
 
         "run_start_utc":
-            parse_run_start_utc(
-                run_id
-            ),
+            run_start_utc,
 
         # Frozen schema explicitly permits null.
         # ESP32 and Pi monotonic clocks are not
