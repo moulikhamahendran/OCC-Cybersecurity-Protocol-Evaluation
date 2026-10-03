@@ -516,7 +516,7 @@ def capture_serial(
     finally:
         ser.close()
 
-    return raw_count, summary
+    return raw_count, summary, observed_run_start_utc
 
 
 def stop_remote_echo(
