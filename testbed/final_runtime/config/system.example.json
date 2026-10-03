@@ -8,7 +8,21 @@
     "broker_host": "127.0.0.1",
     "port": 1883,
     "qos": 1,
-    "topic_root": "fair/v1"
+    "topic_root": "fair/v1",
+    "profiles": {
+      "C0": {
+        "broker_host": "127.0.0.1",
+        "port": 1883
+      },
+      "C1": {
+        "broker_host": "occ-pi.local",
+        "port": 1884
+      },
+      "C2": {
+        "broker_host": "occ-pi.local",
+        "port": 8883
+      }
+    }
   },
   "vehicles": [
     {

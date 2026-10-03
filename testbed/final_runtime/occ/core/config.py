@@ -8,12 +8,19 @@ from pathlib import Path
 
 
 @dataclass(frozen=True)
+class MqttProfileConfig:
+    broker_host: str
+    port: int
+
+
+@dataclass(frozen=True)
 class MqttConfig:
     security_profile: str
     broker_host: str
     port: int
     qos: int
     topic_root: str
+    profiles: dict[str, MqttProfileConfig]
 
 
 @dataclass(frozen=True)
@@ -98,10 +105,82 @@ def load_runtime_config(path):
         "mqtt.topic_root",
     ).rstrip("/")
 
-    vehicles_raw = raw.get("vehicles")
-    if not isinstance(vehicles_raw, list) or not vehicles_raw:
+    profiles_raw = mqtt_raw.get("profiles")
+
+    if profiles_raw is None:
+        profiles = {
+            security_profile: MqttProfileConfig(
+                broker_host=broker_host,
+                port=port,
+            )
+        }
+    else:
+        if not isinstance(profiles_raw, dict):
+            raise ValueError(
+                "mqtt.profiles must be an object"
+            )
+
+        profiles = {}
+
+        for profile_name, profile_raw in profiles_raw.items():
+            if profile_name not in {"C0", "C1", "C2"}:
+                raise ValueError(
+                    f"unsupported MQTT profile: {profile_name}"
+                )
+
+            if not isinstance(profile_raw, dict):
+                raise ValueError(
+                    f"mqtt.profiles.{profile_name} "
+                    "must be an object"
+                )
+
+            profile_host = _require_nonempty_string(
+                profile_raw.get("broker_host"),
+                f"mqtt.profiles.{profile_name}.broker_host",
+            )
+
+            profile_port = profile_raw.get("port")
+
+            if (
+                not isinstance(profile_port, int)
+                or isinstance(profile_port, bool)
+            ):
+                raise ValueError(
+                    f"mqtt.profiles.{profile_name}.port "
+                    "must be an integer"
+                )
+
+            if not 1 <= profile_port <= 65535:
+                raise ValueError(
+                    f"mqtt.profiles.{profile_name}.port "
+                    "must be between 1 and 65535"
+                )
+
+            profiles[profile_name] = MqttProfileConfig(
+                broker_host=profile_host,
+                port=profile_port,
+            )
+
+    if (
+        runtime_mode == "operational"
+        and profiles_raw is not None
+        and set(profiles) != {"C0", "C1", "C2"}
+    ):
         raise ValueError(
-            "vehicles must contain at least one vehicle"
+            "operational mqtt.profiles must contain "
+            "exactly C0, C1, and C2"
+        )
+
+    vehicles_raw = raw.get("vehicles")
+
+    if not isinstance(vehicles_raw, list):
+        raise ValueError(
+            "vehicles must be an array"
+        )
+
+    if runtime_mode == "benchmark" and not vehicles_raw:
+        raise ValueError(
+            "benchmark mode requires at least one vehicle"
         )
 
     vehicles = []
@@ -147,6 +226,7 @@ def load_runtime_config(path):
             port=port,
             qos=qos,
             topic_root=topic_root,
+            profiles=profiles,
         ),
         vehicles=tuple(vehicles),
     )

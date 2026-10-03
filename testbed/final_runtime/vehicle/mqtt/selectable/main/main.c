@@ -841,11 +841,21 @@ static void mqtt_event_handler(
 
 static bool build_topics(void)
 {
+    const char *profile =
+        occ_mqtt_profile_to_string(
+            s_mqtt_profile
+        );
+
+    if (strcmp(profile, "UNKNOWN") == 0) {
+        return false;
+    }
+
     int telemetry_len =
         snprintf(
             s_telemetry_topic,
             sizeof(s_telemetry_topic),
-            "fair/v1/%s/telemetry",
+            "occ/runtime/%s/%s/telemetry",
+            profile,
             s_vehicle_id
         );
 
@@ -853,7 +863,8 @@ static bool build_topics(void)
         snprintf(
             s_echo_topic,
             sizeof(s_echo_topic),
-            "fair/v1/%s/echo",
+            "occ/runtime/%s/%s/echo",
+            profile,
             s_vehicle_id
         );
 
@@ -861,7 +872,8 @@ static bool build_topics(void)
         snprintf(
             s_control_topic,
             sizeof(s_control_topic),
-            "occ/runtime/%s/control",
+            "occ/runtime/%s/%s/control",
+            profile,
             s_vehicle_id
         );
 
@@ -869,7 +881,8 @@ static bool build_topics(void)
         snprintf(
             s_status_topic,
             sizeof(s_status_topic),
-            "occ/runtime/%s/status",
+            "occ/runtime/%s/%s/status",
+            profile,
             s_vehicle_id
         );
 
@@ -1006,15 +1019,6 @@ void app_main(void)
         CONFIG_OCC_RUNTIME_PERIOD_MS
     );
 
-    if (!build_topics()) {
-        ESP_LOGE(
-            TAG,
-            "MQTT topic construction failed"
-        );
-
-        return;
-    }
-
     err =
         occ_mqtt_profile_load(
             &s_mqtt_profile
@@ -1057,6 +1061,15 @@ void app_main(void)
 
             return;
         }
+    }
+
+    if (!build_topics()) {
+        ESP_LOGE(
+            TAG,
+            "MQTT topic construction failed"
+        );
+
+        return;
     }
 
     const char *broker_uri = NULL;

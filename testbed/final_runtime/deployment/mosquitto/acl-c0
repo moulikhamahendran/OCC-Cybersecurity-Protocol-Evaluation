@@ -1,0 +1,5 @@
+# MQTT C0 operational namespace
+topic readwrite occ/runtime/C0/#
+
+# Preserve frozen FAIR benchmark namespace
+topic readwrite fair/v1/#
