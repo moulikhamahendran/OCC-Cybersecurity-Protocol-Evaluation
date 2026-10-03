@@ -14,6 +14,10 @@
     {
       "serial_number": "VM-001",
       "enabled": true
+    },
+    {
+      "serial_number": "VM-002",
+      "enabled": true
     }
   ]
 }
