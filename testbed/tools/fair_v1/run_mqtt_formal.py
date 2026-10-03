@@ -436,6 +436,7 @@ def capture_serial(
 
     raw_count = 0
     summary = None
+    observed_run_start_utc = None
 
     ser = serial.Serial()
     ser.port = port
@@ -477,6 +478,23 @@ def capture_serial(
 
                 if not line:
                     continue
+
+                if (
+                    observed_run_start_utc is None
+                    and "FAIR run start t0=" in line
+                ):
+                    observed_run_start_utc = (
+                        datetime.datetime.now(
+                            datetime.timezone.utc
+                        )
+                        .isoformat(
+                            timespec="microseconds"
+                        )
+                        .replace(
+                            "+00:00",
+                            "Z",
+                        )
+                    )
 
                 print(line)
 
@@ -541,6 +559,14 @@ def run_formal(args):
             "idf.py not found. "
             "Source ESP-IDF export.sh first."
         )
+
+    try:
+        import jsonschema  # noqa: F401
+    except ModuleNotFoundError as exc:
+        raise SystemExit(
+            "jsonschema is missing from the "
+            "active runner Python environment."
+        ) from exc
 
     require_clean_repository()
 
@@ -833,7 +859,19 @@ cat {shlex.quote(remote_service_log)}
                 "===== CAPTURE FORMAL RUN ====="
             )
 
-            raw_count, summary = (
+            (
+
+
+                raw_count,
+
+
+                summary,
+
+
+                observed_run_start_utc,
+
+
+            ) = (
                 capture_serial(
                     args.port,
                     complete_log=(
@@ -897,6 +935,10 @@ cat {shlex.quote(remote_service_log)}
                     summary is not None,
                 "summary_line":
                     summary,
+
+                "run_start_utc":
+                    observed_run_start_utc,
+
                 "runner_capture_complete":
                     (
                         raw_count == 600
