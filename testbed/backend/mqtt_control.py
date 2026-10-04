@@ -176,7 +176,7 @@ class DashboardMqttControlManager:
         store: LiveVehicleStore,
         *,
         enabled: bool = False,
-        timeout_seconds: float = 20.0,
+        timeout_seconds: float = 60.0,
         config_path: Path | None = None,
         runtime_config=None,
         client_factory=mqtt.Client,
@@ -596,7 +596,11 @@ class DashboardMqttControlManager:
                 return
 
             if request["phase"] in TERMINAL_PHASES:
-                return
+                if not (
+                    request["phase"] == "timeout"
+                    and phase == "verified"
+                ):
+                    return
 
             request["phase"] = phase
             request["updated_utc"] = (
@@ -606,7 +610,9 @@ class DashboardMqttControlManager:
             if result is not None:
                 request["result"] = result
 
-            if error is not None:
+            if phase == "verified":
+                request["error"] = None
+            elif error is not None:
                 request["error"] = error
 
             if vehicle_result is not None:
@@ -626,7 +632,10 @@ class DashboardMqttControlManager:
             if request is None:
                 return
 
-            if request["phase"] in TERMINAL_PHASES:
+            if request["phase"] in {
+                "verified",
+                "failed",
+            }:
                 return
 
             deadline = request[

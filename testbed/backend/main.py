@@ -25,7 +25,7 @@ from .results import (
 )
 
 
-APP_VERSION = "0.7.0"
+APP_VERSION = "0.7.1"
 mqtt_live_adapter = (
     build_dashboard_mqtt_adapter(
         live_vehicle_store

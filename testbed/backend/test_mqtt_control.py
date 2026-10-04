@@ -500,6 +500,73 @@ class DashboardMqttControlTests(
             "online",
         )
 
+    def test_default_timeout_is_sixty_seconds(
+        self,
+    ):
+        self.assertEqual(
+            self.manager.timeout_seconds,
+            60.0,
+        )
+
+    def test_timeout_can_reconcile_from_late_target_telemetry(
+        self,
+    ):
+        self.manager.request_profile(
+            "VM-001",
+            "C1",
+        )
+
+        with self.manager._lock:
+            self.manager._requests[
+                "VM-001"
+            ][
+                "_deadline_monotonic"
+            ] = 0.0
+
+        timed_out = (
+            self.manager.control_state(
+                "VM-001"
+            )
+        )
+
+        self.assertEqual(
+            timed_out["request"]["phase"],
+            "timeout",
+        )
+
+        self.store.update_mqtt(
+            "C1",
+            payload(
+                "VM-001",
+                11,
+            ),
+        )
+
+        reconciled = (
+            self.manager.control_state(
+                "VM-001"
+            )
+        )
+
+        self.assertEqual(
+            reconciled["actual_profile"],
+            "C1",
+        )
+
+        self.assertEqual(
+            reconciled["request"]["phase"],
+            "verified",
+        )
+
+        self.assertEqual(
+            reconciled["request"]["result"],
+            "success",
+        )
+
+        self.assertIsNone(
+            reconciled["request"]["error"]
+        )
+
     def test_invalid_profile_rejected(
         self,
     ):
