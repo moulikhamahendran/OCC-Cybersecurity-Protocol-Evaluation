@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 
 from fastapi import FastAPI, HTTPException, WebSocket
+from pydantic import BaseModel
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,6 +12,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from .live_state import live_vehicle_store
 from .live_stream import stream_vehicle_snapshots
 from .mqtt_live import build_dashboard_mqtt_adapter
+from .mqtt_control import (
+    ControlUnavailableError,
+    InvalidProfileError,
+    VehicleOfflineError,
+    build_dashboard_mqtt_control_manager,
+)
 from .results import (
     load_mqtt_qualification_bundle,
     load_mqtt_qualification_repeats,
@@ -18,9 +25,15 @@ from .results import (
 )
 
 
-APP_VERSION = "0.6.0"
+APP_VERSION = "0.7.0"
 mqtt_live_adapter = (
     build_dashboard_mqtt_adapter(
+        live_vehicle_store
+    )
+)
+
+mqtt_control_manager = (
+    build_dashboard_mqtt_control_manager(
         live_vehicle_store
     )
 )
@@ -29,10 +42,12 @@ mqtt_live_adapter = (
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     mqtt_live_adapter.start()
+    mqtt_control_manager.start()
 
     try:
         yield
     finally:
+        mqtt_control_manager.stop()
         mqtt_live_adapter.stop()
 
 
@@ -118,6 +133,10 @@ app.add_middleware(
 )
 
 
+class SecurityProfileRequest(BaseModel):
+    profile: str
+
+
 @app.get("/", include_in_schema=False)
 def root():
     if dashboard_index is not None:
@@ -146,6 +165,66 @@ def health() -> dict[str, str]:
 @app.get("/api/v1/mqtt/live/status")
 def mqtt_live_status_endpoint() -> dict:
     return mqtt_live_adapter.status()
+
+
+@app.get("/api/v1/mqtt/control/status")
+def mqtt_control_status_endpoint() -> dict:
+    return mqtt_control_manager.status()
+
+
+@app.get(
+    "/api/v1/vehicles/{vehicle_id}/control-state"
+)
+def vehicle_control_state_endpoint(
+    vehicle_id: str,
+) -> dict:
+    try:
+        return mqtt_control_manager.control_state(
+            vehicle_id
+        )
+    except KeyError as exc:
+        raise HTTPException(
+            status_code=404,
+            detail="vehicle not found",
+        ) from exc
+
+
+@app.post(
+    "/api/v1/vehicles/{vehicle_id}/security-profile"
+)
+def vehicle_security_profile_endpoint(
+    vehicle_id: str,
+    request: SecurityProfileRequest,
+) -> dict:
+    try:
+        return mqtt_control_manager.request_profile(
+            vehicle_id,
+            request.profile,
+        )
+
+    except KeyError as exc:
+        raise HTTPException(
+            status_code=404,
+            detail="vehicle not found",
+        ) from exc
+
+    except InvalidProfileError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        ) from exc
+
+    except VehicleOfflineError as exc:
+        raise HTTPException(
+            status_code=409,
+            detail=str(exc),
+        ) from exc
+
+    except ControlUnavailableError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=str(exc),
+        ) from exc
 
 
 
