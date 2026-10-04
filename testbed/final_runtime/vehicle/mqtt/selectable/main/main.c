@@ -20,6 +20,7 @@
 #include "runtime_wifi.h"
 #include "runtime_mqtt_config.h"
 #include "runtime_endpoint_config.h"
+#include "runtime_known_wifi.h"
 #include "vehicle_state.h"
 
 
@@ -80,6 +81,7 @@ static char s_requested_vehicle_id[OCC_VEHICLE_ID_MAX_LEN];
 static volatile bool s_credentials_clear_pending = false;
 
 static volatile bool s_endpoint_change_pending = false;
+static volatile bool s_wifi_reprovision_pending = false;
 static char s_requested_occ_host[OCC_ENDPOINT_HOST_MAX_LEN];
 
 static bool s_runtime_status_published = false;
@@ -403,6 +405,7 @@ static void handle_complete_control(void)
         }
 
         if (
+            s_wifi_reprovision_pending ||
             s_endpoint_change_pending ||
             s_profile_change_pending ||
             s_vehicle_id_change_pending ||
@@ -464,6 +467,7 @@ static void handle_complete_control(void)
         }
 
         if (
+            s_wifi_reprovision_pending ||
             s_endpoint_change_pending ||
             s_profile_change_pending ||
             s_vehicle_id_change_pending ||
@@ -530,6 +534,7 @@ static void handle_complete_control(void)
         }
 
         if (
+            s_wifi_reprovision_pending ||
             s_endpoint_change_pending ||
             s_profile_change_pending ||
             s_vehicle_id_change_pending ||
@@ -549,6 +554,70 @@ static void handle_complete_control(void)
         ESP_LOGI(
             TAG,
             "MQTT credential reprovisioning requested"
+        );
+
+        cJSON_Delete(root);
+        return;
+    }
+
+    if (
+        strcmp(
+            command->valuestring,
+            "reprovision_wifi"
+        ) == 0
+    ) {
+        /*
+         * Wi-Fi administration is deliberately restricted
+         * to C2 because C0/C1 do not provide encrypted
+         * control transport.
+         */
+        if (s_mqtt_profile != OCC_MQTT_PROFILE_C2) {
+            ESP_LOGW(
+                TAG,
+                "Wi-Fi reprovision rejected: C2 required"
+            );
+
+            cJSON_Delete(root);
+            return;
+        }
+
+        if (
+            s_wifi_reprovision_pending ||
+            s_endpoint_change_pending ||
+            s_profile_change_pending ||
+            s_vehicle_id_change_pending ||
+            s_credentials_clear_pending
+        ) {
+            ESP_LOGW(
+                TAG,
+                "runtime configuration change already pending"
+            );
+
+            cJSON_Delete(root);
+            return;
+        }
+
+        esp_err_t wifi_admin_err =
+            occ_known_wifi_request_reprovision();
+
+        if (wifi_admin_err != ESP_OK) {
+            ESP_LOGE(
+                TAG,
+                "failed to persist Wi-Fi reprovision request: %s",
+                esp_err_to_name(
+                    wifi_admin_err
+                )
+            );
+
+            cJSON_Delete(root);
+            return;
+        }
+
+        s_wifi_reprovision_pending = true;
+
+        ESP_LOGI(
+            TAG,
+            "Wi-Fi reprovisioning scheduled"
         );
 
         cJSON_Delete(root);
@@ -598,6 +667,7 @@ static void handle_complete_control(void)
         }
 
         if (
+            s_wifi_reprovision_pending ||
             s_endpoint_change_pending ||
             s_profile_change_pending ||
             s_vehicle_id_change_pending ||
@@ -1718,6 +1788,21 @@ void app_main(void)
 
                 esp_restart();
             }
+        }
+
+        if (s_wifi_reprovision_pending) {
+            s_wifi_reprovision_pending = false;
+
+            ESP_LOGI(
+                TAG,
+                "Restarting into Wi-Fi provisioning mode"
+            );
+
+            vTaskDelay(
+                pdMS_TO_TICKS(750)
+            );
+
+            esp_restart();
         }
 
         if (s_endpoint_change_pending) {

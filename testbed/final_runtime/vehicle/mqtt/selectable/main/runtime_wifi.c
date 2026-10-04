@@ -1,5 +1,6 @@
 #include "runtime_wifi.h"
 #include "runtime_mqtt_config.h"
+#include "runtime_known_wifi.h"
 
 #include <inttypes.h>
 #include <stdbool.h>
@@ -240,6 +241,15 @@ static void wifi_event_handler(
                     "Wi-Fi disconnected; reconnecting"
                 );
 
+                if (
+                    occ_known_wifi_rotate_after_disconnect()
+                ) {
+                    ESP_LOGW(
+                        TAG,
+                        "Known-network rotation selected"
+                    );
+                }
+
                 esp_wifi_connect();
                 break;
 
@@ -262,6 +272,8 @@ static void wifi_event_handler(
             "Wi-Fi connected IP=" IPSTR,
             IP2STR(&event->ip_info.ip)
         );
+
+        occ_known_wifi_connected();
 
         xEventGroupSetBits(
             s_wifi_event_group,
@@ -481,6 +493,30 @@ esp_err_t occ_runtime_wifi_connect_or_provision(void)
 
     if (err != ESP_OK) {
         return err;
+    }
+
+    if (
+        occ_known_wifi_consume_reprovision_request()
+    ) {
+        ESP_LOGW(
+            TAG,
+            "Controlled Wi-Fi reprovisioning requested"
+        );
+
+        err =
+            wifi_prov_mgr_reset_provisioning();
+
+        if (err != ESP_OK) {
+            wifi_prov_mgr_deinit();
+
+            ESP_LOGE(
+                TAG,
+                "Wi-Fi provisioning reset failed: %s",
+                esp_err_to_name(err)
+            );
+
+            return err;
+        }
     }
 
     bool provisioned = false;

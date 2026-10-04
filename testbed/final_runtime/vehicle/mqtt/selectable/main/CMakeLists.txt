@@ -5,6 +5,7 @@ idf_component_register(
         "runtime_wifi.c"
         "runtime_mqtt_config.c"
         "runtime_endpoint_config.c"
+        "runtime_known_wifi.c"
 
     INCLUDE_DIRS
         "."
