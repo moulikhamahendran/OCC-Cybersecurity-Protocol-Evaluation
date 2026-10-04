@@ -1,10 +1,12 @@
 import os
+from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from .live_state import live_vehicle_store
+from .mqtt_live import build_dashboard_mqtt_adapter
 from .results import (
     load_mqtt_qualification_bundle,
     load_mqtt_qualification_repeats,
@@ -12,7 +14,23 @@ from .results import (
 )
 
 
-APP_VERSION = "0.3.0"
+APP_VERSION = "0.4.0"
+mqtt_live_adapter = (
+    build_dashboard_mqtt_adapter(
+        live_vehicle_store
+    )
+)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    mqtt_live_adapter.start()
+
+    try:
+        yield
+    finally:
+        mqtt_live_adapter.stop()
+
 
 app = FastAPI(
     title="OCC Cybersecurity Testbed API",
@@ -21,6 +39,7 @@ app = FastAPI(
         "KPIs and security events."
     ),
     version=APP_VERSION,
+    lifespan=lifespan,
 )
 
 
@@ -65,6 +84,12 @@ def health() -> dict[str, str]:
         "version": APP_VERSION,
         "timestamp_utc": datetime.now(UTC).isoformat(),
     }
+
+
+
+@app.get("/api/v1/mqtt/live/status")
+def mqtt_live_status_endpoint() -> dict:
+    return mqtt_live_adapter.status()
 
 
 @app.get("/api/v1/vehicles")
