@@ -1,0 +1,47 @@
+{
+  "analysis_conventions": {
+    "aggregate": "five repeat-level RTT means, not pooled message samples",
+    "confidence_interval": "two-sided 95% Student-t CI, n=5, df=4, t=2.7764451051977987",
+    "jitter": "mean absolute difference between successive successful RTT samples ordered by seq",
+    "late_echo": "transaction failure; excluded from normal latency/jitter",
+    "latency_sample": "seq>=20 and echo_status=ok",
+    "occ_receiver_loss": "successfully submitted seq absent from OCC occ_rx set",
+    "percentiles": "linear interpolation at index (n-1)*q",
+    "primary_latency": "app_rtt_us / 1000",
+    "send_failed": "reported separately; not merged into transaction failures",
+    "skipped": "excluded from transaction-failure denominator; represented by achieved_rate",
+    "standard_deviation": "sample SD, n-1",
+    "timeout": "transaction failure; excluded from normal latency/jitter",
+    "unsuccessful_transaction_percent": "(timeout + late_echo) / sent_success * 100",
+    "warmup_excluded_from_latency_and_jitter": "seq 0..19"
+  },
+  "analysis_repository_head": "960cf7eca8fd1bf54c0222216610e689863ffb99",
+  "analysis_scope": "MQTT Vehicle-1 qualification only",
+  "final_cross_protocol_interleaved_campaign": false,
+  "generated_utc": "2026-10-04T11:17:44.603693+00:00",
+  "profiles": [
+    "C0",
+    "C1",
+    "C2"
+  ],
+  "repeats_per_profile": 5,
+  "run_ids": [
+    "MQTT-C0-R1-20261003T230835Z-9f7bde8",
+    "MQTT-C0-R2-20261003T231637Z-9f7bde8",
+    "MQTT-C0-R3-20261003T233029Z-9f7bde8",
+    "MQTT-C0-R4-20261003T233354Z-9f7bde8",
+    "MQTT-C0-R5-20261003T233718Z-9f7bde8",
+    "MQTT-C1-R1-20261003T234524Z-9f7bde8",
+    "MQTT-C1-R2-20261003T234959Z-9f7bde8",
+    "MQTT-C1-R3-20261003T235342Z-9f7bde8",
+    "MQTT-C1-R4-20261003T235716Z-9f7bde8",
+    "MQTT-C1-R5-20261004T000059Z-9f7bde8",
+    "MQTT-C2-R1-20261004T003120Z-9f7bde8",
+    "MQTT-C2-R2-20261004T003620Z-9f7bde8",
+    "MQTT-C2-R3-20261004T004133Z-9f7bde8",
+    "MQTT-C2-R4-20261004T004547Z-9f7bde8",
+    "MQTT-C2-R5-20261004T004928Z-9f7bde8"
+  ],
+  "selected_run_count": 15,
+  "source_firmware_commit_prefix": "9f7bde8"
+}
