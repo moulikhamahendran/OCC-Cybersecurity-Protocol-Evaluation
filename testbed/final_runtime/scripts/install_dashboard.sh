@@ -25,19 +25,13 @@ TESTBED_SOURCE="$(
 INSTALL_ROOT="/opt/occ-dashboard"
 CONFIG_ROOT="/etc/occ-final-runtime"
 
-SERVICE_SOURCE="${
-    RUNTIME_SOURCE
-}/systemd/occ-dashboard.service"
+SERVICE_SOURCE="${RUNTIME_SOURCE}/systemd/occ-dashboard.service"
 
 SERVICE_TARGET="/etc/systemd/system/occ-dashboard.service"
 
-REQUIREMENTS_SOURCE="${
-    RUNTIME_SOURCE
-}/dashboard/requirements.txt"
+REQUIREMENTS_SOURCE="${RUNTIME_SOURCE}/dashboard/requirements.txt"
 
-FRONTEND_SOURCE="${
-    TESTBED_SOURCE
-}/dashboard/react/dist"
+FRONTEND_SOURCE="${TESTBED_SOURCE}/dashboard/react/dist"
 
 echo "===== OCC DASHBOARD INSTALL ====="
 
