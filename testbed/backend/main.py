@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+from .live_state import live_vehicle_store
 from .results import (
     load_mqtt_qualification_bundle,
     load_mqtt_qualification_repeats,
@@ -11,7 +12,7 @@ from .results import (
 )
 
 
-APP_VERSION = "0.2.0"
+APP_VERSION = "0.3.0"
 
 app = FastAPI(
     title="OCC Cybersecurity Testbed API",
@@ -64,6 +65,29 @@ def health() -> dict[str, str]:
         "version": APP_VERSION,
         "timestamp_utc": datetime.now(UTC).isoformat(),
     }
+
+
+@app.get("/api/v1/vehicles")
+def vehicles_endpoint() -> dict:
+    return live_vehicle_store.snapshot()
+
+
+@app.get("/api/v1/vehicles/{vehicle_id}")
+def vehicle_endpoint(
+    vehicle_id: str,
+) -> dict:
+
+    vehicle = live_vehicle_store.get(
+        vehicle_id
+    )
+
+    if vehicle is None:
+        raise HTTPException(
+            status_code=404,
+            detail="vehicle not found",
+        )
+
+    return vehicle
 
 
 @app.get(
