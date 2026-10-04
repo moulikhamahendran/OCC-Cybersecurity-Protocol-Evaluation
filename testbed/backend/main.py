@@ -1,8 +1,11 @@
 import os
+from pathlib import Path
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 
 from fastapi import FastAPI, HTTPException, WebSocket
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from .live_state import live_vehicle_store
@@ -15,7 +18,7 @@ from .results import (
 )
 
 
-APP_VERSION = "0.5.0"
+APP_VERSION = "0.6.0"
 mqtt_live_adapter = (
     build_dashboard_mqtt_adapter(
         live_vehicle_store
@@ -59,6 +62,53 @@ allowed_origins = [
 ]
 
 
+dashboard_static_raw = os.getenv(
+    "OCC_DASHBOARD_STATIC_DIR",
+    "",
+).strip()
+
+dashboard_static_dir = (
+    Path(dashboard_static_raw)
+    if dashboard_static_raw
+    else None
+)
+
+dashboard_index = None
+
+if dashboard_static_dir is not None:
+    dashboard_index = (
+        dashboard_static_dir
+        / "index.html"
+    )
+
+    dashboard_assets = (
+        dashboard_static_dir
+        / "assets"
+    )
+
+    if not dashboard_index.is_file():
+        raise RuntimeError(
+            "Dashboard index.html missing: "
+            f"{dashboard_index}"
+        )
+
+    if not dashboard_assets.is_dir():
+        raise RuntimeError(
+            "Dashboard assets directory missing: "
+            f"{dashboard_assets}"
+        )
+
+    app.mount(
+        "/assets",
+        StaticFiles(
+            directory=str(
+                dashboard_assets
+            ),
+        ),
+        name="dashboard-assets",
+    )
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
@@ -68,8 +118,13 @@ app.add_middleware(
 )
 
 
-@app.get("/")
-def root() -> dict[str, str]:
+@app.get("/", include_in_schema=False)
+def root():
+    if dashboard_index is not None:
+        return FileResponse(
+            dashboard_index
+        )
+
     return {
         "service": "OCC Cybersecurity Testbed API",
         "version": APP_VERSION,

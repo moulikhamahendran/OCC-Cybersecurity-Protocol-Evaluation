@@ -3,12 +3,16 @@ import { useEffect, useMemo, useState } from "react";
 
 const API_BASE = (
   import.meta.env.VITE_API_BASE
-  || "http://localhost:18080"
+  || window.location.origin
 ).replace(/\/$/, "");
+
+const DEFAULT_WS_BASE = (
+  `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}`
+);
 
 const WS_BASE = (
   import.meta.env.VITE_WS_BASE
-  || "ws://localhost:18080"
+  || DEFAULT_WS_BASE
 ).replace(/\/$/, "");
 
 
