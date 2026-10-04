@@ -15,6 +15,7 @@ Environment=PYTHONDONTWRITEBYTECODE=1
 Environment=PYTHONUNBUFFERED=1
 
 Environment=OCC_DASHBOARD_MQTT_ENABLED=1
+Environment=OCC_DASHBOARD_MQTT_CONTROL_ENABLED=1
 Environment=OCC_DASHBOARD_RUNTIME_CONFIG=/etc/occ-final-runtime/system.json
 Environment=OCC_DASHBOARD_STATIC_DIR=/opt/occ-dashboard/static
 

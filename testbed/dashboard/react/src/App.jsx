@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
+import "./App.css";
 
 
 const API_BASE = (
@@ -15,6 +22,80 @@ const WS_BASE = (
   || DEFAULT_WS_BASE
 ).replace(/\/$/, "");
 
+const PROFILES = [
+  "C0",
+  "C1",
+  "C2",
+];
+
+const TERMINAL_PHASES = new Set([
+  "verified",
+  "failed",
+  "timeout",
+]);
+
+const PROFILE_INFO = {
+  C0: {
+    name: "Open",
+    description: "No MQTT authentication or TLS",
+  },
+  C1: {
+    name: "Authenticated",
+    description: "Username/password authentication",
+  },
+  C2: {
+    name: "Protected",
+    description: "Authentication + verified TLS",
+  },
+};
+
+
+async function apiJson(
+  path,
+  options = {},
+) {
+  const response = await fetch(
+    `${API_BASE}${path}`,
+    {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {}),
+      },
+    },
+  );
+
+  if (!response.ok) {
+    let detail = (
+      `${response.status} ${response.statusText}`
+    );
+
+    try {
+      const body = await response.json();
+
+      if (body?.detail) {
+        detail = body.detail;
+      }
+    } catch {
+      // Preserve HTTP fallback.
+    }
+
+    throw new Error(detail);
+  }
+
+  return response.json();
+}
+
+
+function sleep(ms) {
+  return new Promise(
+    (resolve) => setTimeout(
+      resolve,
+      ms,
+    ),
+  );
+}
+
 
 function formatNumber(
   value,
@@ -30,12 +111,28 @@ function formatNumber(
 }
 
 
-function profileClass(profile) {
-  return (
-    String(profile || "")
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, "")
-    || "unknown"
+function formatTime(value) {
+  if (!value) {
+    return "—";
+  }
+
+  const date = new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime(),
+    )
+  ) {
+    return "—";
+  }
+
+  return date.toLocaleTimeString(
+    [],
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    },
   );
 }
 
@@ -44,7 +141,10 @@ function deepMetric(
   object,
   names,
 ) {
-  if (!object || typeof object !== "object") {
+  if (
+    !object
+    || typeof object !== "object"
+  ) {
     return undefined;
   }
 
@@ -59,7 +159,10 @@ function deepMetric(
     }
   }
 
-  for (const value of Object.values(object)) {
+  for (
+    const value
+    of Object.values(object)
+  ) {
     if (
       value
       && typeof value === "object"
@@ -107,13 +210,17 @@ function extractProfiles(bundle) {
       const rows = Object.entries(
         candidate,
       )
-        .filter(([key]) =>
-          /^C[012]$/i.test(key),
+        .filter(
+          ([key]) => /^C[012]$/i.test(
+            key,
+          ),
         )
-        .map(([profile, value]) => ({
-          profile,
-          ...(value || {}),
-        }));
+        .map(
+          ([profile, value]) => ({
+            profile,
+            ...(value || {}),
+          }),
+        );
 
       if (rows.length) {
         return rows;
@@ -131,13 +238,14 @@ function metricForProfile(
   names,
 ) {
   const row = rows.find(
-    (item) =>
+    (item) => (
       String(
         item.profile
         ?? item.security_profile
         ?? "",
       ).toUpperCase()
-      === profile,
+      === profile
+    ),
   );
 
   return deepMetric(
@@ -153,11 +261,36 @@ function StatusDot({
   return (
     <span
       className={
-        ok
-          ? "status-dot online"
-          : "status-dot offline"
+        `status-dot ${
+          ok
+            ? "online"
+            : "offline"
+        }`
       }
     />
+  );
+}
+
+
+function StatusPill({
+  ok,
+  label,
+  helper,
+}) {
+  return (
+    <div className="status-pill">
+      <StatusDot ok={ok} />
+
+      <div>
+        <strong>{label}</strong>
+
+        {helper && (
+          <span>
+            {helper}
+          </span>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -168,7 +301,11 @@ function ProfileBadge({
   return (
     <span
       className={
-        `profile-badge ${profileClass(profile)}`
+        `profile-badge ${
+          String(
+            profile || "",
+          ).toLowerCase()
+        }`
       }
     >
       {profile || "—"}
@@ -177,44 +314,242 @@ function ProfileBadge({
 }
 
 
-function MetricCard({
-  label,
+function Sparkline({
+  values,
+}) {
+  const clean = (
+    Array.isArray(values)
+      ? values
+      : []
+  )
+    .map(Number)
+    .filter(Number.isFinite)
+    .slice(-32);
+
+  if (clean.length < 2) {
+    return (
+      <div className="sparkline-empty">
+        waiting for telemetry
+      </div>
+    );
+  }
+
+  const width = 180;
+  const height = 42;
+
+  const min = Math.min(
+    ...clean,
+  );
+
+  const max = Math.max(
+    ...clean,
+  );
+
+  const spread = (
+    max - min
+  ) || 1;
+
+  const points = clean
+    .map(
+      (value, index) => {
+        const x = (
+          index
+          / (
+            clean.length - 1
+          )
+        ) * width;
+
+        const y = (
+          height
+          - (
+            (
+              value - min
+            )
+            / spread
+          )
+          * (
+            height - 6
+          )
+          - 3
+        );
+
+        return `${x},${y}`;
+      },
+    )
+    .join(" ");
+
+  return (
+    <svg
+      className="sparkline"
+      viewBox={
+        `0 0 ${width} ${height}`
+      }
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <polyline
+        points={points}
+      />
+    </svg>
+  );
+}
+
+
+function ThemeSwitcher({
   value,
-  unit,
-  helper,
+  onChange,
 }) {
   return (
-    <article className="metric-card">
-      <div className="metric-label">
-        {label}
-      </div>
-
-      <div className="metric-value">
-        {value}
-        {unit && (
-          <span className="metric-unit">
-            {unit}
-          </span>
+    <div
+      className="theme-switcher"
+      aria-label="Appearance"
+    >
+      <button
+        className={
+          value === "light"
+            ? "selected"
+            : ""
+        }
+        onClick={() => onChange(
+          "light",
         )}
+        title="Light mode"
+      >
+        ☀
+      </button>
+
+      <button
+        className={
+          value === "auto"
+            ? "selected"
+            : ""
+        }
+        onClick={() => onChange(
+          "auto",
+        )}
+        title="Follow system"
+      >
+        ◐
+      </button>
+
+      <button
+        className={
+          value === "dark"
+            ? "selected"
+            : ""
+        }
+        onClick={() => onChange(
+          "dark",
+        )}
+        title="Dark mode"
+      >
+        ☾
+      </button>
+    </div>
+  );
+}
+
+
+function SwitchState({
+  request,
+}) {
+  if (!request) {
+    return null;
+  }
+
+  const phase = (
+    request.phase
+    || "requested"
+  );
+
+  const terminal = (
+    TERMINAL_PHASES.has(
+      phase,
+    )
+  );
+
+  return (
+    <div
+      className={
+        `switch-state ${
+          terminal
+            ? phase
+            : "busy"
+        }`
+      }
+    >
+      <div className="switch-state-line">
+        <span>
+          {request.previous_profile}
+        </span>
+
+        <span className="switch-arrow">
+          →
+        </span>
+
+        <strong>
+          {request.target_profile}
+        </strong>
+
+        <span className="switch-phase">
+          {phase
+            .replaceAll(
+              "_",
+              " ",
+            )}
+        </span>
       </div>
 
-      {helper && (
-        <div className="metric-helper">
-          {helper}
+      {!terminal && (
+        <div className="switch-progress">
+          <span />
         </div>
       )}
-    </article>
+
+      {request.error && (
+        <div className="switch-error">
+          {request.error}
+        </div>
+      )}
+    </div>
   );
 }
 
 
 function VehicleCard({
   vehicle,
+  controlState,
+  controlReady,
+  history,
+  onSwitch,
+  onOpen,
 }) {
-  const telemetry = vehicle.telemetry || {};
+  const telemetry = (
+    vehicle.telemetry || {}
+  );
+
+  const request = (
+    controlState?.request
+    || null
+  );
+
+  const busy = Boolean(
+    request
+    && !TERMINAL_PHASES.has(
+      request.phase,
+    ),
+  );
 
   return (
-    <article className="vehicle-card">
+    <article
+      className={
+        `vehicle-card ${
+          vehicle.online
+            ? "vehicle-online"
+            : "vehicle-offline"
+        }`
+      }
+    >
       <div className="vehicle-card-header">
         <div>
           <div className="eyebrow">
@@ -237,32 +572,90 @@ function VehicleCard({
         </div>
       </div>
 
-      <div className="vehicle-meta">
-        <div>
-          <span>Protocol</span>
-          <strong>
-            {String(
-              vehicle.protocol || "—",
-            ).toUpperCase()}
-          </strong>
-        </div>
+      <div className="vehicle-profile-line">
+        <span>
+          MQTT
+        </span>
 
-        <div>
-          <span>Security</span>
-          <ProfileBadge
-            profile={
+        <span className="slash">
+          /
+        </span>
+
+        <ProfileBadge
+          profile={
+            vehicle.security_profile
+          }
+        />
+
+        <span className="profile-name">
+          {
+            PROFILE_INFO[
               vehicle.security_profile
-            }
-          />
-        </div>
-
-        <div>
-          <span>Sequence</span>
-          <strong>
-            {vehicle.seq ?? "—"}
-          </strong>
-        </div>
+            ]?.name
+            || ""
+          }
+        </span>
       </div>
+
+      <div className="profile-controls">
+        {PROFILES.map(
+          (profile) => {
+            const active = (
+              vehicle.security_profile
+              === profile
+            );
+
+            const requested = (
+              busy
+              && request?.target_profile
+              === profile
+            );
+
+            return (
+              <button
+                key={profile}
+                className={
+                  `profile-control ${
+                    active
+                      ? "active"
+                      : ""
+                  } ${
+                    requested
+                      ? "requested"
+                      : ""
+                  }`
+                }
+                disabled={
+                  !vehicle.online
+                  || !controlReady
+                  || busy
+                  || active
+                }
+                onClick={() => onSwitch(
+                  vehicle,
+                  profile,
+                )}
+              >
+                <strong>
+                  {profile}
+                </strong>
+
+                <small>
+                  {
+                    PROFILE_INFO[
+                      profile
+                    ].name
+                  }
+                </small>
+              </button>
+            );
+          },
+        )}
+      </div>
+
+      <SwitchState
+        request={request}
+      />
 
       <div className="telemetry-grid">
         <div>
@@ -288,21 +681,16 @@ function VehicleCard({
         </div>
 
         <div>
-          <span>Position X</span>
+          <span>Position</span>
           <strong>
             {formatNumber(
               telemetry.pos_x,
-              2,
+              1,
             )}
-          </strong>
-        </div>
-
-        <div>
-          <span>Position Y</span>
-          <strong>
+            {" / "}
             {formatNumber(
               telemetry.pos_y,
-              2,
+              1,
             )}
           </strong>
         </div>
@@ -324,138 +712,673 @@ function VehicleCard({
             {telemetry.state || "—"}
           </strong>
         </div>
+
+        <div>
+          <span>Sequence</span>
+          <strong>
+            {vehicle.seq ?? "—"}
+          </strong>
+        </div>
       </div>
 
-      <div className="vehicle-footer">
-        <span>
-          Age
-        </span>
+      <div className="vehicle-heartbeat">
+        <div>
+          <span>
+            Live sequence
+          </span>
 
-        <strong>
-          {formatNumber(
-            vehicle.age_seconds,
-            2,
-          )} s
-        </strong>
+          <small>
+            {formatNumber(
+              vehicle.age_seconds,
+              2,
+            )} s ago
+          </small>
+        </div>
+
+        <Sparkline
+          values={history}
+        />
       </div>
+
+      <button
+        className="details-button"
+        onClick={() => onOpen(
+          vehicle.vehicle_id,
+        )}
+      >
+        View details
+        <span>→</span>
+      </button>
     </article>
   );
 }
 
 
-function SecurityProfileCard({
-  profile,
-  rows,
+function Topology({
+  vehicles,
+  mqttLive,
 }) {
-  const rtt = metricForProfile(
-    rows,
-    profile,
-    [
-      "rtt_mean_of_repeat_means_ms",
-      "mean_rtt_ms",
-      "rtt_mean_ms",
-    ],
-  );
-
-  const jitter = metricForProfile(
-    rows,
-    profile,
-    [
-      "jitter_mean_of_repeats_ms",
-      "mean_jitter_ms",
-      "jitter_ms",
-    ],
-  );
-
-  const achieved = metricForProfile(
-    rows,
-    profile,
-    [
-      "achieved_rate_mean_percent",
-      "achieved_rate_percent",
-    ],
-  );
-
-  const unsuccessful = metricForProfile(
-    rows,
-    profile,
-    [
-      "unsuccessful_transaction_mean_percent",
-      "unsuccessful_percent",
-    ],
+  const brokerConnected = (
+    mqttLive?.profiles
+    || []
+  ).every(
+    (item) => item.connected,
   );
 
   return (
-    <article
-      className={
-        `security-card ${profileClass(profile)}`
-      }
-    >
-      <div className="security-card-title">
-        <ProfileBadge
-          profile={profile}
-        />
+    <section className="panel topology-panel">
+      <div className="panel-heading">
+        <div>
+          <div className="eyebrow">
+            LIVE ARCHITECTURE
+          </div>
 
-        <span>
-          MQTT qualification
+          <h2>
+            OCC topology
+          </h2>
+        </div>
+
+        <span className="live-label">
+          LIVE
         </span>
       </div>
 
-      <div className="security-rtt">
-        {formatNumber(
-          rtt,
-          1,
-        )}
-        <small>ms RTT</small>
+      <div className="topology">
+        <div className="topology-column">
+          {vehicles.map(
+            (vehicle) => (
+              <div
+                key={
+                  vehicle.vehicle_id
+                }
+                className="topology-node vehicle-node"
+              >
+                <StatusDot
+                  ok={vehicle.online}
+                />
+
+                <div>
+                  <strong>
+                    {vehicle.vehicle_id}
+                  </strong>
+
+                  <small>
+                    MQTT · {
+                      vehicle
+                        .security_profile
+                    }
+                  </small>
+                </div>
+              </div>
+            ),
+          )}
+        </div>
+
+        <div className="topology-link">
+          <span />
+          <small>
+            Wi-Fi / LAN
+          </small>
+        </div>
+
+        <div className="topology-node">
+          <StatusDot
+            ok={brokerConnected}
+          />
+
+          <div>
+            <strong>
+              Mosquitto
+            </strong>
+
+            <small>
+              1883 · 1884 · 8883
+            </small>
+          </div>
+        </div>
+
+        <div className="topology-link">
+          <span />
+        </div>
+
+        <div className="topology-node">
+          <StatusDot
+            ok={brokerConnected}
+          />
+
+          <div>
+            <strong>
+              OCC
+            </strong>
+
+            <small>
+              Raspberry Pi 5
+            </small>
+          </div>
+        </div>
+
+        <div className="topology-link">
+          <span />
+        </div>
+
+        <div className="topology-node dashboard-node">
+          <StatusDot ok />
+
+          <div>
+            <strong>
+              Dashboard
+            </strong>
+
+            <small>
+              Control + telemetry
+            </small>
+          </div>
+        </div>
       </div>
-
-      <div className="security-details">
-        <div>
-          <span>Jitter</span>
-          <strong>
-            {formatNumber(
-              jitter,
-              1,
-            )} ms
-          </strong>
-        </div>
-
-        <div>
-          <span>Achieved rate</span>
-          <strong>
-            {formatNumber(
-              achieved,
-              2,
-            )}%
-          </strong>
-        </div>
-
-        <div>
-          <span>Unsuccessful tx</span>
-          <strong>
-            {formatNumber(
-              unsuccessful,
-              2,
-            )}%
-          </strong>
-        </div>
-      </div>
-    </article>
+    </section>
   );
 }
 
 
-function App() {
-  const [fleet, setFleet] = useState({
-    vehicles: [],
-    vehicle_count: 0,
-    online_count: 0,
-  });
+function EventTimeline({
+  events,
+}) {
+  return (
+    <section className="panel timeline-panel">
+      <div className="panel-heading">
+        <div>
+          <div className="eyebrow">
+            SESSION ACTIVITY
+          </div>
+
+          <h2>
+            Security event timeline
+          </h2>
+        </div>
+      </div>
+
+      <div className="timeline">
+        {!events.length && (
+          <div className="empty-state">
+            Profile switch events will
+            appear here.
+          </div>
+        )}
+
+        {events
+          .slice(0, 14)
+          .map(
+            (event, index) => (
+              <div
+                className="timeline-event"
+                key={
+                  `${
+                    event.timestamp_utc
+                  }-${
+                    event.vehicle_id
+                  }-${
+                    event.event
+                  }-${index}`
+                }
+              >
+                <span className="timeline-marker" />
+
+                <div className="timeline-time">
+                  {formatTime(
+                    event.timestamp_utc,
+                  )}
+                </div>
+
+                <div className="timeline-body">
+                  <strong>
+                    {event.vehicle_id}
+                  </strong>
+
+                  <span>
+                    {String(
+                      event.event || "",
+                    ).replaceAll(
+                      "_",
+                      " ",
+                    )}
+                  </span>
+
+                  {event.profile && (
+                    <ProfileBadge
+                      profile={
+                        event.profile
+                      }
+                    />
+                  )}
+                </div>
+              </div>
+            ),
+          )}
+      </div>
+    </section>
+  );
+}
+
+
+function QualificationPanel({
+  qualification,
+}) {
+  const rows = useMemo(
+    () => extractProfiles(
+      qualification,
+    ),
+    [qualification],
+  );
+
+  return (
+    <section className="panel qualification-panel">
+      <div className="panel-heading">
+        <div>
+          <div className="eyebrow">
+            QUALIFICATION EVIDENCE
+          </div>
+
+          <h2>
+            MQTT security comparison
+          </h2>
+        </div>
+
+        <span className="evidence-tag">
+          15 qualification runs
+        </span>
+      </div>
+
+      <div className="qualification-grid">
+        {PROFILES.map(
+          (profile) => {
+            const rtt = (
+              metricForProfile(
+                rows,
+                profile,
+                [
+                  "mean_rtt_repeat_mean_ms",
+                  "mean_timing_ms",
+                  "mean_rtt_ms",
+                  "rtt_mean_ms",
+                ],
+              )
+            );
+
+            const jitter = (
+              metricForProfile(
+                rows,
+                profile,
+                [
+                  "mean_jitter_repeat_mean_ms",
+                  "mean_jitter_ms",
+                  "jitter_mean_ms",
+                  "jitter_ms",
+                ],
+              )
+            );
+
+            const achieved = (
+              metricForProfile(
+                rows,
+                profile,
+                [
+                  "mean_achieved_rate_pct",
+                  "achieved_rate_pct",
+                  "achieved_rate",
+                ],
+              )
+            );
+
+            const unsuccessful = (
+              metricForProfile(
+                rows,
+                profile,
+                [
+                  "mean_unsuccessful_pct",
+                  "unsuccessful_pct",
+                  "transaction_failure_pct",
+                ],
+              )
+            );
+
+            return (
+              <article
+                className={
+                  `qualification-card ${
+                    profile.toLowerCase()
+                  }`
+                }
+                key={profile}
+              >
+                <div className="qualification-title">
+                  <ProfileBadge
+                    profile={profile}
+                  />
+
+                  <div>
+                    <strong>
+                      {
+                        PROFILE_INFO[
+                          profile
+                        ].name
+                      }
+                    </strong>
+
+                    <span>
+                      {
+                        PROFILE_INFO[
+                          profile
+                        ].description
+                      }
+                    </span>
+                  </div>
+                </div>
+
+                <div className="qualification-values">
+                  <div>
+                    <span>
+                      Mean RTT
+                    </span>
+
+                    <strong>
+                      {formatNumber(
+                        rtt,
+                        1,
+                      )}
+                    </strong>
+
+                    <small>ms</small>
+                  </div>
+
+                  <div>
+                    <span>
+                      Jitter
+                    </span>
+
+                    <strong>
+                      {formatNumber(
+                        jitter,
+                        1,
+                      )}
+                    </strong>
+
+                    <small>ms</small>
+                  </div>
+
+                  <div>
+                    <span>
+                      Achieved
+                    </span>
+
+                    <strong>
+                      {formatNumber(
+                        achieved,
+                        2,
+                      )}
+                    </strong>
+
+                    <small>%</small>
+                  </div>
+
+                  <div>
+                    <span>
+                      Unsuccessful
+                    </span>
+
+                    <strong>
+                      {formatNumber(
+                        unsuccessful,
+                        2,
+                      )}
+                    </strong>
+
+                    <small>%</small>
+                  </div>
+                </div>
+              </article>
+            );
+          },
+        )}
+      </div>
+
+      <div className="qualification-note">
+        Qualification evidence is the
+        preserved sequential MQTT
+        engineering dataset. It is not
+        being presented as the final
+        interleaved MQTT/OPC UA/DDS FAIR
+        comparison campaign.
+      </div>
+    </section>
+  );
+}
+
+
+function VehicleDrawer({
+  vehicle,
+  controlState,
+  onClose,
+}) {
+  if (!vehicle) {
+    return null;
+  }
+
+  const telemetry = (
+    vehicle.telemetry || {}
+  );
+
+  const events = (
+    controlState?.recent_events
+    || []
+  )
+    .slice()
+    .reverse();
+
+  return (
+    <div
+      className="drawer-backdrop"
+      onMouseDown={onClose}
+    >
+      <aside
+        className="vehicle-drawer"
+        onMouseDown={
+          (event) => (
+            event.stopPropagation()
+          )
+        }
+      >
+        <button
+          className="drawer-close"
+          onClick={onClose}
+          aria-label="Close"
+        >
+          ×
+        </button>
+
+        <div className="eyebrow">
+          VEHICLE DETAIL
+        </div>
+
+        <h2>
+          {vehicle.vehicle_id}
+        </h2>
+
+        <div className="drawer-status">
+          <StatusPill
+            ok={vehicle.online}
+            label={
+              vehicle.online
+                ? "Online"
+                : "Offline"
+            }
+            helper={
+              `last seen ${
+                formatNumber(
+                  vehicle.age_seconds,
+                  2,
+                )
+              } s ago`
+            }
+          />
+
+          <div>
+            <span>Security</span>
+            <ProfileBadge
+              profile={
+                vehicle.security_profile
+              }
+            />
+          </div>
+        </div>
+
+        <SwitchState
+          request={
+            controlState?.request
+          }
+        />
+
+        <div className="drawer-grid">
+          <div>
+            <span>Protocol</span>
+            <strong>MQTT</strong>
+          </div>
+
+          <div>
+            <span>Sequence</span>
+            <strong>
+              {vehicle.seq ?? "—"}
+            </strong>
+          </div>
+
+          <div>
+            <span>Speed</span>
+            <strong>
+              {formatNumber(
+                telemetry.speed,
+                2,
+              )} m/s
+            </strong>
+          </div>
+
+          <div>
+            <span>Battery</span>
+            <strong>
+              {formatNumber(
+                telemetry.battery_pct,
+                0,
+              )} %
+            </strong>
+          </div>
+
+          <div>
+            <span>Position X</span>
+            <strong>
+              {formatNumber(
+                telemetry.pos_x,
+                2,
+              )}
+            </strong>
+          </div>
+
+          <div>
+            <span>Position Y</span>
+            <strong>
+              {formatNumber(
+                telemetry.pos_y,
+                2,
+              )}
+            </strong>
+          </div>
+
+          <div>
+            <span>Heading</span>
+            <strong>
+              {formatNumber(
+                telemetry.heading,
+                1,
+              )}°
+            </strong>
+          </div>
+
+          <div>
+            <span>State</span>
+            <strong>
+              {telemetry.state || "—"}
+            </strong>
+          </div>
+        </div>
+
+        <div className="drawer-events">
+          <h3>
+            Recent security events
+          </h3>
+
+          {!events.length && (
+            <div className="empty-state">
+              No profile-switch events
+              in this dashboard session.
+            </div>
+          )}
+
+          {events.map(
+            (event, index) => (
+              <div
+                className="drawer-event"
+                key={
+                  `${
+                    event.timestamp_utc
+                  }-${index}`
+                }
+              >
+                <span>
+                  {formatTime(
+                    event.timestamp_utc,
+                  )}
+                </span>
+
+                <strong>
+                  {String(
+                    event.event || "",
+                  ).replaceAll(
+                    "_",
+                    " ",
+                  )}
+                </strong>
+
+                {event.profile && (
+                  <ProfileBadge
+                    profile={
+                      event.profile
+                    }
+                  />
+                )}
+              </div>
+            ),
+          )}
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+
+export default function App() {
+  const [
+    theme,
+    setTheme,
+  ] = useState(
+    () => (
+      localStorage.getItem(
+        "occ-dashboard-theme",
+      )
+      || "auto"
+    ),
+  );
 
   const [
-    socketState,
-    setSocketState,
-  ] = useState("connecting");
+    demoMode,
+    setDemoMode,
+  ] = useState(false);
 
   const [
     health,
@@ -463,531 +1386,1008 @@ function App() {
   ] = useState(null);
 
   const [
-    mqttStatus,
-    setMqttStatus,
+    mqttLive,
+    setMqttLive,
   ] = useState(null);
 
   const [
-    benchmark,
-    setBenchmark,
+    controlStatus,
+    setControlStatus,
   ] = useState(null);
 
   const [
-    benchmarkStatus,
-    setBenchmarkStatus,
+    qualification,
+    setQualification,
   ] = useState(null);
 
   const [
-    error,
-    setError,
-  ] = useState("");
+    fleet,
+    setFleet,
+  ] = useState({
+    vehicle_count: 0,
+    online_count: 0,
+    vehicles: [],
+  });
 
-  useEffect(() => {
-    let cancelled = false;
+  const [
+    wsState,
+    setWsState,
+  ] = useState("connecting");
 
-    async function getJson(path) {
-      const response = await fetch(
-        `${API_BASE}${path}`,
+  const [
+    controlStates,
+    setControlStates,
+  ] = useState({});
+
+  const [
+    histories,
+    setHistories,
+  ] = useState({});
+
+  const [
+    selectedVehicleId,
+    setSelectedVehicleId,
+  ] = useState(null);
+
+  const [
+    toast,
+    setToast,
+  ] = useState(null);
+
+
+  useEffect(
+    () => {
+      const media = (
+        window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        )
       );
 
-      if (!response.ok) {
-        throw new Error(
-          `${path}: HTTP ${response.status}`,
+      const apply = () => {
+        const dark = (
+          theme === "dark"
+          || (
+            theme === "auto"
+            && media.matches
+          )
         );
-      }
 
-      return response.json();
-    }
-
-    async function loadInitial() {
-      const requests = await Promise.allSettled([
-        getJson("/api/v1/health"),
-        getJson(
-          "/api/v1/mqtt/live/status",
-        ),
-        getJson(
-          "/api/v1/benchmark/mqtt/qualification",
-        ),
-        getJson(
-          "/api/v1/benchmark/mqtt/qualification/status",
-        ),
-        getJson("/api/v1/vehicles"),
-      ]);
-
-      if (cancelled) {
-        return;
-      }
-
-      const [
-        healthResult,
-        mqttResult,
-        benchmarkResult,
-        benchmarkStatusResult,
-        fleetResult,
-      ] = requests;
-
-      if (
-        healthResult.status === "fulfilled"
-      ) {
-        setHealth(
-          healthResult.value,
-        );
-      }
-
-      if (
-        mqttResult.status === "fulfilled"
-      ) {
-        setMqttStatus(
-          mqttResult.value,
-        );
-      }
-
-      if (
-        benchmarkResult.status
-        === "fulfilled"
-      ) {
-        setBenchmark(
-          benchmarkResult.value,
-        );
-      }
-
-      if (
-        benchmarkStatusResult.status
-        === "fulfilled"
-      ) {
-        setBenchmarkStatus(
-          benchmarkStatusResult.value,
-        );
-      }
-
-      if (
-        fleetResult.status
-        === "fulfilled"
-      ) {
-        setFleet(
-          fleetResult.value,
-        );
-      }
-
-      const failures = requests.filter(
-        (item) =>
-          item.status === "rejected",
-      );
-
-      if (failures.length) {
-        setError(
-          "Some backend data is unavailable.",
-        );
-      }
-    }
-
-    loadInitial();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-
-  useEffect(() => {
-    let socket;
-    let reconnectTimer;
-    let stopped = false;
-
-    function connect() {
-      if (stopped) {
-        return;
-      }
-
-      setSocketState("connecting");
-
-      socket = new WebSocket(
-        `${WS_BASE}/api/v1/ws/vehicles`,
-      );
-
-      socket.onopen = () => {
-        setSocketState("connected");
-        setError("");
+        document.documentElement
+          .dataset.theme = (
+            dark
+              ? "dark"
+              : "light"
+          );
       };
 
-      socket.onmessage = (event) => {
-        try {
-          setFleet(
-            JSON.parse(
-              event.data,
-            ),
-          );
-        } catch {
-          setError(
-            "Invalid WebSocket payload.",
+      localStorage.setItem(
+        "occ-dashboard-theme",
+        theme,
+      );
+
+      apply();
+
+      media.addEventListener(
+        "change",
+        apply,
+      );
+
+      return () => {
+        media.removeEventListener(
+          "change",
+          apply,
+        );
+      };
+    },
+    [theme],
+  );
+
+
+  useEffect(
+    () => {
+      if (!toast) {
+        return undefined;
+      }
+
+      const timer = setTimeout(
+        () => setToast(null),
+        5000,
+      );
+
+      return () => clearTimeout(
+        timer,
+      );
+    },
+    [toast],
+  );
+
+
+  useEffect(
+    () => {
+      const handleKey = (
+        event,
+      ) => {
+        if (event.key === "Escape") {
+          setSelectedVehicleId(
+            null,
           );
         }
       };
 
-      socket.onerror = () => {
-        setSocketState("error");
-      };
+      window.addEventListener(
+        "keydown",
+        handleKey,
+      );
 
-      socket.onclose = () => {
+      return () => (
+        window.removeEventListener(
+          "keydown",
+          handleKey,
+        )
+      );
+    },
+    [],
+  );
+
+
+  const updateHistories = useCallback(
+    (vehicles) => {
+      setHistories(
+        (previous) => {
+          const next = {
+            ...previous,
+          };
+
+          for (
+            const vehicle
+            of vehicles || []
+          ) {
+            if (
+              !Number.isFinite(
+                Number(
+                  vehicle.seq,
+                ),
+              )
+            ) {
+              continue;
+            }
+
+            const current = (
+              next[
+                vehicle.vehicle_id
+              ] || []
+            );
+
+            const value = Number(
+              vehicle.seq,
+            );
+
+            if (
+              current[
+                current.length - 1
+              ] === value
+            ) {
+              continue;
+            }
+
+            next[
+              vehicle.vehicle_id
+            ] = [
+              ...current,
+              value,
+            ].slice(-32);
+          }
+
+          return next;
+        },
+      );
+    },
+    [],
+  );
+
+
+  const applyFleet = useCallback(
+    (snapshot) => {
+      if (
+        !snapshot
+        || !Array.isArray(
+          snapshot.vehicles,
+        )
+      ) {
+        return;
+      }
+
+      setFleet(snapshot);
+
+      updateHistories(
+        snapshot.vehicles,
+      );
+    },
+    [updateHistories],
+  );
+
+
+  const refreshSystem = useCallback(
+    async () => {
+      const results = await Promise.allSettled([
+        apiJson(
+          "/api/v1/health",
+        ),
+        apiJson(
+          "/api/v1/mqtt/live/status",
+        ),
+        apiJson(
+          "/api/v1/mqtt/control/status",
+        ),
+        apiJson(
+          "/api/v1/benchmark/mqtt/qualification",
+        ),
+        apiJson(
+          "/api/v1/vehicles",
+        ),
+      ]);
+
+      if (
+        results[0].status
+        === "fulfilled"
+      ) {
+        setHealth(
+          results[0].value,
+        );
+      }
+
+      if (
+        results[1].status
+        === "fulfilled"
+      ) {
+        setMqttLive(
+          results[1].value,
+        );
+      }
+
+      if (
+        results[2].status
+        === "fulfilled"
+      ) {
+        setControlStatus(
+          results[2].value,
+        );
+      }
+
+      if (
+        results[3].status
+        === "fulfilled"
+      ) {
+        setQualification(
+          results[3].value,
+        );
+      }
+
+      if (
+        results[4].status
+        === "fulfilled"
+      ) {
+        applyFleet(
+          results[4].value,
+        );
+      }
+    },
+    [applyFleet],
+  );
+
+
+  useEffect(
+    () => {
+      refreshSystem();
+
+      const timer = setInterval(
+        refreshSystem,
+        5000,
+      );
+
+      return () => clearInterval(
+        timer,
+      );
+    },
+    [refreshSystem],
+  );
+
+
+  useEffect(
+    () => {
+      let socket = null;
+      let reconnectTimer = null;
+      let stopped = false;
+
+      const connect = () => {
         if (stopped) {
           return;
         }
 
-        setSocketState(
-          "disconnected",
+        setWsState(
+          "connecting",
         );
 
-        reconnectTimer = window.setTimeout(
-          connect,
-          2000,
+        socket = new WebSocket(
+          `${WS_BASE}/api/v1/ws/vehicles`,
         );
+
+        socket.onopen = () => {
+          setWsState(
+            "connected",
+          );
+        };
+
+        socket.onmessage = (
+          event,
+        ) => {
+          try {
+            applyFleet(
+              JSON.parse(
+                event.data,
+              ),
+            );
+          } catch {
+            // Ignore malformed presentation message.
+          }
+        };
+
+        socket.onerror = () => {
+          setWsState(
+            "error",
+          );
+        };
+
+        socket.onclose = () => {
+          if (stopped) {
+            return;
+          }
+
+          setWsState(
+            "disconnected",
+          );
+
+          reconnectTimer = setTimeout(
+            connect,
+            1500,
+          );
+        };
       };
-    }
 
-    connect();
+      connect();
 
-    return () => {
-      stopped = true;
+      return () => {
+        stopped = true;
 
-      window.clearTimeout(
-        reconnectTimer,
-      );
+        if (reconnectTimer) {
+          clearTimeout(
+            reconnectTimer,
+          );
+        }
 
-      socket?.close();
-    };
-  }, []);
-
-
-  const profileRows = useMemo(
-    () => extractProfiles(
-      benchmark,
-    ),
-    [benchmark],
+        socket?.close();
+      };
+    },
+    [applyFleet],
   );
 
 
-  const connectedProfiles = (
-    mqttStatus?.profiles
+  useEffect(
+    () => {
+      let stopped = false;
+
+      const poll = async () => {
+        const ids = (
+          fleet.vehicles
+          || []
+        ).map(
+          (vehicle) => (
+            vehicle.vehicle_id
+          ),
+        );
+
+        const entries = await Promise.all(
+          ids.map(
+            async (vehicleId) => {
+              try {
+                const state = await apiJson(
+                  `/api/v1/vehicles/${
+                    encodeURIComponent(
+                      vehicleId,
+                    )
+                  }/control-state`,
+                );
+
+                return [
+                  vehicleId,
+                  state,
+                ];
+              } catch {
+                return [
+                  vehicleId,
+                  null,
+                ];
+              }
+            },
+          ),
+        );
+
+        if (stopped) {
+          return;
+        }
+
+        setControlStates(
+          (previous) => {
+            const next = {
+              ...previous,
+            };
+
+            for (
+              const [
+                vehicleId,
+                state,
+              ]
+              of entries
+            ) {
+              if (state) {
+                next[
+                  vehicleId
+                ] = state;
+              }
+            }
+
+            return next;
+          },
+        );
+      };
+
+      poll();
+
+      const timer = setInterval(
+        poll,
+        1000,
+      );
+
+      return () => {
+        stopped = true;
+
+        clearInterval(
+          timer,
+        );
+      };
+    },
+    [fleet.vehicles],
+  );
+
+
+  const controlReady = useMemo(
+    () => {
+      const profiles = (
+        controlStatus?.profiles
+        || []
+      );
+
+      return Boolean(
+        controlStatus?.enabled
+        && controlStatus?.started
+        && profiles.length === 3
+        && profiles.every(
+          (item) => (
+            item.connected
+          ),
+        )
+      );
+    },
+    [controlStatus],
+  );
+
+
+  const liveReady = useMemo(
+    () => {
+      const profiles = (
+        mqttLive?.profiles
+        || []
+      );
+
+      return Boolean(
+        mqttLive?.enabled
+        && mqttLive?.started
+        && profiles.length === 3
+        && profiles.every(
+          (item) => (
+            item.connected
+          ),
+        )
+      );
+    },
+    [mqttLive],
+  );
+
+
+  const switchProfile = useCallback(
+    async (
+      vehicle,
+      targetProfile,
+    ) => {
+      const vehicleId = (
+        vehicle.vehicle_id
+      );
+
+      setToast({
+        type: "info",
+        message:
+          `${vehicleId}: requesting `
+          + `${vehicle.security_profile}`
+          + ` → ${targetProfile}`,
+      });
+
+      try {
+        const initial = await apiJson(
+          `/api/v1/vehicles/${
+            encodeURIComponent(
+              vehicleId,
+            )
+          }/security-profile`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              profile:
+                targetProfile,
+            }),
+          },
+        );
+
+        setControlStates(
+          (previous) => ({
+            ...previous,
+            [vehicleId]:
+              initial,
+          }),
+        );
+
+        for (
+          let attempt = 0;
+          attempt < 42;
+          attempt += 1
+        ) {
+          await sleep(750);
+
+          const state = await apiJson(
+            `/api/v1/vehicles/${
+              encodeURIComponent(
+                vehicleId,
+              )
+            }/control-state`,
+          );
+
+          setControlStates(
+            (previous) => ({
+              ...previous,
+              [vehicleId]:
+                state,
+            }),
+          );
+
+          const request = (
+            state.request
+            || {}
+          );
+
+          if (
+            request.phase
+            === "verified"
+            && state.actual_profile
+            === targetProfile
+          ) {
+            setToast({
+              type: "success",
+              message:
+                `${vehicleId}: `
+                + `${targetProfile} VERIFIED`,
+            });
+
+            await refreshSystem();
+
+            return;
+          }
+
+          if (
+            request.phase
+            === "failed"
+            || request.phase
+            === "timeout"
+          ) {
+            throw new Error(
+              request.error
+              || `profile switch ${
+                request.phase
+              }`,
+            );
+          }
+        }
+
+        throw new Error(
+          "verification timed out",
+        );
+      } catch (error) {
+        setToast({
+          type: "error",
+          message:
+            `${vehicleId}: ${
+              error.message
+            }`,
+        });
+      }
+    },
+    [refreshSystem],
+  );
+
+
+  const allEvents = useMemo(
+    () => (
+      Object.values(
+        controlStates,
+      )
+        .flatMap(
+          (state) => (
+            state?.recent_events
+            || []
+          ),
+        )
+        .sort(
+          (a, b) => (
+            new Date(
+              b.timestamp_utc,
+            ).getTime()
+            - new Date(
+              a.timestamp_utc,
+            ).getTime()
+          ),
+        )
+    ),
+    [controlStates],
+  );
+
+
+  const selectedVehicle = useMemo(
+    () => (
+      fleet.vehicles.find(
+        (vehicle) => (
+          vehicle.vehicle_id
+          === selectedVehicleId
+        ),
+      )
+      || null
+    ),
+    [
+      fleet.vehicles,
+      selectedVehicleId,
+    ],
+  );
+
+
+  const liveConnectedCount = (
+    mqttLive?.profiles
     || []
   ).filter(
-    (profile) =>
-      profile.connected,
+    (item) => item.connected,
+  ).length;
+
+  const controlConnectedCount = (
+    controlStatus?.profiles
+    || []
+  ).filter(
+    (item) => item.connected,
   ).length;
 
 
-  const totalAccepted = (
-    mqttStatus?.profiles
-    || []
-  ).reduce(
-    (sum, profile) =>
-      sum
-      + Number(
-        profile.accepted_messages
-        || 0,
-      ),
-    0,
-  );
-
-
-  const liveConnected = (
-    socketState === "connected"
-  );
-
-
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
+    <div
+      className={
+        `dashboard-shell ${
+          demoMode
+            ? "demo-mode"
+            : ""
+        }`
+      }
+    >
+      <header className="topbar">
         <div className="brand">
           <div className="brand-mark">
-            O
+            OCC
           </div>
 
-          <div>
-            <strong>
-              OCC
-            </strong>
-            <span>
-              Cybersecurity Platform
-            </span>
-          </div>
-        </div>
-
-        <nav>
-          <a
-            href="#overview"
-            className="active"
-          >
-            Overview
-          </a>
-
-          <a href="#fleet">
-            Live Fleet
-          </a>
-
-          <a href="#security">
-            Security Profiles
-          </a>
-
-          <a href="#benchmark">
-            Benchmark
-          </a>
-        </nav>
-
-        <div className="sidebar-footer">
-          <div className="read-only">
-            <span>READ ONLY</span>
-            Monitoring mode
-          </div>
-
-          <small>
-            FAIR-V1 measurement path
-            remains separate.
-          </small>
-        </div>
-      </aside>
-
-      <main className="main-content">
-        <section
-          className="topbar"
-          id="overview"
-        >
           <div>
             <div className="eyebrow">
-              OCC / MQTT OPERATIONAL VIEW
+              CYBERSECURITY PLATFORM
             </div>
 
             <h1>
-              Cybersecurity
-              <span> Control Center</span>
+              Operations Control Center
             </h1>
+          </div>
+        </div>
+
+        <div className="topbar-actions">
+          <button
+            className={
+              `demo-button ${
+                demoMode
+                  ? "active"
+                  : ""
+              }`
+            }
+            onClick={() => setDemoMode(
+              (value) => !value,
+            )}
+          >
+            ◉ Demo
+          </button>
+
+          <ThemeSwitcher
+            value={theme}
+            onChange={setTheme}
+          />
+        </div>
+      </header>
+
+      <main className="dashboard-main">
+        <section className="system-strip">
+          <StatusPill
+            ok={
+              health?.status
+              === "ok"
+            }
+            label="OCC API"
+            helper={
+              health?.status
+              || "waiting"
+            }
+          />
+
+          <StatusPill
+            ok={
+              wsState
+              === "connected"
+            }
+            label="Live stream"
+            helper={wsState}
+          />
+
+          <StatusPill
+            ok={liveReady}
+            label="MQTT observer"
+            helper={
+              `${liveConnectedCount}/3 profiles`
+            }
+          />
+
+          <StatusPill
+            ok={controlReady}
+            label="Control plane"
+            helper={
+              `${controlConnectedCount}/3 profiles`
+            }
+          />
+
+          <StatusPill
+            ok={
+              fleet.online_count
+              > 0
+            }
+            label="Fleet"
+            helper={
+              `${fleet.online_count}/${
+                fleet.vehicle_count
+              } online`
+            }
+          />
+        </section>
+
+        <section className="protocol-tabs">
+          <button className="protocol-tab active">
+            <span className="protocol-dot" />
+            MQTT
+          </button>
+
+          <button
+            className="protocol-tab disabled"
+            disabled
+            title="OPC UA is not yet integrated into the final operational dashboard"
+          >
+            OPC UA
+            <small>
+              pending
+            </small>
+          </button>
+
+          <button
+            className="protocol-tab disabled"
+            disabled
+            title="DDS is not yet integrated into the final operational dashboard"
+          >
+            DDS
+            <small>
+              pending
+            </small>
+          </button>
+
+          <div className="protocol-spacer" />
+
+          <div className="attack-placeholder">
+            Attack lab
+            <span>
+              Phase 8 · not armed
+            </span>
+          </div>
+        </section>
+
+        <section className="hero">
+          <div>
+            <div className="eyebrow">
+              LIVE MQTT OPERATIONS
+            </div>
+
+            <h2>
+              Security-aware fleet control
+            </h2>
 
             <p>
-              Live AGV telemetry,
-              security-profile status,
-              and qualification KPIs.
+              Select a real vehicle security
+              profile. The dashboard only marks
+              a switch verified after status or
+              telemetry confirms the actual
+              ESP32 transition.
             </p>
           </div>
 
-          <div className="top-status">
+          <div className="hero-stats">
             <div>
-              <StatusDot
-                ok={Boolean(health)}
-              />
-              API
+              <span>Vehicles</span>
+              <strong>
+                {fleet.vehicle_count}
+              </strong>
             </div>
 
             <div>
-              <StatusDot
-                ok={liveConnected}
-              />
-              Live stream
+              <span>Online</span>
+              <strong>
+                {fleet.online_count}
+              </strong>
+            </div>
+
+            <div>
+              <span>Profiles</span>
+              <strong>
+                3
+              </strong>
             </div>
           </div>
         </section>
 
-        {error && (
-          <div className="notice">
-            {error}
-          </div>
-        )}
-
-        <section className="summary-grid">
-          <MetricCard
-            label="Vehicles online"
-            value={
-              fleet.online_count ?? 0
-            }
-            helper={
-              `${fleet.vehicle_count ?? 0} discovered`
-            }
-          />
-
-          <MetricCard
-            label="MQTT profiles"
-            value={connectedProfiles}
-            unit="/ 3"
-            helper="C0 · C1 · C2"
-          />
-
-          <MetricCard
-            label="Accepted telemetry"
-            value={totalAccepted}
-            helper="Dashboard observer"
-          />
-
-          <MetricCard
-            label="Live channel"
-            value={
-              liveConnected
-                ? "LIVE"
-                : "WAIT"
-            }
-            helper="WebSocket · 4 Hz UI refresh"
-          />
-        </section>
-
-        <section
-          className="section"
-          id="fleet"
-        >
-          <div className="section-header">
+        <section className="fleet-section">
+          <div className="section-heading">
             <div>
               <div className="eyebrow">
-                REAL-TIME OPERATION
+                LIVE FLEET
               </div>
 
               <h2>
-                Live Vehicle Fleet
+                Connected vehicles
               </h2>
             </div>
 
-            <div
-              className={
-                `connection-pill ${
-                  liveConnected
-                    ? "connected"
-                    : ""
-                }`
-              }
-            >
-              <StatusDot
-                ok={liveConnected}
-              />
-
-              {socketState}
-            </div>
+            {!controlReady && (
+              <div className="warning-chip">
+                Control unavailable
+              </div>
+            )}
           </div>
 
           <div className="vehicle-grid">
-            {fleet.vehicles?.length
-              ? fleet.vehicles.map(
-                  (vehicle) => (
-                    <VehicleCard
-                      key={
-                        vehicle.vehicle_id
-                      }
-                      vehicle={vehicle}
-                    />
-                  ),
-                )
-              : (
-                <div className="empty-state">
-                  Waiting for live vehicle
-                  telemetry…
-                </div>
-              )}
-          </div>
-        </section>
-
-        <section
-          className="section"
-          id="security"
-        >
-          <div className="section-header">
-            <div>
-              <div className="eyebrow">
-                MQTT SECURITY
+            {!fleet.vehicles.length && (
+              <div className="empty-state large">
+                Waiting for operational MQTT
+                vehicles...
               </div>
+            )}
 
-              <h2>
-                Security Profile
-                Comparison
-              </h2>
-            </div>
-
-            <div className="qualification-tag">
-              Qualification dataset
-            </div>
-          </div>
-
-          <div className="security-grid">
-            {["C0", "C1", "C2"].map(
-              (profile) => (
-                <SecurityProfileCard
-                  key={profile}
-                  profile={profile}
-                  rows={profileRows}
+            {fleet.vehicles.map(
+              (vehicle) => (
+                <VehicleCard
+                  key={
+                    vehicle.vehicle_id
+                  }
+                  vehicle={vehicle}
+                  controlState={
+                    controlStates[
+                      vehicle.vehicle_id
+                    ]
+                  }
+                  controlReady={
+                    controlReady
+                  }
+                  history={
+                    histories[
+                      vehicle.vehicle_id
+                    ]
+                    || []
+                  }
+                  onSwitch={
+                    switchProfile
+                  }
+                  onOpen={
+                    setSelectedVehicleId
+                  }
                 />
               ),
             )}
           </div>
-
-          <div className="method-note">
-            <strong>
-              Interpretation:
-            </strong>{" "}
-            KPI values are derived from
-            the sequential MQTT
-            qualification dataset. They
-            are not being relabelled as
-            the final interleaved
-            cross-protocol FAIR-V1
-            campaign.
-          </div>
         </section>
 
-        <section
-          className="section"
-          id="benchmark"
-        >
-          <div className="section-header">
+        <div className="dashboard-two-column">
+          <Topology
+            vehicles={
+              fleet.vehicles
+            }
+            mqttLive={mqttLive}
+          />
+
+          <EventTimeline
+            events={allEvents}
+          />
+        </div>
+
+        <section className="panel security-matrix">
+          <div className="panel-heading">
             <div>
               <div className="eyebrow">
-                EVIDENCE
+                SECURITY LEVELS
               </div>
 
               <h2>
-                Benchmark Status
+                MQTT protection model
               </h2>
             </div>
           </div>
 
-          <div className="benchmark-panel">
-            <div>
-              <span>
-                Dataset
-              </span>
+          <div className="security-level-grid">
+            {PROFILES.map(
+              (profile) => (
+                <div
+                  className="security-level"
+                  key={profile}
+                >
+                  <ProfileBadge
+                    profile={profile}
+                  />
 
-              <strong>
-                MQTT Qualification
-              </strong>
-            </div>
+                  <strong>
+                    {
+                      PROFILE_INFO[
+                        profile
+                      ].name
+                    }
+                  </strong>
 
-            <div>
-              <span>
-                API status
-              </span>
-
-              <strong>
-                {
-                  benchmarkStatus
-                    ? "AVAILABLE"
-                    : "WAITING"
-                }
-              </strong>
-            </div>
-
-            <div>
-              <span>
-                Security conditions
-              </span>
-
-              <strong>
-                C0 / C1 / C2
-              </strong>
-            </div>
-
-            <div>
-              <span>
-                Dashboard role
-              </span>
-
-              <strong>
-                Presentation only
-              </strong>
-            </div>
+                  <span>
+                    {
+                      PROFILE_INFO[
+                        profile
+                      ].description
+                    }
+                  </span>
+                </div>
+              ),
+            )}
           </div>
         </section>
+
+        <QualificationPanel
+          qualification={
+            qualification
+          }
+        />
 
         <footer>
           <span>
@@ -996,13 +2396,37 @@ function App() {
           </span>
 
           <span>
-            MQTT · OPC UA · DDS
+            Operational dashboard · FAIR
+            benchmark remains isolated
           </span>
         </footer>
       </main>
+
+      <VehicleDrawer
+        vehicle={selectedVehicle}
+        controlState={
+          selectedVehicleId
+            ? controlStates[
+                selectedVehicleId
+              ]
+            : null
+        }
+        onClose={
+          () => setSelectedVehicleId(
+            null,
+          )
+        }
+      />
+
+      {toast && (
+        <div
+          className={
+            `toast ${toast.type}`
+          }
+        >
+          {toast.message}
+        </div>
+      )}
     </div>
   );
 }
-
-
-export default App;
