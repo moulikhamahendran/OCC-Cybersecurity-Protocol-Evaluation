@@ -1,17 +1,27 @@
 import os
 from datetime import UTC, datetime
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+from .results import (
+    load_mqtt_qualification_bundle,
+    load_mqtt_qualification_repeats,
+    mqtt_qualification_status,
+)
 
-APP_VERSION = "0.1.0"
+
+APP_VERSION = "0.2.0"
 
 app = FastAPI(
     title="OCC Cybersecurity Testbed API",
-    description="Backend API for telemetry, experiments, KPIs and security events.",
+    description=(
+        "Backend API for telemetry, experiments, "
+        "KPIs and security events."
+    ),
     version=APP_VERSION,
 )
+
 
 default_origins = [
     "http://localhost:3000",
@@ -26,6 +36,7 @@ allowed_origins = [
     ).split(",")
     if origin.strip()
 ]
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -53,3 +64,36 @@ def health() -> dict[str, str]:
         "version": APP_VERSION,
         "timestamp_utc": datetime.now(UTC).isoformat(),
     }
+
+
+@app.get(
+    "/api/v1/benchmark/mqtt/qualification/status"
+)
+def mqtt_qualification_status_endpoint() -> dict:
+    return mqtt_qualification_status()
+
+
+@app.get(
+    "/api/v1/benchmark/mqtt/qualification"
+)
+def mqtt_qualification_endpoint() -> dict:
+    try:
+        return load_mqtt_qualification_bundle()
+    except (FileNotFoundError, ValueError) as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=str(exc),
+        ) from exc
+
+
+@app.get(
+    "/api/v1/benchmark/mqtt/qualification/repeats"
+)
+def mqtt_qualification_repeats_endpoint() -> dict:
+    try:
+        return load_mqtt_qualification_repeats()
+    except (FileNotFoundError, ValueError) as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=str(exc),
+        ) from exc
