@@ -2,10 +2,11 @@ import os
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 
 from .live_state import live_vehicle_store
+from .live_stream import stream_vehicle_snapshots
 from .mqtt_live import build_dashboard_mqtt_adapter
 from .results import (
     load_mqtt_qualification_bundle,
@@ -14,7 +15,7 @@ from .results import (
 )
 
 
-APP_VERSION = "0.4.0"
+APP_VERSION = "0.5.0"
 mqtt_live_adapter = (
     build_dashboard_mqtt_adapter(
         live_vehicle_store
@@ -90,6 +91,17 @@ def health() -> dict[str, str]:
 @app.get("/api/v1/mqtt/live/status")
 def mqtt_live_status_endpoint() -> dict:
     return mqtt_live_adapter.status()
+
+
+
+@app.websocket("/api/v1/ws/vehicles")
+async def websocket_vehicles(
+    websocket: WebSocket,
+) -> None:
+    await stream_vehicle_snapshots(
+        websocket,
+        live_vehicle_store,
+    )
 
 
 @app.get("/api/v1/vehicles")
