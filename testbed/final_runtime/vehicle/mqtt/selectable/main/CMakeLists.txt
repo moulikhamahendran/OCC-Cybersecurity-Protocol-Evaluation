@@ -1,6 +1,7 @@
 idf_component_register(
     SRCS
         "main.c"
+        "vehicle_state.c"
         "runtime_wifi.c"
         "runtime_mqtt_config.c"
 

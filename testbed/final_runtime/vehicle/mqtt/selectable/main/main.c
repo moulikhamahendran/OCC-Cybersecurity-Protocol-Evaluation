@@ -19,6 +19,7 @@
 
 #include "runtime_wifi.h"
 #include "runtime_mqtt_config.h"
+#include "vehicle_state.h"
 
 
 extern const char fair_v1_c2_ca_crt_start[]
@@ -1004,11 +1005,28 @@ static bool build_topics(void)
 static int build_payload(
     char *buffer,
     size_t buffer_size,
-    uint32_t seq
+    uint32_t *seq_out
 )
 {
-    const int64_t t_source_us =
-        esp_timer_get_time();
+    if (
+        buffer == NULL ||
+        seq_out == NULL
+    ) {
+        return -1;
+    }
+
+    vehicle_state_t vehicle;
+
+    if (!vehicle_state_get(&vehicle)) {
+        ESP_LOGE(
+            TAG,
+            "vehicle state unavailable"
+        );
+
+        return -1;
+    }
+
+    *seq_out = vehicle.seq;
 
     return snprintf(
         buffer,
@@ -1018,16 +1036,22 @@ static int build_payload(
         "\"serialNumber\":\"%s\","
         "\"seq\":%" PRIu32 ","
         "\"t_source_us\":%" PRId64 ","
-        "\"speed\":0.0,"
-        "\"pos_x\":0.0,"
-        "\"pos_y\":0.0,"
-        "\"heading\":0.0,"
-        "\"battery_pct\":100.0,"
-        "\"state\":\"IDLE\""
+        "\"speed\":%.3f,"
+        "\"pos_x\":%.3f,"
+        "\"pos_y\":%.3f,"
+        "\"heading\":%.3f,"
+        "\"battery_pct\":%.3f,"
+        "\"state\":\"%s\""
         "}",
         s_vehicle_id,
-        seq,
-        t_source_us
+        vehicle.seq,
+        vehicle.t_source_us,
+        (double)vehicle.speed,
+        (double)vehicle.pos_x,
+        (double)vehicle.pos_y,
+        (double)vehicle.heading,
+        (double)vehicle.battery_pct,
+        vehicle.state
     );
 }
 
@@ -1040,12 +1064,32 @@ void app_main(void)
     );
 
     esp_err_t err =
+        vehicle_state_start(
+            CONFIG_OCC_RUNTIME_PERIOD_MS
+        );
+
+    if (err != ESP_OK) {
+        ESP_LOGE(
+            TAG,
+            "vehicle state engine failed to start: %s",
+            esp_err_to_name(err)
+        );
+
+        return;
+    }
+
+    ESP_LOGI(
+        TAG,
+        "vehicle core active before network startup"
+    );
+
+    err =
         occ_runtime_wifi_connect_or_provision();
 
     if (err != ESP_OK) {
         ESP_LOGE(
             TAG,
-            "Wi-Fi provisioning/connect failed: %s",
+            "Wi-Fi provisioning/connect failed: %s; vehicle core remains active",
             esp_err_to_name(err)
         );
 
@@ -1352,8 +1396,6 @@ void app_main(void)
         )
     );
 
-    uint32_t seq = 0U;
-
     TickType_t last_wake =
         xTaskGetTickCount();
 
@@ -1590,11 +1632,13 @@ void app_main(void)
                 PAYLOAD_BUFFER_BYTES
             ];
 
+            uint32_t publish_seq = 0U;
+
             const int payload_len =
                 build_payload(
                     payload,
                     sizeof(payload),
-                    seq
+                    &publish_seq
                 );
 
             if (
@@ -1620,13 +1664,13 @@ void app_main(void)
 
                 if (rc >= 0) {
                     if (
-                        seq % 100U == 0U
+                        publish_seq % 100U == 0U
                     ) {
                         ESP_LOGI(
                             TAG,
                             "telemetry seq=%" PRIu32
                             " mqtt_id=%d",
-                            seq,
+                            publish_seq,
                             rc
                         );
                     }
@@ -1635,16 +1679,21 @@ void app_main(void)
                         TAG,
                         "telemetry enqueue failed seq=%"
                         PRIu32,
-                        seq
+                        publish_seq
                     );
                 }
-
-                /*
-                 * Operational sequence is continuous.
-                 * It is intentionally NOT limited to 0..599.
-                 */
-                ++seq;
             }
+
+            /*
+             * There is intentionally no transport-side
+             * sequence increment here.
+             *
+             * VehicleState owns sequence progression and
+             * continues advancing while MQTT is offline.
+             *
+             * After reconnect we send the LATEST state,
+             * never a burst of stale queued states.
+             */
 
             waiting_log_counter = 0U;
         } else {
