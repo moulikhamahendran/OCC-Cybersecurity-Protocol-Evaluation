@@ -4,6 +4,7 @@ idf_component_register(
         "vehicle_state.c"
         "runtime_wifi.c"
         "runtime_mqtt_config.c"
+        "runtime_endpoint_config.c"
 
     INCLUDE_DIRS
         "."

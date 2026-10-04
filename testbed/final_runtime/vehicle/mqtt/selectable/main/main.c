@@ -19,6 +19,7 @@
 
 #include "runtime_wifi.h"
 #include "runtime_mqtt_config.h"
+#include "runtime_endpoint_config.h"
 #include "vehicle_state.h"
 
 
@@ -31,6 +32,7 @@ extern const char fair_v1_c2_ca_crt_start[]
 #define ECHO_BUFFER_BYTES 192
 #define CONTROL_BUFFER_BYTES 192
 #define STATUS_BUFFER_BYTES 192
+#define BROKER_URI_BUFFER_BYTES 192
 
 static const char *TAG = "OCC_MQTT_RUNTIME";
 
@@ -47,6 +49,9 @@ static int s_echo_sub_msg_id = -1;
 static int s_control_sub_msg_id = -1;
 
 static char s_vehicle_id[OCC_VEHICLE_ID_MAX_LEN];
+
+static char s_occ_host[OCC_ENDPOINT_HOST_MAX_LEN];
+static char s_broker_uri[BROKER_URI_BUFFER_BYTES];
 
 static char s_telemetry_topic[TOPIC_BUFFER_BYTES];
 static char s_echo_topic[TOPIC_BUFFER_BYTES];
@@ -73,6 +78,9 @@ static volatile bool s_vehicle_id_change_pending = false;
 static char s_requested_vehicle_id[OCC_VEHICLE_ID_MAX_LEN];
 
 static volatile bool s_credentials_clear_pending = false;
+
+static volatile bool s_endpoint_change_pending = false;
+static char s_requested_occ_host[OCC_ENDPOINT_HOST_MAX_LEN];
 
 static bool s_runtime_status_published = false;
 
@@ -395,6 +403,7 @@ static void handle_complete_control(void)
         }
 
         if (
+            s_endpoint_change_pending ||
             s_profile_change_pending ||
             s_vehicle_id_change_pending ||
             s_credentials_clear_pending
@@ -455,6 +464,7 @@ static void handle_complete_control(void)
         }
 
         if (
+            s_endpoint_change_pending ||
             s_profile_change_pending ||
             s_vehicle_id_change_pending ||
             s_credentials_clear_pending
@@ -520,6 +530,7 @@ static void handle_complete_control(void)
         }
 
         if (
+            s_endpoint_change_pending ||
             s_profile_change_pending ||
             s_vehicle_id_change_pending ||
             s_credentials_clear_pending
@@ -538,6 +549,96 @@ static void handle_complete_control(void)
         ESP_LOGI(
             TAG,
             "MQTT credential reprovisioning requested"
+        );
+
+        cJSON_Delete(root);
+        return;
+    }
+
+    if (
+        strcmp(
+            command->valuestring,
+            "set_occ_host"
+        ) == 0
+    ) {
+        /*
+         * Endpoint mutation is intentionally accepted only
+         * through authenticated + TLS-protected C2 control.
+         */
+        if (s_mqtt_profile != OCC_MQTT_PROFILE_C2) {
+            ESP_LOGW(
+                TAG,
+                "OCC endpoint change rejected: C2 required"
+            );
+
+            cJSON_Delete(root);
+            return;
+        }
+
+        const cJSON *host =
+            cJSON_GetObjectItemCaseSensitive(
+                root,
+                "host"
+            );
+
+        if (
+            !cJSON_IsString(host) ||
+            host->valuestring == NULL ||
+            !occ_endpoint_host_is_valid(
+                host->valuestring
+            )
+        ) {
+            ESP_LOGW(
+                TAG,
+                "invalid requested OCC host"
+            );
+
+            cJSON_Delete(root);
+            return;
+        }
+
+        if (
+            s_endpoint_change_pending ||
+            s_profile_change_pending ||
+            s_vehicle_id_change_pending ||
+            s_credentials_clear_pending
+        ) {
+            ESP_LOGW(
+                TAG,
+                "runtime configuration change already pending"
+            );
+
+            cJSON_Delete(root);
+            return;
+        }
+
+        const int written =
+            snprintf(
+                s_requested_occ_host,
+                sizeof(s_requested_occ_host),
+                "%s",
+                host->valuestring
+            );
+
+        if (
+            written <= 0 ||
+            written >=
+                (int)sizeof(s_requested_occ_host)
+        ) {
+            ESP_LOGW(
+                TAG,
+                "requested OCC host too long"
+            );
+
+            cJSON_Delete(root);
+            return;
+        }
+
+        s_endpoint_change_pending = true;
+
+        ESP_LOGI(
+            TAG,
+            "OCC endpoint change requested"
         );
 
         cJSON_Delete(root);
@@ -1215,22 +1316,77 @@ void app_main(void)
         return;
     }
 
-    const char *broker_uri = NULL;
+    err =
+        occ_endpoint_host_load(
+            s_occ_host,
+            sizeof(s_occ_host)
+        );
+
+    if (err != ESP_OK) {
+        if (
+            !occ_endpoint_host_is_valid(
+                CONFIG_OCC_DEFAULT_HOST
+            )
+        ) {
+            ESP_LOGE(
+                TAG,
+                "No valid runtime or bootstrap OCC host"
+            );
+
+            return;
+        }
+
+        const int host_len =
+            snprintf(
+                s_occ_host,
+                sizeof(s_occ_host),
+                "%s",
+                CONFIG_OCC_DEFAULT_HOST
+            );
+
+        if (
+            host_len <= 0 ||
+            host_len >=
+                (int)sizeof(s_occ_host)
+        ) {
+            ESP_LOGE(
+                TAG,
+                "Bootstrap OCC host invalid"
+            );
+
+            return;
+        }
+
+        ESP_LOGI(
+            TAG,
+            "Using bootstrap OCC host=%s",
+            s_occ_host
+        );
+    } else {
+        ESP_LOGI(
+            TAG,
+            "Using runtime OCC host=%s",
+            s_occ_host
+        );
+    }
+
+    const char *scheme = NULL;
+    int port = 0;
 
     switch (s_mqtt_profile) {
         case OCC_MQTT_PROFILE_C0:
-            broker_uri =
-                CONFIG_OCC_MQTT_C0_BROKER_URI;
+            scheme = "mqtt";
+            port = 1883;
             break;
 
         case OCC_MQTT_PROFILE_C1:
-            broker_uri =
-                CONFIG_OCC_MQTT_C1_BROKER_URI;
+            scheme = "mqtt";
+            port = 1884;
             break;
 
         case OCC_MQTT_PROFILE_C2:
-            broker_uri =
-                CONFIG_OCC_MQTT_C2_BROKER_URI;
+            scheme = "mqtts";
+            port = 8883;
             break;
 
         default:
@@ -1242,34 +1398,42 @@ void app_main(void)
             return;
     }
 
+    const int uri_len =
+        snprintf(
+            s_broker_uri,
+            sizeof(s_broker_uri),
+            "%s://%s:%d",
+            scheme,
+            s_occ_host,
+            port
+        );
+
     if (
-        broker_uri == NULL ||
-        broker_uri[0] == '\0'
+        uri_len <= 0 ||
+        uri_len >=
+            (int)sizeof(s_broker_uri)
     ) {
         ESP_LOGE(
             TAG,
-            "broker URI missing for profile=%s",
-            occ_mqtt_profile_to_string(
-                s_mqtt_profile
-            )
+            "MQTT broker URI construction failed"
         );
 
         return;
     }
 
+    const char *broker_uri =
+        s_broker_uri;
+
     ESP_LOGI(
         TAG,
-        "profile=%s broker=%s",
+        "MQTT destination profile=%s host=%s port=%d",
         occ_mqtt_profile_to_string(
             s_mqtt_profile
         ),
-        broker_uri
+        s_occ_host,
+        port
     );
 
-    /*
-     * C2 requires valid time before TLS server
-     * certificate verification.
-     */
     if (s_mqtt_profile == OCC_MQTT_PROFILE_C2) {
         if (
             strlen(CONFIG_OCC_SNTP_SERVER) == 0U ||
@@ -1365,6 +1529,9 @@ void app_main(void)
     if (s_mqtt_profile == OCC_MQTT_PROFILE_C2) {
         mqtt_config.broker.verification.certificate =
             fair_v1_c2_ca_crt_start;
+
+        mqtt_config.broker.verification.common_name =
+            CONFIG_OCC_TLS_SERVER_NAME;
     }
 
     s_client =
@@ -1545,6 +1712,36 @@ void app_main(void)
                  * Give the QoS1 status message time to leave
                  * before restarting into provisioning mode.
                  */
+                vTaskDelay(
+                    pdMS_TO_TICKS(750)
+                );
+
+                esp_restart();
+            }
+        }
+
+        if (s_endpoint_change_pending) {
+            s_endpoint_change_pending = false;
+
+            esp_err_t endpoint_err =
+                occ_endpoint_host_save(
+                    s_requested_occ_host
+                );
+
+            if (endpoint_err != ESP_OK) {
+                ESP_LOGE(
+                    TAG,
+                    "Failed to save OCC endpoint: %s",
+                    esp_err_to_name(
+                        endpoint_err
+                    )
+                );
+            } else {
+                ESP_LOGI(
+                    TAG,
+                    "OCC endpoint saved; restarting runtime"
+                );
+
                 vTaskDelay(
                     pdMS_TO_TICKS(750)
                 );
