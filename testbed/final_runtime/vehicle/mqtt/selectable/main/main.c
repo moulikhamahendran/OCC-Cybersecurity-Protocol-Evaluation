@@ -12,6 +12,7 @@
 #include "esp_netif_sntp.h"
 #include "esp_system.h"
 #include "esp_timer.h"
+#include "driver/gpio.h"
 #include "mqtt_client.h"
 
 #include "freertos/FreeRTOS.h"
@@ -36,6 +37,99 @@ extern const char fair_v1_c2_ca_crt_start[]
 #define BROKER_URI_BUFFER_BYTES 192
 
 static const char *TAG = "OCC_MQTT_RUNTIME";
+
+
+#define OCC_RECOVERY_BUTTON_GPIO GPIO_NUM_0
+#define OCC_RECOVERY_HOLD_MS 3000
+#define OCC_RECOVERY_POLL_MS 50
+
+static void local_recovery_button_task(void *arg)
+{
+    (void)arg;
+
+    const gpio_config_t io_conf = {
+        .pin_bit_mask = 1ULL << OCC_RECOVERY_BUTTON_GPIO,
+        .mode = GPIO_MODE_INPUT,
+        .pull_up_en = GPIO_PULLUP_ENABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_DISABLE,
+    };
+
+    esp_err_t err = gpio_config(&io_conf);
+
+    if (err != ESP_OK) {
+        ESP_LOGE(
+            TAG,
+            "Local recovery button GPIO init failed: %s",
+            esp_err_to_name(err)
+        );
+        vTaskDelete(NULL);
+        return;
+    }
+
+    ESP_LOGI(
+        TAG,
+        "Local Wi-Fi recovery ready: hold BOOT for 3 seconds"
+    );
+
+    uint32_t held_ms = 0U;
+    bool reprovision_requested = false;
+
+    while (true) {
+        const int level =
+            gpio_get_level(OCC_RECOVERY_BUTTON_GPIO);
+
+        if (level == 0) {
+            if (!reprovision_requested) {
+                held_ms += OCC_RECOVERY_POLL_MS;
+
+                if (held_ms >= OCC_RECOVERY_HOLD_MS) {
+                    err =
+                        occ_known_wifi_request_reprovision();
+
+                    if (err == ESP_OK) {
+                        reprovision_requested = true;
+
+                        ESP_LOGW(
+                            TAG,
+                            "BOOT hold accepted; Wi-Fi reprovisioning scheduled"
+                        );
+
+                        ESP_LOGW(
+                            TAG,
+                            "Release BOOT button to restart into provisioning mode"
+                        );
+                    } else {
+                        ESP_LOGE(
+                            TAG,
+                            "Local Wi-Fi reprovision request failed: %s",
+                            esp_err_to_name(err)
+                        );
+
+                        held_ms = 0U;
+                    }
+                }
+            }
+        } else {
+            if (reprovision_requested) {
+                ESP_LOGW(
+                    TAG,
+                    "BOOT released; restarting into Wi-Fi provisioning mode"
+                );
+
+                vTaskDelay(pdMS_TO_TICKS(200));
+                esp_restart();
+            }
+
+            held_ms = 0U;
+        }
+
+        vTaskDelay(
+            pdMS_TO_TICKS(OCC_RECOVERY_POLL_MS)
+        );
+    }
+}
+
 
 static esp_mqtt_client_handle_t s_client = NULL;
 
@@ -1254,6 +1348,23 @@ void app_main(void)
         "vehicle core active before network startup"
     );
 
+    BaseType_t recovery_task_created =
+        xTaskCreate(
+            local_recovery_button_task,
+            "occ_wifi_recovery",
+            3072,
+            NULL,
+            5,
+            NULL
+        );
+
+    if (recovery_task_created != pdPASS) {
+        ESP_LOGE(
+            TAG,
+            "Failed to start local Wi-Fi recovery task"
+        );
+    }
+
     err =
         occ_runtime_wifi_connect_or_provision();
 
@@ -1517,47 +1628,57 @@ void app_main(void)
             return;
         }
 
-        esp_sntp_config_t sntp_config =
-            ESP_NETIF_SNTP_DEFAULT_CONFIG(
-                CONFIG_OCC_SNTP_SERVER
-            );
+        while (true) {
+            esp_sntp_config_t sntp_config =
+                ESP_NETIF_SNTP_DEFAULT_CONFIG(
+                    CONFIG_OCC_SNTP_SERVER
+                );
 
-        err =
-            esp_netif_sntp_init(
-                &sntp_config
-            );
+            err =
+                esp_netif_sntp_init(
+                    &sntp_config
+                );
 
-        if (err != ESP_OK) {
-            ESP_LOGE(
+            if (err != ESP_OK) {
+                ESP_LOGW(
+                    TAG,
+                    "C2 SNTP initialization failed: %s; retrying",
+                    esp_err_to_name(err)
+                );
+
+                vTaskDelay(
+                    pdMS_TO_TICKS(5000)
+                );
+
+                continue;
+            }
+
+            err =
+                esp_netif_sntp_sync_wait(
+                    pdMS_TO_TICKS(30000)
+                );
+
+            esp_netif_sntp_deinit();
+
+            if (err == ESP_OK) {
+                ESP_LOGI(
+                    TAG,
+                    "C2 SNTP synchronization complete"
+                );
+
+                break;
+            }
+
+            ESP_LOGW(
                 TAG,
-                "C2 SNTP initialization failed: %s",
+                "C2 SNTP synchronization failed: %s; vehicle remains active; retrying",
                 esp_err_to_name(err)
             );
 
-            return;
-        }
-
-        err =
-            esp_netif_sntp_sync_wait(
-                pdMS_TO_TICKS(30000)
+            vTaskDelay(
+                pdMS_TO_TICKS(5000)
             );
-
-        esp_netif_sntp_deinit();
-
-        if (err != ESP_OK) {
-            ESP_LOGE(
-                TAG,
-                "C2 SNTP synchronization failed: %s",
-                esp_err_to_name(err)
-            );
-
-            return;
         }
-
-        ESP_LOGI(
-            TAG,
-            "C2 SNTP synchronization complete"
-        );
     }
 
     /*
