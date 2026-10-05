@@ -11,7 +11,7 @@ only binds those roles to specific physical devices.
 |---|---|---|---|---|
 | ESP32 #1 | Legitimate Vehicle 1 | VM-001 | 94:3c:c6:33:6a:64 | Assigned |
 | ESP32 #2 | Legitimate Vehicle 2 | VM-002 | 94:3c:c6:34:d0:60 | Assigned |
-| ESP32 #3 | Dedicated attacker / rogue / stress vehicle | Pending physical identification | Pending | Not yet identified |
+| ESP32 #3 | Dedicated attacker / rogue / stress vehicle | 94:3c:c6:32:05:80 | Identified | /dev/cu.usbserial-0001 during identification |
 
 ## Notes
 
