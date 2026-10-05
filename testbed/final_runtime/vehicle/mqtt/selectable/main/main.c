@@ -1617,62 +1617,115 @@ void app_main(void)
 
     if (s_mqtt_profile == OCC_MQTT_PROFILE_C2) {
         if (
-            strlen(CONFIG_OCC_SNTP_SERVER) == 0U ||
+            (
+                strlen(CONFIG_OCC_SNTP_PRIMARY_SERVER) == 0U &&
+                strlen(CONFIG_OCC_SNTP_SERVER) == 0U
+            ) ||
             fair_v1_c2_ca_crt_start[0] == '\0'
         ) {
             ESP_LOGE(
                 TAG,
-                "C2 requires SNTP server and CA certificate"
+                "C2 requires an SNTP server and CA certificate"
             );
 
             return;
         }
 
+        const char *sntp_servers[] = {
+            CONFIG_OCC_SNTP_PRIMARY_SERVER,
+            CONFIG_OCC_SNTP_SERVER
+        };
+
         while (true) {
-            esp_sntp_config_t sntp_config =
-                ESP_NETIF_SNTP_DEFAULT_CONFIG(
-                    CONFIG_OCC_SNTP_SERVER
-                );
+            bool time_synced = false;
 
-            err =
-                esp_netif_sntp_init(
-                    &sntp_config
-                );
+            for (
+                size_t server_index = 0;
+                server_index <
+                    sizeof(sntp_servers) /
+                    sizeof(sntp_servers[0]);
+                ++server_index
+            ) {
+                const char *server =
+                    sntp_servers[server_index];
 
-            if (err != ESP_OK) {
-                ESP_LOGW(
-                    TAG,
-                    "C2 SNTP initialization failed: %s; retrying",
-                    esp_err_to_name(err)
-                );
+                if (
+                    server == NULL ||
+                    server[0] == '\0'
+                ) {
+                    continue;
+                }
 
-                vTaskDelay(
-                    pdMS_TO_TICKS(5000)
-                );
+                if (
+                    server_index > 0 &&
+                    strcmp(
+                        server,
+                        sntp_servers[0]
+                    ) == 0
+                ) {
+                    continue;
+                }
 
-                continue;
-            }
-
-            err =
-                esp_netif_sntp_sync_wait(
-                    pdMS_TO_TICKS(30000)
-                );
-
-            esp_netif_sntp_deinit();
-
-            if (err == ESP_OK) {
                 ESP_LOGI(
                     TAG,
-                    "C2 SNTP synchronization complete"
+                    "C2 SNTP attempting server=%s",
+                    server
                 );
 
+                esp_sntp_config_t sntp_config =
+                    ESP_NETIF_SNTP_DEFAULT_CONFIG(
+                        server
+                    );
+
+                err =
+                    esp_netif_sntp_init(
+                        &sntp_config
+                    );
+
+                if (err != ESP_OK) {
+                    ESP_LOGW(
+                        TAG,
+                        "C2 SNTP initialization failed server=%s: %s",
+                        server,
+                        esp_err_to_name(err)
+                    );
+
+                    continue;
+                }
+
+                err =
+                    esp_netif_sntp_sync_wait(
+                        pdMS_TO_TICKS(30000)
+                    );
+
+                esp_netif_sntp_deinit();
+
+                if (err == ESP_OK) {
+                    ESP_LOGI(
+                        TAG,
+                        "C2 SNTP synchronization complete server=%s",
+                        server
+                    );
+
+                    time_synced = true;
+                    break;
+                }
+
+                ESP_LOGW(
+                    TAG,
+                    "C2 SNTP synchronization failed server=%s: %s",
+                    server,
+                    esp_err_to_name(err)
+                );
+            }
+
+            if (time_synced) {
                 break;
             }
 
             ESP_LOGW(
                 TAG,
-                "C2 SNTP synchronization failed: %s; vehicle remains active; retrying",
-                esp_err_to_name(err)
+                "C2 SNTP sources unavailable; vehicle remains active; retrying"
             );
 
             vTaskDelay(
