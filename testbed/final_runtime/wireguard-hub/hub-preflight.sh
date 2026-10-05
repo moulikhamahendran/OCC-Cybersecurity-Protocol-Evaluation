@@ -9,7 +9,7 @@ if [[ -f "$DIR/.env" ]]; then
     set +a
 fi
 
-WG_PUBLIC_PORT="${WG_PUBLIC_PORT:-443}"
+WG_PUBLIC_PORT="${WG_PUBLIC_PORT:-51820}"
 WG_UI_PORT="${WG_UI_PORT:-51821}"
 
 echo "========================================"

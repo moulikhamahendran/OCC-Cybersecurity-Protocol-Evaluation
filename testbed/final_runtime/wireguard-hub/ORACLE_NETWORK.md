@@ -5,7 +5,7 @@ For the WireGuard hub VM:
 Required inbound traffic:
 
 - TCP 22 from trusted administration sources for SSH
-- UDP 443 from WireGuard peers
+- UDP 51820 from WireGuard peers
 
 Do NOT expose TCP 51821 publicly.
 

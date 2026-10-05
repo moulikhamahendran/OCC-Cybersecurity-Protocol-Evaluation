@@ -44,7 +44,7 @@ WireGuard: 10.8.0.4
 The Oracle hub exposes only:
 
 - SSH TCP 22
-- WireGuard UDP 443
+- WireGuard UDP 51820
 
 The wg-easy dashboard is bound to:
 
@@ -57,7 +57,7 @@ and should be accessed with an SSH tunnel.
 Use:
 
 - Host: Oracle reserved public IPv4 or VPN DNS hostname
-- Port: 443
+- Port: 51820
 - IPv4 CIDR: 10.8.0.0/24
 - Allowed IPs: 10.8.0.0/24
 
