@@ -234,6 +234,12 @@ class MqttOccService:
             dynamic=self.dynamic_operational,
         )
 
+        # Security guard state belongs to this OCC service
+        # instance. This prevents stale replay/flood state
+        # leaking across service recreation or unit tests.
+        self._mqtt_fair_v1_rate_windows = {}
+        self._mqtt_fair_v1_last_accepted_seq = {}
+
         self.telemetry_topics = {}
 
         if self.dynamic_operational:
@@ -455,6 +461,93 @@ class MqttOccService:
             return
 
         seq = payload["seq"]
+        # FAIR_V1_MQTT_REPLAY_FLOOD_GUARD
+        # ---------------------------------------------------------
+        # Security ordering:
+        #   validation -> flood guard -> replay guard ->
+        #   registry update -> echo
+        #
+        # Normal FAIR-V1 telemetry is approximately 10 msg/s.
+        # Threshold 30 msg/s therefore leaves substantial headroom
+        # while detecting the controlled VM-003 flood campaign.
+        # ---------------------------------------------------------
+
+        _attack_identity = str(
+            payload.get("serialNumber", "UNKNOWN")
+        )
+
+        _attack_now = __import__("time").monotonic()
+
+        _rate_windows = (
+            self._mqtt_fair_v1_rate_windows
+        )
+
+        _window = _rate_windows.setdefault(
+            _attack_identity,
+            []
+        )
+
+        # Keep only arrivals from the last one second.
+        _window[:] = [
+            _t for _t in _window
+            if (_attack_now - _t) <= 1.0
+        ]
+
+        _window.append(_attack_now)
+
+        if len(_window) > 30:
+            print(
+                "[SECURITY][FLOOD] "
+                f"id={_attack_identity} "
+                f"rate={len(_window)}msg/s "
+                "threshold=30msg/s "
+                "action=REJECT"
+            )
+            return
+
+        # ---------------------------------------------------------
+        # Anti-replay:
+        #
+        # A sequence number that is equal to or below the last
+        # accepted value is stale/replayed and is rejected BEFORE
+        # registry.update() and BEFORE the OCC echo.
+        # ---------------------------------------------------------
+
+        _accepted_seq = (
+            self._mqtt_fair_v1_last_accepted_seq
+        )
+
+        try:
+            _incoming_seq = int(seq)
+        except (TypeError, ValueError):
+            print(
+                "[SECURITY][REPLAY] "
+                f"id={_attack_identity} "
+                f"invalid_seq={seq!r} "
+                "action=REJECT"
+            )
+            return
+
+        _previous_seq = _accepted_seq.get(
+            _attack_identity
+        )
+
+        if (
+            _previous_seq is not None
+            and _incoming_seq <= _previous_seq
+        ):
+            print(
+                "[SECURITY][REPLAY] "
+                f"id={_attack_identity} "
+                f"incoming_seq={_incoming_seq} "
+                f"last_seq={_previous_seq} "
+                "action=REJECT"
+            )
+            return
+
+        # Sequence becomes accepted only after all rejection
+        # conditions above passed.
+        _accepted_seq[_attack_identity] = _incoming_seq
 
         self.registry.update(
             serial_number,

@@ -23,6 +23,7 @@
 #include "runtime_endpoint_config.h"
 #include "runtime_known_wifi.h"
 #include "attack_controller.h"
+#include "attack_publish_wrapper.h"
 #include "vehicle_state.h"
 
 
@@ -1527,14 +1528,16 @@ static void execute_armed_attack_once(void)
         return;
     }
 
+    /*
+     * MALFORMED is generated explicitly by this function.
+     *
+     * REPLAY, SPOOF and FLOOD are deliberately executed by
+     * attack_publish_wrapper.h when the next VM-003 telemetry
+     * publication reaches the MQTT transport.
+     *
+     * Therefore DO NOT stop those modes here.
+     */
     if (mode != OCC_ATTACK_MODE_MALFORMED) {
-        ESP_LOGW(
-            TAG,
-            "attack mode=%s not implemented",
-            occ_attack_mode_to_string(mode)
-        );
-
-        occ_attack_controller_stop();
         return;
     }
 
@@ -1632,7 +1635,7 @@ void app_main(void)
 {
     ESP_LOGI(
         TAG,
-        "OCC MQTT VM-003 attacker runtime starting - native MALFORMED enabled"
+        "OCC MQTT VM-003 attacker runtime starting - MALFORMED/REPLAY/SPOOF/FLOOD enabled"
     );
 
     occ_attack_controller_init();
@@ -2485,15 +2488,23 @@ void app_main(void)
                     "payload construction failed"
                 );
             } else {
+                /*
+                 * Dedicated VM-003 attacker runtime:
+                 *
+                 * use publish() so attack_publish_wrapper.h can
+                 * intercept this telemetry publication.
+                 *
+                 * Normal VM-001/VM-002 selectable runtimes are
+                 * not modified.
+                 */
                 const int rc =
-                    esp_mqtt_client_enqueue(
+                    esp_mqtt_client_publish(
                         s_client,
                         s_telemetry_topic,
                         payload,
                         payload_len,
                         OCC_MQTT_QOS,
-                        0,
-                        false
+                        0
                     );
 
                 if (rc >= 0) {

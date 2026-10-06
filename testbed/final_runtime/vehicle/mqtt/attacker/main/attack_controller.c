@@ -119,11 +119,25 @@ esp_err_t occ_attack_controller_arm(
 )
 {
     /*
-     * First native-attack checkpoint:
-     * only MALFORMED is implemented.
+     * FAIR-V1 VM-003 native bounded attack set.
+     *
+     * IDLE cannot be armed explicitly.
+     * Supported attack modes:
+     *   MALFORMED
+     *   REPLAY
+     *   SPOOF
+     *   FLOOD
      */
-    if (mode != OCC_ATTACK_MODE_MALFORMED) {
-        return ESP_ERR_NOT_SUPPORTED;
+    switch (mode) {
+        case OCC_ATTACK_MODE_MALFORMED:
+        case OCC_ATTACK_MODE_REPLAY:
+        case OCC_ATTACK_MODE_SPOOF:
+        case OCC_ATTACK_MODE_FLOOD:
+            break;
+
+        case OCC_ATTACK_MODE_IDLE:
+        default:
+            return ESP_ERR_INVALID_ARG;
     }
 
     taskENTER_CRITICAL(&s_attack_lock);
