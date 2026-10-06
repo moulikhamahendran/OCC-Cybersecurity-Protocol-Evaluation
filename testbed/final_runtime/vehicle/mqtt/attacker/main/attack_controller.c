@@ -118,11 +118,12 @@ esp_err_t occ_attack_controller_arm(
     occ_attack_mode_t mode
 )
 {
-    if (
-        mode <= OCC_ATTACK_MODE_IDLE ||
-        mode > OCC_ATTACK_MODE_FLOOD
-    ) {
-        return ESP_ERR_INVALID_ARG;
+    /*
+     * First native-attack checkpoint:
+     * only MALFORMED is implemented.
+     */
+    if (mode != OCC_ATTACK_MODE_MALFORMED) {
+        return ESP_ERR_NOT_SUPPORTED;
     }
 
     taskENTER_CRITICAL(&s_attack_lock);
@@ -163,10 +164,7 @@ occ_attack_mode_t occ_attack_controller_mode(void)
 bool occ_attack_execution_enabled(void)
 {
     /*
-     * SAFETY INVARIANT FOR THIS CHECKPOINT.
-     *
-     * Controller modes can be armed for command/status testing,
-     * but no attack generator is allowed to execute.
+     * Native bounded MALFORMED execution is enabled.
      */
-    return false;
+    return true;
 }

