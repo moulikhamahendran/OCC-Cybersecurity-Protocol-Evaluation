@@ -22,6 +22,7 @@
 #include "runtime_mqtt_config.h"
 #include "runtime_endpoint_config.h"
 #include "runtime_known_wifi.h"
+#include "attack_controller.h"
 #include "vehicle_state.h"
 
 
@@ -419,6 +420,10 @@ static bool vehicle_id_is_valid(
 }
 
 
+static void publish_attack_controller_status(
+    const char *result
+);
+
 static void handle_complete_control(void)
 {
     cJSON *root =
@@ -809,6 +814,122 @@ static void handle_complete_control(void)
         return;
     }
 
+
+    if (
+        strcmp(
+            command->valuestring,
+            "arm_attack"
+        ) == 0
+    ) {
+        /*
+         * Attacker controller is remotely administrated only
+         * through authenticated + TLS-protected C2.
+         */
+        if (
+            s_mqtt_profile !=
+                OCC_MQTT_PROFILE_C2
+        ) {
+            ESP_LOGW(
+                TAG,
+                "attack arm rejected: C2 required"
+            );
+
+            cJSON_Delete(root);
+            return;
+        }
+
+        const cJSON *mode_json =
+            cJSON_GetObjectItemCaseSensitive(
+                root,
+                "mode"
+            );
+
+        if (
+            !cJSON_IsString(mode_json) ||
+            mode_json->valuestring == NULL
+        ) {
+            ESP_LOGW(
+                TAG,
+                "attack arm rejected: mode missing"
+            );
+
+            cJSON_Delete(root);
+            return;
+        }
+
+        occ_attack_mode_t mode;
+
+        if (
+            !occ_attack_mode_from_string(
+                mode_json->valuestring,
+                &mode
+            ) ||
+            mode == OCC_ATTACK_MODE_IDLE
+        ) {
+            ESP_LOGW(
+                TAG,
+                "attack arm rejected: invalid mode"
+            );
+
+            cJSON_Delete(root);
+            return;
+        }
+
+        esp_err_t attack_err =
+            occ_attack_controller_arm(
+                mode
+            );
+
+        if (attack_err != ESP_OK) {
+            ESP_LOGW(
+                TAG,
+                "attack controller arm failed: %s",
+                esp_err_to_name(
+                    attack_err
+                )
+            );
+
+            cJSON_Delete(root);
+            return;
+        }
+
+        ESP_LOGI(
+            TAG,
+            "attack controller armed mode=%s execution_enabled=false",
+            occ_attack_mode_to_string(
+                mode
+            )
+        );
+
+        publish_attack_controller_status(
+            "armed_no_execution"
+        );
+
+        cJSON_Delete(root);
+        return;
+    }
+
+    if (
+        strcmp(
+            command->valuestring,
+            "stop_attack"
+        ) == 0
+    ) {
+        occ_attack_controller_stop();
+
+        ESP_LOGI(
+            TAG,
+            "attack controller stopped mode=IDLE execution_enabled=false"
+        );
+
+        publish_attack_controller_status(
+            "stopped_idle"
+        );
+
+        cJSON_Delete(root);
+        return;
+    }
+
     ESP_LOGW(
         TAG,
         "unsupported control command"
@@ -913,6 +1034,75 @@ static void handle_control_fragment(
     handle_complete_control();
 
     reset_control_reassembly();
+}
+
+
+
+static void publish_attack_controller_status(
+    const char *result
+)
+{
+    if (
+        s_client == NULL ||
+        result == NULL
+    ) {
+        return;
+    }
+
+    const occ_attack_mode_t mode =
+        occ_attack_controller_mode();
+
+    char status[STATUS_BUFFER_BYTES];
+
+    const int status_len =
+        snprintf(
+            status,
+            sizeof(status),
+            "{"
+            "\"vehicle_id\":\"%s\","
+            "\"attacker_hardware_unit_id\":\"ESP32_3\","
+            "\"physical_mac\":\"94:3c:c6:32:05:80\","
+            "\"attack_mode\":\"%s\","
+            "\"controller_result\":\"%s\","
+            "\"execution_enabled\":%s"
+            "}",
+            s_vehicle_id,
+            occ_attack_mode_to_string(mode),
+            result,
+            occ_attack_execution_enabled()
+                ? "true"
+                : "false"
+        );
+
+    if (
+        status_len <= 0 ||
+        status_len >=
+            (int)sizeof(status)
+    ) {
+        ESP_LOGW(
+            TAG,
+            "attack controller status construction failed"
+        );
+
+        return;
+    }
+
+    const int msg_id =
+        esp_mqtt_client_publish(
+            s_client,
+            s_status_topic,
+            status,
+            status_len,
+            OCC_MQTT_QOS,
+            0
+        );
+
+    if (msg_id < 0) {
+        ESP_LOGW(
+            TAG,
+            "attack controller status publish failed"
+        );
+    }
 }
 
 
@@ -1325,7 +1515,20 @@ void app_main(void)
 {
     ESP_LOGI(
         TAG,
-        "OCC MQTT VM-003 attacker runtime starting - SAFE CONNECTIVITY ONLY"
+        "OCC MQTT VM-003 attacker controller runtime starting - execution disabled"
+    );
+
+    occ_attack_controller_init();
+
+    ESP_LOGI(
+        TAG,
+        "attack controller initialized mode=%s execution_enabled=%s",
+        occ_attack_mode_to_string(
+            occ_attack_controller_mode()
+        ),
+        occ_attack_execution_enabled()
+            ? "true"
+            : "false"
     );
 
     esp_err_t err =
