@@ -42,3 +42,7 @@ results/fair_v1/**
 results/hardware/**
 !results/hardware/cross_protocol_pilot/
 !results/hardware/cross_protocol_pilot/*.csv
+
+# Preserve portability-validation evidence
+!results/portability/
+!results/portability/**
