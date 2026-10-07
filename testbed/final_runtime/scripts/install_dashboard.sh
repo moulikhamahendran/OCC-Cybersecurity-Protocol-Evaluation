@@ -46,7 +46,8 @@ SERVICE_TARGET="/etc/systemd/system/occ-dashboard.service"
 
 REQUIREMENTS_SOURCE="${RUNTIME_SOURCE}/dashboard/requirements.txt"
 
-FRONTEND_SOURCE="${TESTBED_SOURCE}/dashboard/react/dist"
+FRONTEND_PROJECT="${TESTBED_SOURCE}/dashboard/react"
+FRONTEND_SOURCE="${FRONTEND_PROJECT}/dist"
 
 echo "===== OCC DASHBOARD INSTALL ====="
 
@@ -63,7 +64,10 @@ for required in \
     "${CONFIG_ROOT}/mqtt.env" \
     "${SERVICE_SOURCE}" \
     "${REQUIREMENTS_SOURCE}" \
-    "${FRONTEND_SOURCE}/index.html"
+    "${FRONTEND_PROJECT}/package.json" \
+    "${FRONTEND_PROJECT}/package-lock.json" \
+    "${FRONTEND_PROJECT}/index.html" \
+    "${FRONTEND_PROJECT}/src"
 do
     if [[ ! -e "${required}" ]]; then
         echo "[FAIL] Missing required path:"
@@ -71,11 +75,6 @@ do
         exit 1
     fi
 done
-
-if [[ ! -d "${FRONTEND_SOURCE}/assets" ]]; then
-    echo "[FAIL] React production assets are missing."
-    exit 1
-fi
 
 if ! systemctl is-active --quiet mosquitto; then
     echo "[FAIL] mosquitto.service is not active."
@@ -87,12 +86,69 @@ if ! systemctl is-active --quiet occ-mqtt; then
     exit 1
 fi
 
-echo "[2/9] Stopping previous dashboard service"
+echo "[2/10] Ensuring React build toolchain"
+
+if ! command -v node >/dev/null 2>&1 \
+    || ! command -v npm >/dev/null 2>&1; then
+
+    if ! command -v apt-get >/dev/null 2>&1; then
+        echo "[FAIL] node/npm missing and apt-get unavailable"
+        exit 1
+    fi
+
+    apt-get update
+    DEBIAN_FRONTEND=noninteractive \
+        apt-get install -y nodejs npm
+fi
+
+echo "[INFO] node=$(node --version)"
+echo "[INFO] npm=$(npm --version)"
+
+echo
+echo "[3/10] Building React production frontend"
+
+BUILD_ROOT="$(mktemp -d /tmp/occ-dashboard-react.XXXXXX)"
+
+cleanup_build() {
+    rm -rf "${BUILD_ROOT}"
+}
+
+trap cleanup_build EXIT
+
+cp -R "${FRONTEND_PROJECT}/." "${BUILD_ROOT}/"
+
+rm -rf \
+    "${BUILD_ROOT}/node_modules" \
+    "${BUILD_ROOT}/dist"
+
+(
+    cd "${BUILD_ROOT}"
+
+    npm ci
+    npm run build
+)
+
+if [[ ! -f "${BUILD_ROOT}/dist/index.html" ]]; then
+    echo "[FAIL] React build did not create dist/index.html"
+    exit 1
+fi
+
+if [[ ! -d "${BUILD_ROOT}/dist/assets" ]]; then
+    echo "[FAIL] React build did not create dist/assets"
+    exit 1
+fi
+
+FRONTEND_SOURCE="${BUILD_ROOT}/dist"
+
+echo "[PASS] React production frontend built"
+
+echo
+echo "[4/10] Stopping previous dashboard service"
 
 systemctl stop occ-dashboard \
     2>/dev/null || true
 
-echo "[3/9] Installing dashboard application"
+echo "[5/10] Installing dashboard application"
 
 rm -rf "${INSTALL_ROOT}"
 
@@ -138,7 +194,7 @@ find "${INSTALL_ROOT}/testbed" \
     -prune \
     -exec rm -rf {} +
 
-echo "[4/9] Installing React production build"
+echo "[6/10] Installing React production build"
 
 install -d \
     -o root \
@@ -150,7 +206,7 @@ cp -R \
     "${FRONTEND_SOURCE}/." \
     "${INSTALL_ROOT}/static/"
 
-echo "[5/9] Installing requirements"
+echo "[7/10] Installing requirements"
 
 install \
     -o root \
@@ -159,7 +215,7 @@ install \
     "${REQUIREMENTS_SOURCE}" \
     "${INSTALL_ROOT}/requirements.txt"
 
-echo "[6/9] Creating dashboard Python environment"
+echo "[8/10] Creating dashboard Python environment"
 
 python3 -m venv \
     "${INSTALL_ROOT}/.venv"
@@ -172,7 +228,7 @@ python3 -m venv \
     -m pip install \
     -r "${INSTALL_ROOT}/requirements.txt"
 
-echo "[7/9] Installing dashboard deployment configuration"
+echo "[9/10] Installing dashboard deployment configuration"
 
 cat > "${DASHBOARD_ENV}" <<EOF
 OCC_DASHBOARD_BIND_HOST=${DASHBOARD_BIND_HOST}
@@ -185,7 +241,7 @@ chmod 0640 "${DASHBOARD_ENV}"
 echo "[OK] Dashboard bind=${DASHBOARD_BIND_HOST}:${DASHBOARD_PORT}"
 
 echo
-echo "[7/9] Installing systemd service"
+echo "[9/10] Installing systemd service"
 
 install \
     -o root \
@@ -196,7 +252,7 @@ install \
 
 systemctl daemon-reload
 
-echo "[8/9] Starting permanent dashboard"
+echo "[10/10] Starting permanent dashboard"
 
 systemctl enable occ-dashboard
 systemctl restart occ-dashboard
@@ -212,7 +268,7 @@ if ! systemctl is-active --quiet occ-dashboard; then
     exit 1
 fi
 
-echo "[9/9] Performing local health check"
+echo "[VERIFY] Performing local health check"
 
 HEALTH_HOST="${DASHBOARD_BIND_HOST}"
 
