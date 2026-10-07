@@ -7,6 +7,12 @@ if [[ "${EUID}" -ne 0 ]]; then
     exit 1
 fi
 
+if [[ -z "${OCC_TLS_SERVER_NAME:-}" ]]; then
+    echo "[FAIL] OCC_TLS_SERVER_NAME is required."
+    echo "       Use the generic install-linux.sh entry point."
+    exit 1
+fi
+
 SCRIPT_DIR="$(
     cd "$(dirname "${BASH_SOURCE[0]}")"
     pwd
@@ -254,7 +260,7 @@ fi
 
 openssl verify \
     -CAfile "${C2_CA}" \
-    -verify_hostname occ-pi.local \
+    -verify_hostname "${OCC_TLS_SERVER_NAME}" \
     "${C2_CERT}"
 
 echo "[8/10] Installing operational MQTT ACL enforcement"
