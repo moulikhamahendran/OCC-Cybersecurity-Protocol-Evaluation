@@ -1,0 +1,21 @@
+● occ-mqtt.service - OCC Final Runtime MQTT Adapter
+     Loaded: loaded (/etc/systemd/system/occ-mqtt.service; enabled; preset: enabled)
+     Active: active (running) since Wed 2026-10-07 15:37:23 UTC; 1h 57min ago
+ Invocation: ffae623da13b495ebb674c24d5ae9ace
+   Main PID: 13390 (python)
+      Tasks: 4 (limit: 627)
+     Memory: 18.3M (peak: 18.3M)
+        CPU: 8.393s
+     CGroup: /system.slice/occ-mqtt.service
+             └─13390 /opt/occ-final-runtime/.venv/bin/python /opt/occ-final-runtime/occ/mqtt/mqtt_occ.py --config /etc/occ-final-runtime/system.json
+
+Oct 07 17:34:35 ip-172-31-44-82 python[13390]: [OCC] vehicle=VM-002 seq=12833 rx_us=11698966267 tx_us=11698966346 publish_rc=0
+Oct 07 17:34:35 ip-172-31-44-82 python[13390]: [OCC] vehicle=VM-002 seq=12834 rx_us=11699004634 tx_us=11699004712 publish_rc=0
+Oct 07 17:34:35 ip-172-31-44-82 python[13390]: [OCC] vehicle=VM-002 seq=12835 rx_us=11699005026 tx_us=11699005090 publish_rc=0
+Oct 07 17:34:35 ip-172-31-44-82 python[13390]: [OCC] vehicle=VM-002 seq=12836 rx_us=11699005246 tx_us=11699005296 publish_rc=0
+Oct 07 17:34:35 ip-172-31-44-82 python[13390]: [OCC] vehicle=VM-002 seq=12837 rx_us=11699005415 tx_us=11699005464 publish_rc=0
+Oct 07 17:34:35 ip-172-31-44-82 python[13390]: [OCC] vehicle=VM-002 seq=12838 rx_us=11699046414 tx_us=11699046484 publish_rc=0
+Oct 07 17:34:35 ip-172-31-44-82 python[13390]: [OCC] vehicle=VM-002 seq=12839 rx_us=11699046655 tx_us=11699046710 publish_rc=0
+Oct 07 17:34:35 ip-172-31-44-82 python[13390]: [OCC] vehicle=VM-002 seq=12840 rx_us=11699064100 tx_us=11699064172 publish_rc=0
+Oct 07 17:34:35 ip-172-31-44-82 python[13390]: [OCC] vehicle=VM-002 seq=12841 rx_us=11699103830 tx_us=11699103930 publish_rc=0
+Oct 07 17:34:35 ip-172-31-44-82 python[13390]: [OCC] vehicle=VM-002 seq=12842 rx_us=11699163817 tx_us=11699163895 publish_rc=0

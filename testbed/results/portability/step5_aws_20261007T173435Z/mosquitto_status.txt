@@ -1,0 +1,19 @@
+● mosquitto.service - Mosquitto MQTT Broker
+     Loaded: loaded (/usr/lib/systemd/system/mosquitto.service; enabled; preset: enabled)
+     Active: active (running) since Wed 2026-10-07 15:37:22 UTC; 1h 57min ago
+ Invocation: 8d5cea3d179e4c32927950a7fcf579aa
+       Docs: man:mosquitto.conf(5)
+             man:mosquitto(8)
+   Main PID: 13260 (mosquitto)
+      Tasks: 1 (limit: 627)
+     Memory: 1.8M (peak: 2.3M)
+        CPU: 5.786s
+     CGroup: /system.slice/mosquitto.service
+             └─13260 /usr/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf
+
+Oct 07 15:37:22 ip-172-31-44-82 systemd[1]: Starting mosquitto.service - Mosquitto MQTT Broker...
+Oct 07 15:37:22 ip-172-31-44-82 mosquitto[13260]: 1791387442: Loading config file /etc/mosquitto/conf.d/00-occ-final-runtime.conf
+Oct 07 15:37:22 ip-172-31-44-82 mosquitto[13260]: 1791387442: Loading config file /etc/mosquitto/conf.d/fair-v1-c0.conf
+Oct 07 15:37:22 ip-172-31-44-82 mosquitto[13260]: 1791387442: Loading config file /etc/mosquitto/conf.d/fair-v1-c1.conf
+Oct 07 15:37:22 ip-172-31-44-82 mosquitto[13260]: 1791387442: Loading config file /etc/mosquitto/conf.d/fair-v1-c2.conf
+Oct 07 15:37:22 ip-172-31-44-82 systemd[1]: Started mosquitto.service - Mosquitto MQTT Broker.
