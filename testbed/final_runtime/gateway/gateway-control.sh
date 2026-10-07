@@ -167,7 +167,10 @@ migrate_legacy_sntp() {
     local cmd
     cmd="$(process_command "${owner}")"
 
-    if [[ "${cmd}" == *"${SNTP_SCRIPT}"* ]]; then
+    if [[
+        "${cmd}" == *"${SNTP_SCRIPT}"* ||
+        "${cmd}" == *"sntp_server.py"*
+    ]]; then
         echo "${owner}" > "${SNTP_PID}"
         echo "[OK] Existing managed SNTP adopted PID=${owner}"
         return 0
@@ -191,6 +194,15 @@ start_sntp() {
 
     if pid_file_running "${SNTP_PID}"; then
         echo "[OK] SNTP already running PID=$(cat "${SNTP_PID}")"
+        return 0
+    fi
+
+    # A previous run may still own UDP/123 even when its PID file
+    # is missing. Adopt a known OCC SNTP process before trying
+    # to start another one.
+    migrate_legacy_sntp || return 1
+
+    if pid_file_running "${SNTP_PID}"; then
         return 0
     fi
 
@@ -526,12 +538,14 @@ health_all() {
     echo "----- mDNS -----"
 
     if ! mdns_running; then
-        echo "[FAIL] mDNS publisher not running"
-        return 1
-    fi
+        echo "[WARN] mDNS publisher not running (optional)"
+    else
+        echo "[OK] mDNS publisher running"
 
-    echo "[OK] mDNS publisher running"
-    check_mdns
+        if ! check_mdns; then
+            echo "[WARN] mDNS resolution unavailable (optional)"
+        fi
+    fi
 
     echo
     echo "OCC GATEWAY: READY"
@@ -567,7 +581,10 @@ start_all() {
     start_sntp
 
     echo
-    start_mdns
+
+    if ! start_mdns; then
+        echo "[WARN] mDNS startup failed; continuing without mDNS"
+    fi
 
     echo
     health_all
