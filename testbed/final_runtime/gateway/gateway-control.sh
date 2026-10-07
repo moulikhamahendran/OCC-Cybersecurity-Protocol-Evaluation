@@ -328,7 +328,7 @@ start_mdns() {
                 "_mqtt._tcp" \
                 "local" \
                 8883 \
-                "occ-pi.local" \
+                "${OCC_MDNS_HOSTNAME}" \
                 "${lan_ip}" \
                 >> "${MDNS_LOG}" 2>&1 &
 
@@ -344,7 +344,7 @@ start_mdns() {
 
             nohup avahi-publish \
                 -a \
-                "occ-pi.local" \
+                "${OCC_MDNS_HOSTNAME}" \
                 "${lan_ip}" \
                 >> "${MDNS_LOG}" 2>&1 &
 
@@ -352,7 +352,7 @@ start_mdns() {
 
             nohup avahi-publish \
                 -s \
-                -H "occ-pi.local" \
+                -H "${OCC_MDNS_HOSTNAME}" \
                 "OCC-Pi-Gateway" \
                 "_mqtt._tcp" \
                 8883 \
@@ -443,22 +443,23 @@ check_mdns() {
     local lan_ip
     lan_ip="$(detect_lan_ip)"
 
-    python3 - "${lan_ip}" <<'PY'
+    python3 - "${OCC_MDNS_HOSTNAME}" "${lan_ip}" <<'PY'
 import socket
 import sys
 import time
 
-expected = sys.argv[1]
+hostname = sys.argv[1]
+expected = sys.argv[2]
 last = None
 
 for _ in range(10):
     try:
-        actual = socket.gethostbyname("occ-pi.local")
+        actual = socket.gethostbyname(hostname)
         last = actual
 
         if actual == expected:
             print(
-                f"[OK] occ-pi.local -> {actual}"
+                f"[OK] {hostname} -> {actual}"
             )
             raise SystemExit(0)
     except OSError:
@@ -467,7 +468,7 @@ for _ in range(10):
     time.sleep(0.5)
 
 print(
-    f"[FAIL] occ-pi.local expected={expected} "
+    f"[FAIL] {hostname} expected={expected} "
     f"actual={last}"
 )
 

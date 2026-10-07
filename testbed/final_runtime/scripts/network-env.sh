@@ -46,6 +46,7 @@ load_occ_network_env() {
     OCC_MQTT_C1_PORT="${OCC_MQTT_C1_PORT:-1884}"
     OCC_MQTT_C2_PORT="${OCC_MQTT_C2_PORT:-8883}"
     OCC_DASHBOARD_PORT="${OCC_DASHBOARD_PORT:-8080}"
+    OCC_MDNS_HOSTNAME="${OCC_MDNS_HOSTNAME:-${OCC_TLS_SERVER_NAME}}"
 
     export \
         OCC_SERVICE_NAME \
@@ -54,5 +55,6 @@ load_occ_network_env() {
         OCC_MQTT_C0_PORT \
         OCC_MQTT_C1_PORT \
         OCC_MQTT_C2_PORT \
-        OCC_DASHBOARD_PORT
+        OCC_DASHBOARD_PORT \
+        OCC_MDNS_HOSTNAME
 }
