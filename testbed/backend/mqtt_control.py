@@ -27,7 +27,7 @@ REPO_RUNTIME_CONFIG = (
     / "system.example.json"
 )
 
-PI_RUNTIME_CONFIG = Path(
+SYSTEM_RUNTIME_CONFIG = Path(
     "/etc/occ-final-runtime/system.json"
 )
 
@@ -89,8 +89,8 @@ def default_runtime_config_path() -> Path:
             configured
         ).expanduser().resolve()
 
-    if PI_RUNTIME_CONFIG.is_file():
-        return PI_RUNTIME_CONFIG
+    if SYSTEM_RUNTIME_CONFIG.is_file():
+        return SYSTEM_RUNTIME_CONFIG
 
     return REPO_RUNTIME_CONFIG
 

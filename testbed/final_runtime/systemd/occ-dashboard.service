@@ -21,11 +21,15 @@ Environment=OCC_DASHBOARD_STATIC_DIR=/opt/occ-dashboard/static
 
 EnvironmentFile=-/etc/occ-final-runtime/mqtt.env
 
+Environment=OCC_DASHBOARD_BIND_HOST=0.0.0.0
+Environment=OCC_DASHBOARD_PORT=8080
+EnvironmentFile=-/etc/occ-final-runtime/dashboard.env
+
 ExecStart=/opt/occ-dashboard/.venv/bin/python \
     -m uvicorn \
     testbed.backend.main:app \
-    --host 0.0.0.0 \
-    --port 8080
+    --host ${OCC_DASHBOARD_BIND_HOST} \
+    --port ${OCC_DASHBOARD_PORT}
 
 Restart=always
 RestartSec=2

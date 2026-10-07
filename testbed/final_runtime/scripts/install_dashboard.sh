@@ -25,6 +25,21 @@ TESTBED_SOURCE="$(
 INSTALL_ROOT="/opt/occ-dashboard"
 CONFIG_ROOT="/etc/occ-final-runtime"
 
+DASHBOARD_BIND_HOST="${OCC_DASHBOARD_BIND_HOST:-0.0.0.0}"
+DASHBOARD_PORT="${OCC_DASHBOARD_PORT:-8080}"
+DASHBOARD_ENV="${CONFIG_ROOT}/dashboard.env"
+
+if ! [[ "${DASHBOARD_PORT}" =~ ^[0-9]+$ ]] \
+    || (( DASHBOARD_PORT < 1 || DASHBOARD_PORT > 65535 )); then
+    echo "[FAIL] Invalid OCC_DASHBOARD_PORT: ${DASHBOARD_PORT}"
+    exit 1
+fi
+
+if [[ -z "${DASHBOARD_BIND_HOST}" ]]; then
+    echo "[FAIL] OCC_DASHBOARD_BIND_HOST must not be empty"
+    exit 1
+fi
+
 SERVICE_SOURCE="${RUNTIME_SOURCE}/systemd/occ-dashboard.service"
 
 SERVICE_TARGET="/etc/systemd/system/occ-dashboard.service"
@@ -157,6 +172,19 @@ python3 -m venv \
     -m pip install \
     -r "${INSTALL_ROOT}/requirements.txt"
 
+echo "[7/9] Installing dashboard deployment configuration"
+
+cat > "${DASHBOARD_ENV}" <<EOF
+OCC_DASHBOARD_BIND_HOST=${DASHBOARD_BIND_HOST}
+OCC_DASHBOARD_PORT=${DASHBOARD_PORT}
+EOF
+
+chown root:occ-runtime "${DASHBOARD_ENV}"
+chmod 0640 "${DASHBOARD_ENV}"
+
+echo "[OK] Dashboard bind=${DASHBOARD_BIND_HOST}:${DASHBOARD_PORT}"
+
+echo
 echo "[7/9] Installing systemd service"
 
 install \
@@ -186,22 +214,35 @@ fi
 
 echo "[9/9] Performing local health check"
 
-"${INSTALL_ROOT}/.venv/bin/python" - <<'PY'
+HEALTH_HOST="${DASHBOARD_BIND_HOST}"
+
+case "${HEALTH_HOST}" in
+    0.0.0.0)
+        HEALTH_HOST="127.0.0.1"
+        ;;
+    "::")
+        HEALTH_HOST="[::1]"
+        ;;
+esac
+
+"${INSTALL_ROOT}/.venv/bin/python" \
+    - "${HEALTH_HOST}" "${DASHBOARD_PORT}" <<'PYHEALTH'
 import json
+import sys
 import urllib.request
+
+host = sys.argv[1]
+port = int(sys.argv[2])
+
+base_url = f"http://{host}:{port}"
 
 for path in (
     "/api/v1/health",
     "/api/v1/vehicles",
     "/api/v1/mqtt/live/status",
 ):
-    url = (
-        "http://127.0.0.1:8080"
-        + path
-    )
-
     with urllib.request.urlopen(
-        url,
+        base_url + path,
         timeout=5,
     ) as response:
         json.load(response)
@@ -209,14 +250,12 @@ for path in (
     print(path, "PASS")
 
 with urllib.request.urlopen(
-    "http://127.0.0.1:8080/",
+    base_url + "/",
     timeout=5,
 ) as response:
-    content_type = (
-        response.headers.get(
-            "Content-Type",
-            "",
-        )
+    content_type = response.headers.get(
+        "Content-Type",
+        "",
     )
 
     body = response.read().decode(
@@ -235,10 +274,10 @@ if 'id="root"' not in body:
     )
 
 print("/ React frontend PASS")
-PY
+PYHEALTH
 
 echo
 echo "===== DASHBOARD INSTALL COMPLETE ====="
 echo
-echo "Open from the LAN:"
-echo "http://occ-pi.local:8080"
+echo "Open using a reachable address of this OCC host:"
+echo "  http://<reachable-OCC-host>:${DASHBOARD_PORT}"
