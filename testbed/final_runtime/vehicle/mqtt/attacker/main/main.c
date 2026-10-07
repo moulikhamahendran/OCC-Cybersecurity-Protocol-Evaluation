@@ -1880,52 +1880,19 @@ void app_main(void)
         );
 
     if (err != ESP_OK) {
-        if (
-            !occ_endpoint_host_is_valid(
-                CONFIG_OCC_DEFAULT_HOST
-            )
-        ) {
-            ESP_LOGE(
-                TAG,
-                "No valid runtime or bootstrap OCC host"
-            );
-
-            return;
-        }
-
-        const int host_len =
-            snprintf(
-                s_occ_host,
-                sizeof(s_occ_host),
-                "%s",
-                CONFIG_OCC_DEFAULT_HOST
-            );
-
-        if (
-            host_len <= 0 ||
-            host_len >=
-                (int)sizeof(s_occ_host)
-        ) {
-            ESP_LOGE(
-                TAG,
-                "Bootstrap OCC host invalid"
-            );
-
-            return;
-        }
-
-        ESP_LOGI(
+        ESP_LOGE(
             TAG,
-            "Using bootstrap OCC host=%s",
-            s_occ_host
+            "OCC endpoint is not provisioned; run device provisioning"
         );
-    } else {
-        ESP_LOGI(
-            TAG,
-            "Using runtime OCC host=%s",
-            s_occ_host
-        );
+
+        return;
     }
+
+    ESP_LOGI(
+        TAG,
+        "Using provisioned OCC endpoint=%s",
+        s_occ_host
+    );
 
     const char *scheme = NULL;
     int port = 0;
@@ -1993,22 +1960,18 @@ void app_main(void)
 
     if (s_mqtt_profile == OCC_MQTT_PROFILE_C2) {
         if (
-            (
-                strlen(CONFIG_OCC_SNTP_PRIMARY_SERVER) == 0U &&
-                strlen(CONFIG_OCC_SNTP_SERVER) == 0U
-            ) ||
             fair_v1_c2_ca_crt_start[0] == '\0'
         ) {
             ESP_LOGE(
                 TAG,
-                "C2 requires an SNTP server and CA certificate"
+                "C2 requires a CA certificate"
             );
 
             return;
         }
 
         const char *sntp_servers[] = {
-            CONFIG_OCC_SNTP_SERVER,
+            s_occ_host,
             CONFIG_OCC_SNTP_PRIMARY_SERVER
         };
 

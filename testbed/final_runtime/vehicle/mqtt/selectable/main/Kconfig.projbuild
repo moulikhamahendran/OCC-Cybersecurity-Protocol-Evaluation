@@ -7,13 +7,6 @@ config OCC_MQTT_DEFAULT_PROFILE
         Initial profile used when no runtime profile exists in NVS.
         Valid values: C0, C1, C2.
 
-config OCC_DEFAULT_HOST
-    string "Bootstrap OCC host"
-    default "occ-pi.local"
-    help
-        Used only when no runtime OCC endpoint exists in NVS.
-        Runtime endpoint configuration overrides this value.
-
 config OCC_TLS_SERVER_NAME
     string "C2 TLS server identity"
     default "occ-pi.local"
@@ -23,18 +16,12 @@ config OCC_TLS_SERVER_NAME
         separate.
 
 config OCC_SNTP_PRIMARY_SERVER
-    string "Primary SNTP server for C2 TLS certificate validation"
-    default "pool.ntp.org"
+    string "Optional secondary SNTP server"
+    default ""
     help
-        Network-independent time source used first when Internet
-        connectivity is available.
-
-config OCC_SNTP_SERVER
-    string "Fallback local SNTP server for C2 TLS certificate validation"
-    default "occ-pi.local"
-    help
-        Local OCC time source used when the primary SNTP server
-        is unavailable.
+        Optional secondary time source.
+        The provisioned OCC/gateway endpoint is tried first.
+        Leave empty when the gateway provides SNTP.
 
 config OCC_VEHICLE_ID
     string "Vehicle identity"

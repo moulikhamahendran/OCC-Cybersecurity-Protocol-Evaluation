@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+
+SCRIPT_DIR="$(
+    cd "$(dirname "${BASH_SOURCE[0]}")"
+    pwd
+)"
+
+source "${SCRIPT_DIR}/network-env.sh"
+load_occ_network_env
+
+
 set -u
 
 if [[ "${EUID}" -ne 0 ]]; then
@@ -116,10 +126,10 @@ echo "===== TLS CERTIFICATE ====="
 
 if openssl verify \
     -CAfile "${CA_FILE}" \
-    -verify_hostname occ-pi.local \
+    -verify_hostname "${OCC_TLS_SERVER_NAME}" \
     "${SERVER_CERT}"
 then
-    echo "[OK] server certificate valid for occ-pi.local"
+    echo "[OK] server certificate valid for ${OCC_TLS_SERVER_NAME}"
 else
     echo "[FAIL] server certificate validation failed"
     fail=1
@@ -159,7 +169,7 @@ probe_payload="health-c2-$$"
 if [[ -n "${MQTT_USER:-}" && -n "${MQTT_PASS:-}" ]]; then
     probe_output="$(
         timeout 6 mosquitto_sub \
-            -h occ-pi.local \
+            -h "${OCC_SERVICE_NAME}" \
             -p 8883 \
             --cafile "${CA_FILE}" \
             -u "${MQTT_USER}" \
@@ -172,7 +182,7 @@ if [[ -n "${MQTT_USER:-}" && -n "${MQTT_PASS:-}" ]]; then
         sleep 0.5
 
         mosquitto_pub \
-            -h occ-pi.local \
+            -h "${OCC_SERVICE_NAME}" \
             -p 8883 \
             --cafile "${CA_FILE}" \
             -u "${MQTT_USER}" \

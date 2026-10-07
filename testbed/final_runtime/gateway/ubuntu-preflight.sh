@@ -128,24 +128,20 @@ else
 fi
 
 echo
-echo "===== 8. TAILSCALE ====="
+echo "===== 8. WIREGUARD ====="
 
-if command -v tailscale >/dev/null 2>&1; then
-    echo "[PASS] Tailscale installed"
+if command -v wg >/dev/null 2>&1; then
+    echo "[PASS] WireGuard tools installed"
 
-    TS_IP="$(
-        tailscale ip -4 2>/dev/null \
-            | head -n 1 \
-            || true
-    )"
+    WG_INTERFACES="$(wg show interfaces 2>/dev/null || true)"
 
-    if [[ -n "$TS_IP" ]]; then
-        echo "Tailscale IP: $TS_IP"
+    if [ -n "${WG_INTERFACES}" ]; then
+        echo "Active WireGuard interface(s): ${WG_INTERFACES}"
     else
-        echo "[INFO] Tailscale installed but no active IPv4"
+        echo "[INFO] WireGuard installed; no active interface"
     fi
 else
-    echo "[INFO] Tailscale not installed yet"
+    echo "[INFO] WireGuard tools not installed yet"
 fi
 
 echo

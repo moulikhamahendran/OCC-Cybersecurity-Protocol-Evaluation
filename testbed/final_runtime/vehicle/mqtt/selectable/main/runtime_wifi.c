@@ -1,5 +1,6 @@
 #include "runtime_wifi.h"
 #include "runtime_mqtt_config.h"
+#include "runtime_endpoint_config.h"
 #include "runtime_known_wifi.h"
 
 #include <inttypes.h>
@@ -34,6 +35,7 @@ static EventGroupHandle_t s_wifi_event_group = NULL;
 
 static bool s_wifi_credentials_ready = false;
 static bool s_mqtt_credentials_ready = false;
+static bool s_occ_endpoint_ready = false;
 
 
 static esp_err_t mqtt_credentials_prov_handler(
@@ -75,38 +77,88 @@ static esp_err_t mqtt_credentials_prov_handler(
                     "password"
                 );
 
-            if (
+            const cJSON *occ_host =
+                cJSON_GetObjectItemCaseSensitive(
+                    root,
+                    "occ_host"
+                );
+
+            const bool credentials_valid =
                 cJSON_IsString(username) &&
                 username->valuestring != NULL &&
                 cJSON_IsString(password) &&
-                password->valuestring != NULL
+                password->valuestring != NULL;
+
+            const bool endpoint_valid =
+                cJSON_IsString(occ_host) &&
+                occ_host->valuestring != NULL &&
+                occ_endpoint_host_is_valid(
+                    occ_host->valuestring
+                );
+
+            if (
+                credentials_valid &&
+                endpoint_valid
             ) {
-                esp_err_t err =
+                esp_err_t credentials_err =
                     occ_mqtt_credentials_save(
                         username->valuestring,
                         password->valuestring
                     );
 
-                if (err == ESP_OK) {
-                    ESP_LOGI(
-                        TAG,
-                        "MQTT C1 credentials stored in NVS"
+                esp_err_t endpoint_err =
+                    occ_endpoint_host_save(
+                        occ_host->valuestring
                     );
 
-                    response = "SUCCESS";
+                if (
+                    credentials_err == ESP_OK &&
+                    endpoint_err == ESP_OK
+                ) {
+                    ESP_LOGI(
+                        TAG,
+                        "MQTT credentials and OCC endpoint stored in NVS"
+                    );
+
+                    ESP_LOGI(
+                        TAG,
+                        "Provisioned OCC endpoint=%s",
+                        occ_host->valuestring
+                    );
 
                     s_mqtt_credentials_ready = true;
+                    s_occ_endpoint_ready = true;
+                    response = "SUCCESS";
 
                     if (s_wifi_credentials_ready) {
                         wifi_prov_mgr_stop_provisioning();
                     }
                 } else {
-                    ESP_LOGE(
-                        TAG,
-                        "MQTT credential storage failed: %s",
-                        esp_err_to_name(err)
-                    );
+                    if (credentials_err != ESP_OK) {
+                        ESP_LOGE(
+                            TAG,
+                            "MQTT credential storage failed: %s",
+                            esp_err_to_name(
+                                credentials_err
+                            )
+                        );
+                    }
+
+                    if (endpoint_err != ESP_OK) {
+                        ESP_LOGE(
+                            TAG,
+                            "OCC endpoint storage failed: %s",
+                            esp_err_to_name(
+                                endpoint_err
+                            )
+                        );
+                    }
                 }
+            } else {
+                ESP_LOGW(
+                    TAG,
+                    "Provisioning custom-data requires username, password and valid occ_host"
+                );
             }
 
             cJSON_Delete(root);
@@ -184,7 +236,10 @@ static void wifi_event_handler(
 
                 s_wifi_credentials_ready = true;
 
-                if (s_mqtt_credentials_ready) {
+                if (
+                    s_mqtt_credentials_ready &&
+                    s_occ_endpoint_ready
+                ) {
                     wifi_prov_mgr_stop_provisioning();
                 }
 
@@ -200,7 +255,8 @@ static void wifi_event_handler(
 
                 if (
                     s_wifi_credentials_ready &&
-                    s_mqtt_credentials_ready
+                    s_mqtt_credentials_ready &&
+                    s_occ_endpoint_ready
                 ) {
                     ESP_LOGI(
                         TAG,
@@ -547,15 +603,38 @@ esp_err_t occ_runtime_wifi_connect_or_provision(void)
         sizeof(existing_credentials)
     );
 
+    char existing_occ_host[
+        OCC_ENDPOINT_HOST_MAX_LEN
+    ] = {0};
+
+    esp_err_t occ_endpoint_err =
+        occ_endpoint_host_load(
+            existing_occ_host,
+            sizeof(existing_occ_host)
+        );
+
+    bool occ_endpoint_present =
+        occ_endpoint_err == ESP_OK;
+
+    memset(
+        existing_occ_host,
+        0,
+        sizeof(existing_occ_host)
+    );
+
     s_wifi_credentials_ready =
         provisioned;
 
     s_mqtt_credentials_ready =
         mqtt_credentials_present;
 
+    s_occ_endpoint_ready =
+        occ_endpoint_present;
+
     if (
         !provisioned ||
-        !mqtt_credentials_present
+        !mqtt_credentials_present ||
+        !occ_endpoint_present
     ) {
         char service_name[20];
         char pop[20];
@@ -570,12 +649,25 @@ esp_err_t occ_runtime_wifi_connect_or_provision(void)
         if (!provisioned) {
             ESP_LOGW(
                 TAG,
-                "FIRST BOOT: Wi-Fi and MQTT provisioning required"
+                "FIRST BOOT: Wi-Fi, MQTT and OCC endpoint provisioning required"
+            );
+        } else if (
+            !mqtt_credentials_present &&
+            !occ_endpoint_present
+        ) {
+            ESP_LOGW(
+                TAG,
+                "MQTT credentials and OCC endpoint missing; provisioning required"
+            );
+        } else if (!mqtt_credentials_present) {
+            ESP_LOGW(
+                TAG,
+                "MQTT credentials missing; provisioning required"
             );
         } else {
             ESP_LOGW(
                 TAG,
-                "MQTT C1 credentials missing; provisioning required"
+                "OCC endpoint missing; provisioning required"
             );
         }
 

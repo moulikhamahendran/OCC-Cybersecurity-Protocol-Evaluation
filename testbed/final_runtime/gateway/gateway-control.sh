@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+NETWORK_ENV_HELPER="$(
+    cd "$(dirname "${BASH_SOURCE[0]}")/../scripts"
+    pwd
+)/network-env.sh"
+
+source "${NETWORK_ENV_HELPER}"
+load_occ_network_env
+
 SCRIPT_DIR="$(
     cd "$(dirname "${BASH_SOURCE[0]}")"
     pwd
@@ -98,7 +106,8 @@ load_config() {
 
     source "${CONFIG_FILE}"
 
-    : "${OCC_GATEWAY_TARGET_IP:?Missing OCC_GATEWAY_TARGET_IP}"
+    OCC_GATEWAY_TARGET_IP="${OCC_GATEWAY_TARGET}"
+    export OCC_GATEWAY_TARGET_IP
 }
 
 process_command() {

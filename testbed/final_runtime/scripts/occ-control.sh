@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+
+SCRIPT_DIR="$(
+    cd "$(dirname "${BASH_SOURCE[0]}")"
+    pwd
+)"
+
+source "${SCRIPT_DIR}/network-env.sh"
+load_occ_network_env
+
+
 set -euo pipefail
 
 CONFIG="/etc/occ-final-runtime/system.json"
@@ -89,7 +99,7 @@ send_vehicle_profile() {
             load_mqtt_env || return 1
 
             if ! mosquitto_pub \
-                -h occ-pi.local \
+                -h "${OCC_SERVICE_NAME}" \
                 -p 1884 \
                 -u "${OCC_MQTT_USERNAME}" \
                 -P "${OCC_MQTT_PASSWORD}" \
@@ -114,7 +124,7 @@ send_vehicle_profile() {
             fi
 
             if ! mosquitto_pub \
-                -h occ-pi.local \
+                -h "${OCC_SERVICE_NAME}" \
                 -p 8883 \
                 --cafile "${OCC_MQTT_CA_FILE}" \
                 -u "${OCC_MQTT_USERNAME}" \
@@ -161,7 +171,7 @@ start_vehicle_status_listener() {
             load_mqtt_env || return 1
 
             mosquitto_sub \
-                -h occ-pi.local \
+                -h "${OCC_SERVICE_NAME}" \
                 -p 1884 \
                 -u "${OCC_MQTT_USERNAME}" \
                 -P "${OCC_MQTT_PASSWORD}" \
@@ -182,7 +192,7 @@ start_vehicle_status_listener() {
             fi
 
             mosquitto_sub \
-                -h occ-pi.local \
+                -h "${OCC_SERVICE_NAME}" \
                 -p 8883 \
                 --cafile "${OCC_MQTT_CA_FILE}" \
                 -u "${OCC_MQTT_USERNAME}" \
@@ -422,11 +432,11 @@ apply_profile() {
             port=1883
             ;;
         C1)
-            host="occ-pi.local"
+            host="${OCC_SERVICE_NAME}"
             port=1884
             ;;
         C2)
-            host="occ-pi.local"
+            host="${OCC_SERVICE_NAME}"
             port=8883
             ;;
         *)
