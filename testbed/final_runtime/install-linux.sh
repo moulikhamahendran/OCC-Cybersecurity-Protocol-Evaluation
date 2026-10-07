@@ -40,6 +40,9 @@ CA_FILE="${MOSQUITTO_CERT_ROOT}/ca.crt"
 SERVER_CERT="${MOSQUITTO_CERT_ROOT}/server.crt"
 SERVER_KEY="${MOSQUITTO_CERT_ROOT}/server.key"
 
+OCC_CA_ROOT="${CONFIG_ROOT}/certs"
+OCC_CA_FILE="${OCC_CA_ROOT}/ca.crt"
+
 BOOTSTRAP_DIR="${OCC_BOOTSTRAP_DIR:-}"
 
 fail()
@@ -221,6 +224,12 @@ install -d \
 
 install -d \
     -o root \
+    -g occ-runtime \
+    -m 0750 \
+    "${OCC_CA_ROOT}"
+
+install -d \
+    -o root \
     -g mosquitto \
     -m 0750 \
     "${MOSQUITTO_CERT_ROOT}"
@@ -265,6 +274,15 @@ install \
     "${BOOT_CA}" \
     "${CA_FILE}"
 
+# OCC is a TLS client and needs only the public CA certificate.
+# Keep broker private material isolated under /etc/mosquitto.
+install \
+    -o root \
+    -g occ-runtime \
+    -m 0640 \
+    "${BOOT_CA}" \
+    "${OCC_CA_FILE}"
+
 install \
     -o root \
     -g mosquitto \
@@ -293,7 +311,7 @@ for line in lines:
     if line.startswith("OCC_MQTT_CA_FILE="):
         result.append(
             "OCC_MQTT_CA_FILE="
-            "/etc/mosquitto/certs/fair-v1-c2/ca.crt"
+            "/etc/occ-final-runtime/certs/ca.crt"
         )
         found = True
     else:
@@ -311,7 +329,15 @@ PY
 chown root:occ-runtime "${MQTT_ENV}"
 chmod 0640 "${MQTT_ENV}"
 
+if ! runuser \
+    -u occ-runtime \
+    -- test -r "${OCC_CA_FILE}"
+then
+    fail "OCC runtime user cannot read MQTT CA file."
+fi
+
 echo "[OK] Credentials and certificates installed"
+echo "[OK] OCC runtime CA is readable by occ-runtime"
 echo "[OK] Secret values were not printed"
 
 echo
