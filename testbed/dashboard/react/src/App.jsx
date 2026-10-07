@@ -996,6 +996,7 @@ function QualificationPanel({
                 rows,
                 profile,
                 [
+                  "rtt_mean_of_repeat_means_ms",
                   "mean_rtt_repeat_mean_ms",
                   "mean_timing_ms",
                   "mean_rtt_ms",
@@ -1009,6 +1010,7 @@ function QualificationPanel({
                 rows,
                 profile,
                 [
+                  "jitter_mean_of_repeats_ms",
                   "mean_jitter_repeat_mean_ms",
                   "mean_jitter_ms",
                   "jitter_mean_ms",
@@ -1022,6 +1024,7 @@ function QualificationPanel({
                 rows,
                 profile,
                 [
+                  "achieved_rate_mean_percent",
                   "mean_achieved_rate_pct",
                   "achieved_rate_pct",
                   "achieved_rate",
@@ -1034,6 +1037,7 @@ function QualificationPanel({
                 rows,
                 profile,
                 [
+                  "unsuccessful_transaction_mean_percent",
                   "mean_unsuccessful_pct",
                   "unsuccessful_pct",
                   "transaction_failure_pct",
