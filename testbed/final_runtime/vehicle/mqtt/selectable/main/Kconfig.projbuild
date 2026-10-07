@@ -16,12 +16,12 @@ config OCC_TLS_SERVER_NAME
         separate.
 
 config OCC_SNTP_PRIMARY_SERVER
-    string "Optional secondary SNTP server"
-    default ""
+    string "Primary SNTP server for C2 TLS certificate validation"
+    default "pool.ntp.org"
     help
-        Optional secondary time source.
-        The provisioned OCC/gateway endpoint is tried first.
-        Leave empty when the gateway provides SNTP.
+        Network-independent time source used first when Internet
+        connectivity is available. The runtime OCC endpoint is
+        retained only as a fallback time source.
 
 config OCC_VEHICLE_ID
     string "Vehicle identity"

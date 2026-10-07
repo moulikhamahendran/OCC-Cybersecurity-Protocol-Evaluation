@@ -1595,8 +1595,8 @@ void app_main(void)
         }
 
         const char *sntp_servers[] = {
-            s_occ_host,
-            CONFIG_OCC_SNTP_PRIMARY_SERVER
+            CONFIG_OCC_SNTP_PRIMARY_SERVER,
+            s_occ_host
         };
 
         while (true) {
