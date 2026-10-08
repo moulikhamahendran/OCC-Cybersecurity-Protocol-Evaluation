@@ -1,3 +1,4 @@
+#include "esp_wifi.h"
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -12,6 +13,7 @@
 #include "esp_netif_sntp.h"
 #include "esp_system.h"
 #include "esp_timer.h"
+#include "nvs_flash.h"
 #include "driver/gpio.h"
 #include "mqtt_client.h"
 
@@ -1328,7 +1330,16 @@ void app_main(void)
         "OCC MQTT selectable operational runtime starting"
     );
 
-    esp_err_t err =
+    /* Initialize persistent sequence storage before starting the state task.
+     * Do not automatically erase NVS: that could reset the replay counter. */
+    esp_err_t err = nvs_flash_init();
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "NVS initialization failed (no erase): %s",
+                 esp_err_to_name(err));
+        return;
+    }
+
+    err =
         vehicle_state_start(
             CONFIG_OCC_RUNTIME_PERIOD_MS
         );
@@ -1495,6 +1506,36 @@ void app_main(void)
         );
 
         return;
+    }
+
+    /* VM-002 ONE-TIME ENDPOINT MIGRATION */
+    {
+        uint8_t mac[6] = {0};
+        static const uint8_t vm002_mac[6] = {
+            0x94, 0x3c, 0xc6, 0x34, 0xd0, 0x60
+        };
+        char saved_host[OCC_ENDPOINT_HOST_MAX_LEN] = {0};
+
+        if (
+            strcmp(s_vehicle_id, "VM-002") == 0 &&
+            esp_wifi_get_mac(WIFI_IF_STA, mac) == ESP_OK &&
+            memcmp(mac, vm002_mac, sizeof(vm002_mac)) == 0 &&
+            occ_endpoint_host_load(
+                saved_host, sizeof(saved_host)
+            ) == ESP_OK &&
+            strcmp(saved_host, "192.168.0.131") == 0
+        ) {
+            ESP_LOGI(TAG, "VM-002: migrating saved OCC endpoint");
+
+            err = occ_endpoint_host_save("192.168.1.115");
+            if (err != ESP_OK) {
+                ESP_LOGE(TAG, "VM-002 endpoint migration failed: %s",
+                         esp_err_to_name(err));
+                return;
+            }
+
+            ESP_LOGI(TAG, "VM-002: OCC endpoint migrated successfully");
+        }
     }
 
     err =
@@ -1779,6 +1820,10 @@ void app_main(void)
         );
 
     uint32_t waiting_log_counter = 0U;
+
+    /* Only submit fresh normal telemetry samples. */
+    bool have_last_submitted_seq = false;
+    uint32_t last_submitted_seq = 0U;
 
     while (true) {
         if (
@@ -2069,6 +2114,11 @@ void app_main(void)
                     TAG,
                     "payload construction failed"
                 );
+            } else if (
+                have_last_submitted_seq &&
+                publish_seq <= last_submitted_seq
+            ) {
+                /* State task has not produced a newer sample yet. */
             } else {
                 const int rc =
                     esp_mqtt_client_enqueue(
@@ -2082,6 +2132,8 @@ void app_main(void)
                     );
 
                 if (rc >= 0) {
+                    last_submitted_seq = publish_seq;
+                    have_last_submitted_seq = true;
                     if (
                         publish_seq % 100U == 0U
                     ) {

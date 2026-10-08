@@ -1105,6 +1105,8 @@ class DashboardMqttControlManager:
         if profile not in PROFILES:
             return
 
+        from .attack_api import observe_status
+        observe_status(profile, message.topic, message.payload)
         self.handle_status_message(
             profile,
             message.topic,

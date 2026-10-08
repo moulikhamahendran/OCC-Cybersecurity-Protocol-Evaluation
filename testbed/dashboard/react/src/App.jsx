@@ -516,6 +516,100 @@ function SwitchState({
 }
 
 
+function AttackControls({ vehicle }) {
+  const [password, setPassword] = useState("");
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [mode, setMode] = useState("MALFORMED");
+  const [state, setState] = useState(null);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const root = `${API_BASE}/api/v1/mqtt/attacker`;
+  const checkSession = useCallback(async () => {
+    try {
+      const r = await fetch(`${root}/session`, { credentials: "same-origin", cache: "no-store" });
+      if (!r.ok) throw new Error(`Session HTTP ${r.status}`);
+      const data = await r.json();
+      setLoggedIn(Boolean(data.authenticated));
+    } catch (e) { setError(String(e.message || e)); }
+    finally { setAuthChecked(true); }
+  }, [root]);
+  useEffect(() => { checkSession(); }, [checkSession]);
+  const fetchState = useCallback(async () => {
+    if (!loggedIn || !vehicle.online) return;
+    try {
+      const r = await fetch(`${root}/state`, { credentials: "same-origin", cache: "no-store" });
+      if (r.status === 401) { setLoggedIn(false); setState(null); return; }
+      if (!r.ok) throw new Error(`Status HTTP ${r.status}`);
+      setState(await r.json()); setError("");
+    } catch (e) { setError(String(e.message || e)); }
+  }, [root, loggedIn, vehicle.online]);
+  useEffect(() => {
+    fetchState();
+    if (!loggedIn || !vehicle.online) return;
+    const timer = setInterval(fetchState, 1500);
+    return () => clearInterval(timer);
+  }, [fetchState, loggedIn, vehicle.online]);
+  async function login(e) {
+    e.preventDefault();
+    if (!password) return;
+    setBusy(true); setError("");
+    try {
+      const r = await fetch(`${root}/login`, { method: "POST", credentials: "same-origin",
+        headers: { "Content-Type": "application/json" }, body: JSON.stringify({password}) });
+      if (!r.ok) { const data=await r.json(); throw new Error(data.detail || `Login HTTP ${r.status}`); }
+      setPassword(""); setLoggedIn(true);
+    } catch (e) { setError(String(e.message || e)); }
+    finally { setBusy(false); }
+  }
+  async function logout() {
+    setBusy(true);
+    try { await fetch(`${root}/logout`, {method:"POST", credentials:"same-origin"}); }
+    finally {setLoggedIn(false); setState(null); setPassword(""); setBusy(false);}
+  }
+  async function send(selected) {
+    if (!loggedIn) {setError("Operator login required"); return;}
+    if (selected !== "STOP" && !window.confirm(`Start ${selected} on VM-003 in the authorized testbed?`)) return;
+    setBusy(true); setError("");
+    try {
+      const r = await fetch(`${root}/command`, { method: "POST", credentials: "same-origin",
+        headers: {"Content-Type":"application/json"}, body: JSON.stringify({mode:selected}) });
+      const result = await r.json();
+      if (r.status === 401) {setLoggedIn(false); throw new Error("Session expired — please sign in again");}
+      if (!r.ok) throw new Error(result.detail || `HTTP ${r.status}`);
+      await fetchState();
+    } catch (e) {setError(String(e.message || e));}
+    finally {setBusy(false);}
+  }
+  return <div className="attacker-control-panel">
+    <div className="operator-panel-title"><strong>VM-003 attack control</strong>
+      {loggedIn && <button type="button" className="operator-logout" onClick={logout} disabled={busy}>Log out</button>}
+    </div>
+    <p className="operator-help">C2 secure control · Authorized testbed operator · No automatic attacks</p>
+    {!authChecked ? <p>Checking operator session…</p> : !loggedIn ? (
+      <form onSubmit={login} className="operator-login-panel">
+        <label htmlFor="occ-operator-password">Operator password</label>
+        <input id="occ-operator-password" type="password" autoComplete="current-password" required
+          placeholder="Enter operator password once" value={password} onChange={e=>setPassword(e.target.value)} />
+        <button type="submit" disabled={busy || !password}>Sign in</button>
+        <small>The existing Pi operator secret is your initial password. The session lasts up to 8 hours; log out after the demo.</small>
+      </form>
+    ) : <>
+      <p className="operator-session-status">Operator signed in</p>
+      <div className="operator-action-row">
+        <select aria-label="Attack mode" value={mode} onChange={e=>setMode(e.target.value)}>
+          {["MALFORMED","REPLAY","SPOOF","FLOOD"].map(x=><option key={x} value={x}>{x}</option>)}
+        </select>
+        <button type="button" className="operator-enable" disabled={busy || !vehicle.online || (state && !["idle","unconfirmed"].includes(state.phase))} onClick={()=>send(mode)}>ENABLE ATTACK</button>
+        <button type="button" className="operator-stop" disabled={busy || !vehicle.online} onClick={()=>send("STOP")}>STOP ATTACK</button>
+      </div>
+      <p role="status">Status: {state?.phase || "Checking…"} · Mode: {state?.mode || "—"}</p>
+      {state?.last_status && <p className="operator-help">ESP32 response: {state.last_status.controller_result || "—"}</p>}
+    </>}
+    {error && <p role="alert" className="operator-error">{error}</p>}
+  </div>;
+}
+
 function VehicleCard({
   vehicle,
   controlState,
@@ -524,6 +618,7 @@ function VehicleCard({
   onSwitch,
   onOpen,
 }) {
+  const isAttacker = vehicle.vehicle_id === "VM-003";
   const telemetry = (
     vehicle.telemetry || {}
   );
@@ -553,12 +648,15 @@ function VehicleCard({
       <div className="vehicle-card-header">
         <div>
           <div className="eyebrow">
-            AGV COMMUNICATION NODE
+            {vehicle.vehicle_id === "VM-003" ? "ATTACK TEST VEHICLE" : "AGV COMMUNICATION NODE"}
           </div>
 
           <h3>
             {vehicle.vehicle_id}
           </h3>
+          {vehicle.vehicle_id === "VM-003" && (
+            <small className="attacker-role-tag">ATTACKER · MALFORMED · REPLAY · SPOOF · FLOOD</small>
+          )}
         </div>
 
         <div className="vehicle-status">
@@ -597,6 +695,14 @@ function VehicleCard({
         </span>
       </div>
 
+      {isAttacker ? (
+        <div className="attacker-role-panel" role="status">
+          <strong>DEDICATED ATTACKER · C2 CONTROL</strong>
+          <small>MALFORMED · REPLAY · SPOOF · FLOOD</small>
+          <small>Profile switching is disabled for VM-003.</small>
+        </div>
+      ) : (
+        <>
       <div className="profile-controls">
         {PROFILES.map(
           (profile) => {
@@ -656,6 +762,11 @@ function VehicleCard({
       <SwitchState
         request={request}
       />
+
+        </>
+      )}
+
+      {vehicle.vehicle_id === "VM-003" && <AttackControls vehicle={vehicle} />}
 
       <div className="telemetry-grid">
         <div>
@@ -1167,6 +1278,7 @@ function VehicleDrawer({
     return null;
   }
 
+  const isAttacker = vehicle.vehicle_id === "VM-003";
   const telemetry = (
     vehicle.telemetry || {}
   );
@@ -1235,11 +1347,16 @@ function VehicleDrawer({
           </div>
         </div>
 
-        <SwitchState
-          request={
-            controlState?.request
-          }
-        />
+        {!isAttacker && (
+          <SwitchState request={controlState?.request} />
+        )}
+        {isAttacker && (
+          <div className="attacker-role-panel" role="status">
+            <strong>DEDICATED ATTACKER · C2 CONTROL</strong>
+            <small>MALFORMED · REPLAY · SPOOF · FLOOD</small>
+            <small>Profile switching is disabled for VM-003.</small>
+          </div>
+        )}
 
         <div className="drawer-grid">
           <div>
@@ -1312,7 +1429,7 @@ function VehicleDrawer({
           </div>
         </div>
 
-        <div className="drawer-events">
+        {!isAttacker && <div className="drawer-events">
           <h3>
             Recent security events
           </h3>
@@ -1359,7 +1476,7 @@ function VehicleDrawer({
               </div>
             ),
           )}
-        </div>
+        </div>}
       </aside>
     </div>
   );
@@ -1913,6 +2030,7 @@ export default function App() {
       vehicle,
       targetProfile,
     ) => {
+      if (vehicle.vehicle_id === "VM-003") return;
       const vehicleId = (
         vehicle.vehicle_id
       );
@@ -2053,9 +2171,15 @@ export default function App() {
   );
 
 
+  // Only accepted, fresh OCC telemetry counts as a live vehicle.
+  const onlineVehicles = useMemo(
+    () => (fleet.vehicles || []).filter((vehicle) => vehicle.online === true),
+    [fleet.vehicles],
+  );
+
   const selectedVehicle = useMemo(
     () => (
-      fleet.vehicles.find(
+      onlineVehicles.find(
         (vehicle) => (
           vehicle.vehicle_id
           === selectedVehicleId
@@ -2064,7 +2188,7 @@ export default function App() {
       || null
     ),
     [
-      fleet.vehicles,
+      onlineVehicles,
       selectedVehicleId,
     ],
   );
@@ -2249,7 +2373,7 @@ export default function App() {
             <div>
               <span>Vehicles</span>
               <strong>
-                {fleet.vehicle_count}
+                {onlineVehicles.length}
               </strong>
             </div>
 
@@ -2289,14 +2413,14 @@ export default function App() {
           </div>
 
           <div className="vehicle-grid">
-            {!fleet.vehicles.length && (
+            {!onlineVehicles.length && (
               <div className="empty-state large">
                 Waiting for operational MQTT
                 vehicles...
               </div>
             )}
 
-            {fleet.vehicles.map(
+            {onlineVehicles.map(
               (vehicle) => (
                 <VehicleCard
                   key={
@@ -2332,7 +2456,7 @@ export default function App() {
         <div className="dashboard-two-column">
           <Topology
             vehicles={
-              fleet.vehicles
+              onlineVehicles
             }
             mqttLive={mqttLive}
           />

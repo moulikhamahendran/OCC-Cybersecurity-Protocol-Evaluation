@@ -12,6 +12,7 @@
 #include "esp_netif_sntp.h"
 #include "esp_system.h"
 #include "esp_timer.h"
+#include "nvs_flash.h"
 #include "driver/gpio.h"
 #include "mqtt_client.h"
 
@@ -1651,7 +1652,16 @@ void app_main(void)
             : "false"
     );
 
-    esp_err_t err =
+    /* Initialize persistent sequence storage before starting the state task.
+     * Do not automatically erase NVS: that could reset the replay counter. */
+    esp_err_t err = nvs_flash_init();
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "NVS initialization failed (no erase): %s",
+                 esp_err_to_name(err));
+        return;
+    }
+
+    err =
         vehicle_state_start(
             CONFIG_OCC_RUNTIME_PERIOD_MS
         );
@@ -2156,6 +2166,10 @@ void app_main(void)
 
     uint32_t waiting_log_counter = 0U;
 
+    /* Only submit fresh normal telemetry samples. */
+    bool have_last_submitted_seq = false;
+    uint32_t last_submitted_seq = 0U;
+
     while (true) {
         if (
             s_mqtt_connected &&
@@ -2450,6 +2464,11 @@ void app_main(void)
                     TAG,
                     "payload construction failed"
                 );
+            } else if (
+                have_last_submitted_seq &&
+                publish_seq <= last_submitted_seq
+            ) {
+                /* Do not resubmit a stale normal sample. */
             } else {
                 /*
                  * Dedicated VM-003 attacker runtime:
@@ -2471,6 +2490,8 @@ void app_main(void)
                     );
 
                 if (rc >= 0) {
+                    last_submitted_seq = publish_seq;
+                    have_last_submitted_seq = true;
                     if (
                         publish_seq % 100U == 0U
                     ) {

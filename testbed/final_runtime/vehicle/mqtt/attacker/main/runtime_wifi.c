@@ -348,13 +348,9 @@ static esp_err_t initialise_nvs(void)
         err == ESP_ERR_NVS_NO_FREE_PAGES ||
         err == ESP_ERR_NVS_NEW_VERSION_FOUND
     ) {
-        err = nvs_flash_erase();
-
-        if (err != ESP_OK) {
-            return err;
-        }
-
-        err = nvs_flash_init();
+        /* Preserve persistent replay counters and credentials.
+         * Never erase NVS automatically on initialization failure. */
+        return err;
     }
 
     return err;

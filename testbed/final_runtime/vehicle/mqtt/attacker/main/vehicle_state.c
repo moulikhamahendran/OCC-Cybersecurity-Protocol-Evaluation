@@ -7,6 +7,8 @@
 
 #include "esp_log.h"
 #include "esp_timer.h"
+#include "nvs.h"
+#include <limits.h>
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -23,6 +25,53 @@ static bool s_started = false;
 static uint32_t s_period_ms = 100U;
 static TaskHandle_t s_vehicle_task = NULL;
 
+/* A committed high-water mark; unused numbers are deliberately skipped after reboot. */
+#define OCC_SEQ_BLOCK_SIZE UINT32_C(65536)
+#define OCC_SEQ_MIGRATION_FLOOR UINT32_C(999999)
+static uint32_t s_seq_reserved_end = 0U;
+
+static esp_err_t reserve_sequence_block(uint32_t *first_seq)
+{
+    if (first_seq == NULL) {
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    nvs_handle_t handle;
+    esp_err_t err = nvs_open("occ_seq_v1", NVS_READWRITE, &handle);
+    if (err != ESP_OK) {
+        return err;
+    }
+
+    uint32_t high_water = 0U;
+    err = nvs_get_u32(handle, "reserved_end", &high_water);
+    if (err == ESP_ERR_NVS_NOT_FOUND) {
+        /* One-time migration above previously observed legacy seq values.
+         * For a fresh device or erased NVS, operator must verify this floor
+         * exceeds the OCC's last accepted value for that vehicle identity. */
+        high_water = OCC_SEQ_MIGRATION_FLOOR;
+        err = ESP_OK;
+    }
+    if (err == ESP_OK && high_water > UINT32_MAX - OCC_SEQ_BLOCK_SIZE) {
+        err = ESP_ERR_INVALID_STATE; /* Never wrap/reuse a sequence number. */
+    }
+    if (err == ESP_OK) {
+        const uint32_t new_end = high_water + OCC_SEQ_BLOCK_SIZE;
+        err = nvs_set_u32(handle, "reserved_end", new_end);
+        if (err == ESP_OK) {
+            err = nvs_commit(handle);
+        }
+        if (err == ESP_OK) {
+            *first_seq = high_water + 1U;
+            s_seq_reserved_end = new_end;
+            ESP_LOGI(TAG, "reserved seq range [%lu, %lu]",
+                     (unsigned long)*first_seq, (unsigned long)new_end);
+        }
+    }
+    nvs_close(handle);
+    return err;
+}
+
+
 
 static void copy_state(
     vehicle_state_t *destination,
@@ -37,10 +86,10 @@ static void copy_state(
 }
 
 
-static void initialize_vehicle_state(void)
+static void initialize_vehicle_state(uint32_t first_seq)
 {
     vehicle_state_t initial = {
-        .seq = 0U,
+        .seq = first_seq - 1U,
         .t_source_us = esp_timer_get_time(),
 
         .speed = 0.80f,
@@ -77,7 +126,20 @@ static void advance_vehicle_state(void)
     copy_state(&next, &s_state);
     portEXIT_CRITICAL(&s_state_lock);
 
-    ++next.seq;
+    if (next.seq >= s_seq_reserved_end) {
+        uint32_t first_seq = 0U;
+        const esp_err_t err = reserve_sequence_block(&first_seq);
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "sequence reservation failed: %s; stopping telemetry",
+                     esp_err_to_name(err));
+            s_started = false;
+            vTaskDelete(NULL);
+            return;
+        }
+        next.seq = first_seq;
+    } else {
+        ++next.seq;
+    }
 
     next.t_source_us =
         esp_timer_get_time();
@@ -259,7 +321,14 @@ esp_err_t vehicle_state_start(uint32_t period_ms)
 
     s_period_ms = period_ms;
 
-    initialize_vehicle_state();
+    uint32_t first_seq = 0U;
+    esp_err_t err = reserve_sequence_block(&first_seq);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "cannot reserve initial sequence range: %s",
+                 esp_err_to_name(err));
+        return err;
+    }
+    initialize_vehicle_state(first_seq);
 
     const BaseType_t created =
         xTaskCreate(

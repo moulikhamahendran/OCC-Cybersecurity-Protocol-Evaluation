@@ -9,6 +9,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
+from .attack_api import router as attack_router
 from .live_state import live_vehicle_store
 from .live_stream import stream_vehicle_snapshots
 from .mqtt_live import build_dashboard_mqtt_adapter
@@ -150,6 +151,8 @@ def root():
         "documentation": "/docs",
     }
 
+
+app.include_router(attack_router)
 
 @app.get("/api/v1/health")
 def health() -> dict[str, str]:
