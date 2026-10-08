@@ -1508,36 +1508,6 @@ void app_main(void)
         return;
     }
 
-    /* VM-002 ONE-TIME ENDPOINT MIGRATION */
-    {
-        uint8_t mac[6] = {0};
-        static const uint8_t vm002_mac[6] = {
-            0x94, 0x3c, 0xc6, 0x34, 0xd0, 0x60
-        };
-        char saved_host[OCC_ENDPOINT_HOST_MAX_LEN] = {0};
-
-        if (
-            strcmp(s_vehicle_id, "VM-002") == 0 &&
-            esp_wifi_get_mac(WIFI_IF_STA, mac) == ESP_OK &&
-            memcmp(mac, vm002_mac, sizeof(vm002_mac)) == 0 &&
-            occ_endpoint_host_load(
-                saved_host, sizeof(saved_host)
-            ) == ESP_OK &&
-            strcmp(saved_host, "192.168.0.131") == 0
-        ) {
-            ESP_LOGI(TAG, "VM-002: migrating saved OCC endpoint");
-
-            err = occ_endpoint_host_save("192.168.1.115");
-            if (err != ESP_OK) {
-                ESP_LOGE(TAG, "VM-002 endpoint migration failed: %s",
-                         esp_err_to_name(err));
-                return;
-            }
-
-            ESP_LOGI(TAG, "VM-002: OCC endpoint migrated successfully");
-        }
-    }
-
     err =
         occ_endpoint_host_load(
             s_occ_host,
