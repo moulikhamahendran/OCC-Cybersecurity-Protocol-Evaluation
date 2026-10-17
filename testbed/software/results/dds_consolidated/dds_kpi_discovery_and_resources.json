@@ -1,0 +1,1391 @@
+{
+  "created_utc": "2026-10-12T17:51:58.297173+00:00",
+  "resource_run_summaries": [
+    {
+      "date": "20260915",
+      "security": "C0",
+      "scenario": "delay",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c0_net-delay_repeat_1_20260915T160336Z_5aa63a35.csv"
+      ],
+      "cpu_percent_mean": 10.179540229885058,
+      "cpu_percent_max": 23.33,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2721.1454896551722,
+      "memory_mb_max": 8148.75,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 19.90896551724138,
+      "memory_percent_max": 59.4,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C0",
+      "scenario": "delay",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c0_net-delay_repeat_2_20260915T160440Z_01775913.csv"
+      ],
+      "cpu_percent_mean": 10.28551724137931,
+      "cpu_percent_max": 23.64,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2723.9014735632186,
+      "memory_mb_max": 8141.1406,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 19.92816091954023,
+      "memory_percent_max": 59.3,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C0",
+      "scenario": "delay",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c0_net-delay_repeat_3_20260915T160544Z_0bf335e6.csv"
+      ],
+      "cpu_percent_mean": 10.474022988505746,
+      "cpu_percent_max": 23.77,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2726.303791954023,
+      "memory_mb_max": 8214.2344,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 19.941724137931036,
+      "memory_percent_max": 59.7,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C0",
+      "scenario": "ideal",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c0_net-ideal_repeat_1_20260915T155402Z_4c1a739d.csv"
+      ],
+      "cpu_percent_mean": 8.26344827586207,
+      "cpu_percent_max": 22.03,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2720.5388229885057,
+      "memory_mb_max": 8258.2188,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 19.897701149425288,
+      "memory_percent_max": 60.0,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C0",
+      "scenario": "ideal",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c0_net-ideal_repeat_2_20260915T155506Z_206dd8c5.csv"
+      ],
+      "cpu_percent_mean": 9.24551724137931,
+      "cpu_percent_max": 22.6,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2711.1569804597702,
+      "memory_mb_max": 8519.2969,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 19.85287356321839,
+      "memory_percent_max": 61.6,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C0",
+      "scenario": "ideal",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c0_net-ideal_repeat_3_20260915T155610Z_b9ff48dd.csv"
+      ],
+      "cpu_percent_mean": 8.549195402298851,
+      "cpu_percent_max": 21.76,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2689.58376091954,
+      "memory_mb_max": 8157.6094,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 19.719425287356323,
+      "memory_percent_max": 59.4,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C0",
+      "scenario": "jitter",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c0_net-jitter_repeat_1_20260915T161318Z_a164a7f9.csv"
+      ],
+      "cpu_percent_mean": 10.417241379310346,
+      "cpu_percent_max": 23.29,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2744.3027505747127,
+      "memory_mb_max": 8518.9062,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 20.077011494252872,
+      "memory_percent_max": 61.7,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C0",
+      "scenario": "jitter",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c0_net-jitter_repeat_2_20260915T161422Z_072b8800.csv"
+      ],
+      "cpu_percent_mean": 8.735977011494253,
+      "cpu_percent_max": 22.93,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2705.428559770115,
+      "memory_mb_max": 8179.0,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 19.83241379310345,
+      "memory_percent_max": 59.6,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C0",
+      "scenario": "jitter",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c0_net-jitter_repeat_3_20260915T161526Z_03cc0ddc.csv"
+      ],
+      "cpu_percent_mean": 9.813333333333333,
+      "cpu_percent_max": 23.3,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2722.5763793103447,
+      "memory_mb_max": 8453.8438,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 20.048505747126438,
+      "memory_percent_max": 62.2,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C0",
+      "scenario": "loss",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c0_net-loss_repeat_1_20260915T162259Z_266ec3e3.csv"
+      ],
+      "cpu_percent_mean": 8.375057471264368,
+      "cpu_percent_max": 22.19,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2643.1674666666668,
+      "memory_mb_max": 8017.1719,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 19.655977011494254,
+      "memory_percent_max": 59.2,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C0",
+      "scenario": "loss",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c0_net-loss_repeat_2_20260915T162403Z_4f2863d6.csv"
+      ],
+      "cpu_percent_mean": 8.331379310344827,
+      "cpu_percent_max": 22.29,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2658.287322988506,
+      "memory_mb_max": 8030.0,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 19.74183908045977,
+      "memory_percent_max": 59.3,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C0",
+      "scenario": "loss",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c0_net-loss_repeat_3_20260915T162507Z_93c444cf.csv"
+      ],
+      "cpu_percent_mean": 8.207816091954022,
+      "cpu_percent_max": 21.52,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2661.4811551724138,
+      "memory_mb_max": 8012.7031,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 19.769885057471264,
+      "memory_percent_max": 59.2,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C1",
+      "scenario": "delay",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c1_net-delay_repeat_1_20260915T160648Z_a481d4a2.csv"
+      ],
+      "cpu_percent_mean": 10.401444444444444,
+      "cpu_percent_max": 23.25,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2751.411672222222,
+      "memory_mb_max": 8382.7969,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 20.09777777777778,
+      "memory_percent_max": 60.8,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260915",
+      "security": "C1",
+      "scenario": "delay",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c1_net-delay_repeat_2_20260915T160753Z_0549e5a3.csv"
+      ],
+      "cpu_percent_mean": 8.273,
+      "cpu_percent_max": 22.2,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2757.469201111111,
+      "memory_mb_max": 8369.6562,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 20.134444444444444,
+      "memory_percent_max": 60.7,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260915",
+      "security": "C1",
+      "scenario": "delay",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c1_net-delay_repeat_3_20260915T160858Z_df21fcd2.csv"
+      ],
+      "cpu_percent_mean": 8.310888888888888,
+      "cpu_percent_max": 21.7,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2747.9502377777776,
+      "memory_mb_max": 8262.7344,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 20.082555555555555,
+      "memory_percent_max": 60.1,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260915",
+      "security": "C1",
+      "scenario": "ideal",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c1_net-ideal_repeat_1_20260915T155713Z_0cf439b3.csv"
+      ],
+      "cpu_percent_mean": 8.778850574712644,
+      "cpu_percent_max": 22.42,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2698.753547126437,
+      "memory_mb_max": 8175.9219,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 19.777011494252875,
+      "memory_percent_max": 59.5,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C1",
+      "scenario": "ideal",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c1_net-ideal_repeat_2_20260915T155817Z_57f386c6.csv"
+      ],
+      "cpu_percent_mean": 8.849080459770114,
+      "cpu_percent_max": 22.33,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2711.0775942528735,
+      "memory_mb_max": 8243.3594,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 19.855862068965518,
+      "memory_percent_max": 60.0,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C1",
+      "scenario": "ideal",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c1_net-ideal_repeat_3_20260915T155921Z_2035caf8.csv"
+      ],
+      "cpu_percent_mean": 8.394712643678162,
+      "cpu_percent_max": 22.77,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2696.4773275862067,
+      "memory_mb_max": 8241.8438,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 19.76471264367816,
+      "memory_percent_max": 59.9,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C1",
+      "scenario": "jitter",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c1_net-jitter_repeat_1_20260915T161629Z_7ad31279.csv"
+      ],
+      "cpu_percent_mean": 11.113,
+      "cpu_percent_max": 23.86,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2584.1716244444447,
+      "memory_mb_max": 7887.1719,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 19.392222222222223,
+      "memory_percent_max": 58.7,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260915",
+      "security": "C1",
+      "scenario": "jitter",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c1_net-jitter_repeat_2_20260915T161734Z_5fb6fdf3.csv"
+      ],
+      "cpu_percent_mean": 8.077,
+      "cpu_percent_max": 22.9,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2562.3598944444443,
+      "memory_mb_max": 7705.2656,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 19.242555555555555,
+      "memory_percent_max": 57.6,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260915",
+      "security": "C1",
+      "scenario": "jitter",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c1_net-jitter_repeat_3_20260915T161839Z_78115e09.csv"
+      ],
+      "cpu_percent_mean": 7.967444444444444,
+      "cpu_percent_max": 22.47,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2562.803388888889,
+      "memory_mb_max": 7746.1406,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 19.252666666666666,
+      "memory_percent_max": 57.8,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260915",
+      "security": "C1",
+      "scenario": "loss",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c1_net-loss_repeat_1_20260915T162610Z_3be29f44.csv"
+      ],
+      "cpu_percent_mean": 7.740666666666667,
+      "cpu_percent_max": 20.99,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2645.266308888889,
+      "memory_mb_max": 7963.2969,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 19.662333333333333,
+      "memory_percent_max": 58.8,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260915",
+      "security": "C1",
+      "scenario": "loss",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c1_net-loss_repeat_2_20260915T162714Z_acd6d42c.csv"
+      ],
+      "cpu_percent_mean": 8.834022988505748,
+      "cpu_percent_max": 23.02,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2661.4531574712646,
+      "memory_mb_max": 8243.1562,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 19.763448275862068,
+      "memory_percent_max": 60.6,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C1",
+      "scenario": "loss",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c1_net-loss_repeat_3_20260915T162818Z_700b0f59.csv"
+      ],
+      "cpu_percent_mean": 8.52632183908046,
+      "cpu_percent_max": 21.95,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2668.6346333333336,
+      "memory_mb_max": 8036.8125,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 19.796781609195403,
+      "memory_percent_max": 59.3,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C2",
+      "scenario": "delay",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c2_net-delay_repeat_1_20260915T161003Z_9cdf3bcf.csv"
+      ],
+      "cpu_percent_mean": 8.38411111111111,
+      "cpu_percent_max": 22.25,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2752.1100755555553,
+      "memory_mb_max": 8265.8125,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 20.105444444444444,
+      "memory_percent_max": 60.1,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260915",
+      "security": "C2",
+      "scenario": "delay",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c2_net-delay_repeat_2_20260915T161108Z_e27ebb28.csv"
+      ],
+      "cpu_percent_mean": 10.331555555555555,
+      "cpu_percent_max": 22.98,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2762.278801111111,
+      "memory_mb_max": 8347.7188,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 20.170555555555556,
+      "memory_percent_max": 60.6,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260915",
+      "security": "C2",
+      "scenario": "delay",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c2_net-delay_repeat_3_20260915T161213Z_6c845356.csv"
+      ],
+      "cpu_percent_mean": 12.546,
+      "cpu_percent_max": 26.6,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2770.7205955555555,
+      "memory_mb_max": 8509.8438,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 20.21988888888889,
+      "memory_percent_max": 61.6,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260915",
+      "security": "C2",
+      "scenario": "ideal",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c2_net-ideal_repeat_1_20260915T160025Z_6a00fdbc.csv"
+      ],
+      "cpu_percent_mean": 12.33367816091954,
+      "cpu_percent_max": 25.2,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2725.8972747126436,
+      "memory_mb_max": 8239.7969,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 19.94287356321839,
+      "memory_percent_max": 59.9,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C2",
+      "scenario": "ideal",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c2_net-ideal_repeat_2_20260915T160129Z_acfecae9.csv"
+      ],
+      "cpu_percent_mean": 10.569655172413793,
+      "cpu_percent_max": 23.33,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2723.4736586206895,
+      "memory_mb_max": 8268.0625,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 19.92103448275862,
+      "memory_percent_max": 60.0,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C2",
+      "scenario": "ideal",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c2_net-ideal_repeat_3_20260915T160233Z_f3a4c48a.csv"
+      ],
+      "cpu_percent_mean": 10.706206896551723,
+      "cpu_percent_max": 23.47,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2720.7053666666666,
+      "memory_mb_max": 8145.4375,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 19.9083908045977,
+      "memory_percent_max": 59.4,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C2",
+      "scenario": "jitter",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c2_net-jitter_repeat_1_20260915T161944Z_2da4d63e.csv"
+      ],
+      "cpu_percent_mean": 7.975222222222222,
+      "cpu_percent_max": 23.11,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2605.942666666667,
+      "memory_mb_max": 7887.6406,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 19.46988888888889,
+      "memory_percent_max": 58.6,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260915",
+      "security": "C2",
+      "scenario": "jitter",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c2_net-jitter_repeat_2_20260915T162049Z_168059a3.csv"
+      ],
+      "cpu_percent_mean": 7.711111111111111,
+      "cpu_percent_max": 20.91,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2617.292012222222,
+      "memory_mb_max": 7961.3594,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 19.50888888888889,
+      "memory_percent_max": 58.9,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260915",
+      "security": "C2",
+      "scenario": "jitter",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c2_net-jitter_repeat_3_20260915T162154Z_ee5ac422.csv"
+      ],
+      "cpu_percent_mean": 7.8806666666666665,
+      "cpu_percent_max": 22.35,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2616.1096166666666,
+      "memory_mb_max": 7934.9062,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 19.493666666666666,
+      "memory_percent_max": 58.7,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260915",
+      "security": "C2",
+      "scenario": "loss",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c2_net-loss_repeat_1_20260915T162922Z_eb0779bf.csv"
+      ],
+      "cpu_percent_mean": 8.524777777777778,
+      "cpu_percent_max": 21.81,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2671.0451722222224,
+      "memory_mb_max": 8079.0,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 19.817777777777778,
+      "memory_percent_max": 59.6,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260915",
+      "security": "C2",
+      "scenario": "loss",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c2_net-loss_repeat_2_20260915T163026Z_d9c95eb2.csv"
+      ],
+      "cpu_percent_mean": 8.240574712643678,
+      "cpu_percent_max": 21.82,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2671.4198264367815,
+      "memory_mb_max": 8030.1094,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 19.813563218390804,
+      "memory_percent_max": 59.3,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260915",
+      "security": "C2",
+      "scenario": "loss",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c2_net-loss_repeat_3_20260915T163130Z_ebd84930.csv"
+      ],
+      "cpu_percent_mean": 8.514137931034483,
+      "cpu_percent_max": 21.53,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2673.435644827586,
+      "memory_mb_max": 8054.6094,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 19.831264367816093,
+      "memory_percent_max": 59.4,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C0",
+      "scenario": "delay",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c0_net-delay_repeat_1_20260917T141338Z_d3d2e69c.csv"
+      ],
+      "cpu_percent_mean": 10.337011494252874,
+      "cpu_percent_max": 23.1,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2573.2116988505745,
+      "memory_mb_max": 7935.1875,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.49206896551724,
+      "memory_percent_max": 66.1,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C0",
+      "scenario": "delay",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c0_net-delay_repeat_2_20260917T141442Z_b5569bc7.csv"
+      ],
+      "cpu_percent_mean": 11.235172413793103,
+      "cpu_percent_max": 23.37,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2530.2154022988507,
+      "memory_mb_max": 7773.7031,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.420114942528734,
+      "memory_percent_max": 65.1,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C0",
+      "scenario": "delay",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c0_net-delay_repeat_3_20260917T141546Z_ac36ccbb.csv"
+      ],
+      "cpu_percent_mean": 9.380689655172414,
+      "cpu_percent_max": 22.67,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2544.007412643678,
+      "memory_mb_max": 7674.2656,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.437816091954023,
+      "memory_percent_max": 64.2,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C0",
+      "scenario": "ideal",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c0_net-ideal_repeat_1_20260917T140404Z_278cde0a.csv",
+        "resource_dds_c0_net-ideal_repeat_1_20260917T161531Z_cf6ac002.csv"
+      ],
+      "cpu_percent_mean": 10.652727272727272,
+      "cpu_percent_max": 23.9,
+      "cpu_percent_samples": 99,
+      "memory_mb_mean": 2568.3334161616162,
+      "memory_mb_max": 7882.5312,
+      "memory_mb_samples": 99,
+      "memory_percent_mean": 21.4,
+      "memory_percent_max": 66.3,
+      "memory_percent_samples": 99
+    },
+    {
+      "date": "20260917",
+      "security": "C0",
+      "scenario": "ideal",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c0_net-ideal_repeat_2_20260917T140508Z_d88c14b4.csv"
+      ],
+      "cpu_percent_mean": 11.740344827586206,
+      "cpu_percent_max": 23.81,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2602.4025367816093,
+      "memory_mb_max": 7959.1094,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.429080459770116,
+      "memory_percent_max": 64.9,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C0",
+      "scenario": "ideal",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c0_net-ideal_repeat_3_20260917T140612Z_ba7ca6df.csv"
+      ],
+      "cpu_percent_mean": 9.461379310344828,
+      "cpu_percent_max": 22.38,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2584.8886022988504,
+      "memory_mb_max": 7805.6094,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.35551724137931,
+      "memory_percent_max": 64.1,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C0",
+      "scenario": "jitter",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c0_net-jitter_repeat_1_20260917T142320Z_034d4d37.csv"
+      ],
+      "cpu_percent_mean": 9.874252873563218,
+      "cpu_percent_max": 23.77,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2509.929097701149,
+      "memory_mb_max": 7809.5,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.407471264367818,
+      "memory_percent_max": 65.2,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C0",
+      "scenario": "jitter",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c0_net-jitter_repeat_2_20260917T142424Z_63aeec1a.csv"
+      ],
+      "cpu_percent_mean": 11.412528735632185,
+      "cpu_percent_max": 22.74,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2524.393314942529,
+      "memory_mb_max": 7769.0312,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.72816091954023,
+      "memory_percent_max": 66.3,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C0",
+      "scenario": "jitter",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c0_net-jitter_repeat_3_20260917T142528Z_cbb3205b.csv"
+      ],
+      "cpu_percent_mean": 11.654712643678161,
+      "cpu_percent_max": 24.65,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2544.595259770115,
+      "memory_mb_max": 7817.125,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.743563218390804,
+      "memory_percent_max": 66.0,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C0",
+      "scenario": "loss",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c0_net-loss_repeat_1_20260917T143302Z_488a0bb7.csv"
+      ],
+      "cpu_percent_mean": 11.403218390804598,
+      "cpu_percent_max": 24.2,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2500.4212735632186,
+      "memory_mb_max": 7810.2031,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.44022988505747,
+      "memory_percent_max": 65.9,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C0",
+      "scenario": "loss",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c0_net-loss_repeat_2_20260917T143406Z_9e756bd9.csv"
+      ],
+      "cpu_percent_mean": 9.778735632183908,
+      "cpu_percent_max": 23.08,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2480.717363218391,
+      "memory_mb_max": 7731.3594,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.232183908045975,
+      "memory_percent_max": 65.1,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C0",
+      "scenario": "loss",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c0_net-loss_repeat_3_20260917T143510Z_34d15f3a.csv"
+      ],
+      "cpu_percent_mean": 8.89287356321839,
+      "cpu_percent_max": 21.64,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2494.276796551724,
+      "memory_mb_max": 7656.9688,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.207011494252875,
+      "memory_percent_max": 64.4,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C1",
+      "scenario": "delay",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c1_net-delay_repeat_1_20260917T141650Z_661f774d.csv"
+      ],
+      "cpu_percent_mean": 8.975444444444445,
+      "cpu_percent_max": 23.27,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2549.0612544444443,
+      "memory_mb_max": 7659.4688,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 21.430888888888887,
+      "memory_percent_max": 64.1,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260917",
+      "security": "C1",
+      "scenario": "delay",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c1_net-delay_repeat_2_20260917T141755Z_83c69046.csv"
+      ],
+      "cpu_percent_mean": 9.329666666666666,
+      "cpu_percent_max": 23.21,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2560.7591322222224,
+      "memory_mb_max": 7752.0781,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 21.49877777777778,
+      "memory_percent_max": 64.6,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260917",
+      "security": "C1",
+      "scenario": "delay",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c1_net-delay_repeat_3_20260917T141900Z_2f1b9bb9.csv"
+      ],
+      "cpu_percent_mean": 12.537888888888888,
+      "cpu_percent_max": 30.2,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2575.9472288888887,
+      "memory_mb_max": 7827.7031,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 21.557555555555556,
+      "memory_percent_max": 65.0,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260917",
+      "security": "C1",
+      "scenario": "ideal",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c1_net-ideal_repeat_1_20260917T140715Z_037b32c6.csv"
+      ],
+      "cpu_percent_mean": 9.487666666666666,
+      "cpu_percent_max": 22.72,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2579.3512166666665,
+      "memory_mb_max": 7748.5625,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 21.32,
+      "memory_percent_max": 63.7,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260917",
+      "security": "C1",
+      "scenario": "ideal",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c1_net-ideal_repeat_2_20260917T140819Z_26bd981c.csv"
+      ],
+      "cpu_percent_mean": 9.461609195402298,
+      "cpu_percent_max": 22.04,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2575.4109149425285,
+      "memory_mb_max": 7757.5469,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.39080459770115,
+      "memory_percent_max": 64.0,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C1",
+      "scenario": "ideal",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c1_net-ideal_repeat_3_20260917T140923Z_e281cc30.csv"
+      ],
+      "cpu_percent_mean": 9.298275862068966,
+      "cpu_percent_max": 22.41,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2567.03081954023,
+      "memory_mb_max": 7740.9375,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.341494252873563,
+      "memory_percent_max": 63.9,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C1",
+      "scenario": "jitter",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c1_net-jitter_repeat_1_20260917T142632Z_37e32783.csv"
+      ],
+      "cpu_percent_mean": 10.926777777777778,
+      "cpu_percent_max": 23.37,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2533.131181111111,
+      "memory_mb_max": 7866.9531,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 21.60022222222222,
+      "memory_percent_max": 66.0,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260917",
+      "security": "C1",
+      "scenario": "jitter",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c1_net-jitter_repeat_2_20260917T142737Z_264e86ee.csv"
+      ],
+      "cpu_percent_mean": 9.945698924731182,
+      "cpu_percent_max": 23.71,
+      "cpu_percent_samples": 93,
+      "memory_mb_mean": 2526.174558064516,
+      "memory_mb_max": 7862.1094,
+      "memory_mb_samples": 93,
+      "memory_percent_mean": 21.52010752688172,
+      "memory_percent_max": 66.0,
+      "memory_percent_samples": 93
+    },
+    {
+      "date": "20260917",
+      "security": "C1",
+      "scenario": "jitter",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c1_net-jitter_repeat_3_20260917T142842Z_a5a7bfbb.csv"
+      ],
+      "cpu_percent_mean": 10.47788888888889,
+      "cpu_percent_max": 100.0,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2508.7523255555557,
+      "memory_mb_max": 7648.0625,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 21.394,
+      "memory_percent_max": 64.6,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260917",
+      "security": "C1",
+      "scenario": "loss",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c1_net-loss_repeat_1_20260917T143613Z_025d91d0.csv"
+      ],
+      "cpu_percent_mean": 9.027816091954023,
+      "cpu_percent_max": 22.85,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2515.705,
+      "memory_mb_max": 7726.6719,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.332873563218392,
+      "memory_percent_max": 64.8,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C1",
+      "scenario": "loss",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c1_net-loss_repeat_2_20260917T143717Z_d3c770a0.csv"
+      ],
+      "cpu_percent_mean": 10.593218390804598,
+      "cpu_percent_max": 23.45,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2512.918259770115,
+      "memory_mb_max": 7694.9062,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.36344827586207,
+      "memory_percent_max": 64.8,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C1",
+      "scenario": "loss",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c1_net-loss_repeat_3_20260917T143821Z_dcc073a8.csv"
+      ],
+      "cpu_percent_mean": 9.6,
+      "cpu_percent_max": 22.37,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2507.5328712643677,
+      "memory_mb_max": 7658.2812,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.313218390804597,
+      "memory_percent_max": 64.4,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C2",
+      "scenario": "delay",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c2_net-delay_repeat_1_20260917T142005Z_be3778be.csv"
+      ],
+      "cpu_percent_mean": 11.57611111111111,
+      "cpu_percent_max": 23.77,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2575.4673444444443,
+      "memory_mb_max": 7777.7656,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 21.567666666666668,
+      "memory_percent_max": 64.7,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260917",
+      "security": "C2",
+      "scenario": "delay",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c2_net-delay_repeat_2_20260917T142110Z_142622bb.csv"
+      ],
+      "cpu_percent_mean": 10.653888888888888,
+      "cpu_percent_max": 24.05,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2575.309043333333,
+      "memory_mb_max": 7806.6875,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 21.593666666666667,
+      "memory_percent_max": 65.1,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260917",
+      "security": "C2",
+      "scenario": "delay",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c2_net-delay_repeat_3_20260917T142215Z_9a199f75.csv"
+      ],
+      "cpu_percent_mean": 9.687333333333333,
+      "cpu_percent_max": 23.08,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2500.067048888889,
+      "memory_mb_max": 7667.0,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 21.191777777777776,
+      "memory_percent_max": 64.3,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260917",
+      "security": "C2",
+      "scenario": "ideal",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c2_net-ideal_repeat_1_20260917T141027Z_feaef964.csv"
+      ],
+      "cpu_percent_mean": 9.92896551724138,
+      "cpu_percent_max": 22.7,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2577.0098850574714,
+      "memory_mb_max": 7828.3906,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.39344827586207,
+      "memory_percent_max": 64.4,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C2",
+      "scenario": "ideal",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c2_net-ideal_repeat_2_20260917T141131Z_20a24801.csv"
+      ],
+      "cpu_percent_mean": 9.564942528735632,
+      "cpu_percent_max": 23.42,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2572.113143678161,
+      "memory_mb_max": 7729.9062,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.369540229885057,
+      "memory_percent_max": 63.9,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C2",
+      "scenario": "ideal",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c2_net-ideal_repeat_3_20260917T141235Z_938a6975.csv"
+      ],
+      "cpu_percent_mean": 9.385402298850575,
+      "cpu_percent_max": 21.8,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2572.325257471264,
+      "memory_mb_max": 7713.0469,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.375402298850574,
+      "memory_percent_max": 63.8,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C2",
+      "scenario": "jitter",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c2_net-jitter_repeat_1_20260917T142947Z_f41c1498.csv"
+      ],
+      "cpu_percent_mean": 10.434444444444445,
+      "cpu_percent_max": 23.3,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2516.4092488888887,
+      "memory_mb_max": 7902.1875,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 21.47288888888889,
+      "memory_percent_max": 66.3,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260917",
+      "security": "C2",
+      "scenario": "jitter",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c2_net-jitter_repeat_2_20260917T143052Z_cf6138b5.csv"
+      ],
+      "cpu_percent_mean": 9.572222222222223,
+      "cpu_percent_max": 22.98,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2505.836521111111,
+      "memory_mb_max": 7724.4531,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 21.613333333333333,
+      "memory_percent_max": 65.9,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260917",
+      "security": "C2",
+      "scenario": "jitter",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c2_net-jitter_repeat_3_20260917T143157Z_eea0de32.csv"
+      ],
+      "cpu_percent_mean": 9.790222222222223,
+      "cpu_percent_max": 24.23,
+      "cpu_percent_samples": 90,
+      "memory_mb_mean": 2524.2444644444445,
+      "memory_mb_max": 7835.2969,
+      "memory_mb_samples": 90,
+      "memory_percent_mean": 21.698888888888888,
+      "memory_percent_max": 67.0,
+      "memory_percent_samples": 90
+    },
+    {
+      "date": "20260917",
+      "security": "C2",
+      "scenario": "loss",
+      "repeat": 1,
+      "source_files": [
+        "resource_dds_c2_net-loss_repeat_1_20260917T143925Z_b18800d3.csv"
+      ],
+      "cpu_percent_mean": 9.318505747126437,
+      "cpu_percent_max": 22.3,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2517.318849425287,
+      "memory_mb_max": 7771.7812,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.371379310344828,
+      "memory_percent_max": 65.2,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C2",
+      "scenario": "loss",
+      "repeat": 2,
+      "source_files": [
+        "resource_dds_c2_net-loss_repeat_2_20260917T144029Z_fe761e00.csv"
+      ],
+      "cpu_percent_mean": 9.474022988505746,
+      "cpu_percent_max": 22.55,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2500.945957471264,
+      "memory_mb_max": 7534.3906,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.268620689655172,
+      "memory_percent_max": 63.7,
+      "memory_percent_samples": 87
+    },
+    {
+      "date": "20260917",
+      "security": "C2",
+      "scenario": "loss",
+      "repeat": 3,
+      "source_files": [
+        "resource_dds_c2_net-loss_repeat_3_20260917T144133Z_4feed64a.csv"
+      ],
+      "cpu_percent_mean": 10.490459770114942,
+      "cpu_percent_max": 23.63,
+      "cpu_percent_samples": 87,
+      "memory_mb_mean": 2528.3017471264366,
+      "memory_mb_max": 7756.0469,
+      "memory_mb_samples": 87,
+      "memory_percent_mean": 21.427471264367817,
+      "memory_percent_max": 65.0,
+      "memory_percent_samples": 87
+    }
+  ],
+  "duplicate_combinations": {
+    "('20260917', 'C0', 'ideal', 1)": [
+      "resource_dds_c0_net-ideal_repeat_1_20260917T140404Z_278cde0a.csv",
+      "resource_dds_c0_net-ideal_repeat_1_20260917T161531Z_cf6ac002.csv"
+    ]
+  },
+  "resource_read_errors": [],
+  "potential_communication_kpi_files": [
+    {
+      "path": "testbed/results/audit/dds_harmonized_resource_phase_summary.csv",
+      "bytes": 1595,
+      "first_line": "run_id,security_level,repeat,cpu_field,memory_field,pre_cpu_mean,attack_cpu_mean,post_cpu_mean,pre_memory_mean,attack_memory_mean,post_memory_mean,cpu_attack_increase,memory_attack_increase"
+    },
+    {
+      "path": "testbed/results/audit/dds_harmonized_component_resource_summary_v2.csv",
+      "bytes": 5678,
+      "first_line": "run_id,security_level,repeat,component,pre_attack_resource_available,attack_samples,post_attack_samples,attack_cpu_percent,post_attack_cpu_percent,attack_memory_mb,post_attack_memory_mb,resource_time_origin,experiment_attack_start_s,attack_duration_s"
+    },
+    {
+      "path": "testbed/results/audit/dds_common_core_authoritative.csv",
+      "bytes": 19893,
+      "first_line": "protocol,security_level,net_profile,repeat_index,selection_status,run_id,run_timestamp,candidate_count,valid_candidate_count,stale_candidate_count,stale_run_ids,kpi_evidence_source,kpi_evidence_path,resource_path,resource_rows,resource_span_s,resource_components,duration_seconds,expected_messages,re"
+    },
+    {
+      "path": "testbed/results/audit/dds_harmonized_component_resource_summary.csv",
+      "bytes": 5238,
+      "first_line": "run_id,security_level,repeat,component,pre_samples,attack_samples,recovery_samples,pre_cpu_percent,attack_cpu_percent,recovery_cpu_percent,pre_memory_mb,attack_memory_mb,recovery_memory_mb,cpu_attack_delta_percent,memory_attack_delta_mb"
+    },
+    {
+      "path": "testbed/results/dds/dds_kpi_stream.csv",
+      "bytes": 6570,
+      "first_line": "timestamp,run_id,protocol,security_level,net_profile,repeat_index,domain_id,duration_seconds,subscriber_elapsed_seconds,expected_messages,received_messages,invalid_messages,duplicate_messages,lost_messages,loss_percent,latency_ms,jitter_ms,max_latency_ms,throughput_messages_per_second,throughput_kbp"
+    },
+    {
+      "path": "testbed/results/dds/dds_kpi_stream_v2.csv",
+      "bytes": 16495,
+      "first_line": "timestamp,run_id,protocol,security_level,net_profile,repeat_index,domain_id,duration_seconds,subscriber_elapsed_seconds,loss_metric_version,metric_basis,expected_messages,eligible_sent_messages,received_messages,invalid_messages,duplicate_messages,identical_duplicate_messages,conflicting_duplicate_m"
+    },
+    {
+      "path": "testbed/results/dds/dds_hardware_net_ideal_summary.csv",
+      "bytes": 630,
+      "first_line": "security_profile,repeat,received,loss_percent,throughput_msg_s,mean_latency_ms,median_latency_ms,p95_latency_ms,p99_latency_ms,mean_jitter_ms"
+    },
+    {
+      "path": "testbed/results/dds/dds_acceptance_after_termination_fix.csv",
+      "bytes": 8479,
+      "first_line": "timestamp,run_id,protocol,security_level,net_profile,repeat_index,domain_id,duration_seconds,subscriber_elapsed_seconds,loss_metric_version,metric_basis,expected_messages,eligible_sent_messages,received_messages,invalid_messages,duplicate_messages,identical_duplicate_messages,conflicting_duplicate_m"
+    },
+    {
+      "path": "testbed/results/dds/analysis_v2/dds_run_resource_summary_v2.csv",
+      "bytes": 7379,
+      "first_line": "run_id,security_level,net_profile,repeat_index,publisher_samples,publisher_cpu_mean_pct,publisher_cpu_peak_pct,publisher_memory_mean_mb,publisher_memory_peak_mb,subscriber_samples,subscriber_cpu_mean_pct,subscriber_cpu_peak_pct,subscriber_memory_mean_mb,subscriber_memory_peak_mb,combined_cpu_mean_pc"
+    },
+    {
+      "path": "testbed/results/dds/analysis_v2/dds_network_summary_v2.csv",
+      "bytes": 2995,
+      "first_line": "security_level,net_profile,runs,latency_mean_ms,latency_sd_ms,jitter_mean_ms,jitter_sd_ms,max_latency_mean_ms,throughput_mean_mps,throughput_sd_mps,loss_mean_percent,lost_messages_total,publisher_cpu_mean_pct,subscriber_cpu_mean_pct,combined_cpu_mean_pct,publisher_memory_mean_mb,subscriber_memory_me"
+    },
+    {
+      "path": "testbed/results/dds/dos/dds_dos_smoke_summary.csv",
+      "bytes": 1114,
+      "first_line": "run_id,security_level,repeat,legitimate_rate_mps,legitimate_duration_s,attack_rate_mps,attack_duration_s,attack_delay_s,expected_legitimate_messages,eligible_legitimate_messages,received_legitimate_messages,unexpected_attack_messages,lost_legitimate_messages,legitimate_loss_percent,latency_ms,jitter"
+    },
+    {
+      "path": "testbed/results/dds/dos/dds_dos_summary.csv",
+      "bytes": 2322,
+      "first_line": "run_id,security_level,repeat,legitimate_rate_mps,legitimate_duration_s,attack_rate_mps,attack_duration_s,attack_delay_s,expected_legitimate_messages,eligible_legitimate_messages,received_legitimate_messages,unexpected_attack_messages,lost_legitimate_messages,legitimate_loss_percent,latency_ms,jitter"
+    },
+    {
+      "path": "testbed/results/dds/dos/analysis_v1/dds_dos_run_resource_summary.csv",
+      "bytes": 3514,
+      "first_line": "run_id,security_level,repeat,component,samples,cpu_percent_mean,cpu_percent_peak,memory_mb_mean,memory_mb_peak"
+    },
+    {
+      "path": "testbed/results/dds/dos/analysis_v1/dds_dos_resource_summary.csv",
+      "bytes": 831,
+      "first_line": "security_level,component,runs,cpu_percent_mean,cpu_percent_stdev,cpu_percent_peak_mean,memory_mb_mean,memory_mb_stdev,memory_mb_peak_mean"
+    },
+    {
+      "path": "testbed/results/dds/dos/analysis_v1/dds_dos_security_summary.csv",
+      "bytes": 649,
+      "first_line": "security_level,runs,received_legitimate_messages_mean,received_legitimate_messages_stdev,unexpected_attack_messages_mean,unexpected_attack_messages_stdev,legitimate_loss_percent_mean,legitimate_loss_percent_stdev,latency_ms_mean,latency_ms_stdev,jitter_ms_mean,jitter_ms_stdev,throughput_messages_per"
+    }
+  ],
+  "methodology": {
+    "resource": "Per-run means, then equal weighting of runs",
+    "communication": "Candidate discovery only; not yet validated",
+    "hardware_data_merged": false
+  }
+}

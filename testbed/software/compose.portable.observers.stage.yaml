@@ -1,0 +1,64 @@
+services:
+  opcua-c0:
+    command:
+      - --profile
+      - C0
+      - --endpoint
+      - opc.tcp://0.0.0.0:4840/occ/
+      - --run-id
+      - c0_service_docker_stage
+      - --clock-domain
+      - UTC
+      - --service-id
+      - occ-opcua-c0-stage
+      - --event-log
+      - /app/occ-events/c0_service_docker_stage_events.jsonl
+    volumes:
+      - ./_runtime/portable_occ/opcua/events:/app/occ-events
+
+  dds-subscriber:
+    entrypoint:
+      - /bin/sh
+      - /opt/occ-dds/dds_stage_start.sh
+    command: []
+    volumes:
+      - ./_runtime/portable_occ/dds/state:/state
+      - ./_runtime/portable_occ/dds/dds_stage_start.sh:/opt/occ-dds/dds_stage_start.sh:ro
+
+  opcua-observer:
+    image: occ-live-observers:stage
+    build:
+      context: ./_runtime/portable_occ/wiring
+    restart: unless-stopped
+    environment:
+      OCC_OPCUA_LOG_ROOT: /events
+      OCC_OPCUA_LIVE_STATE: /var/lib/occ-dashboard/opcua-live/state.json
+    command:
+      - python
+      - -u
+      - /observer/opcua_observer.py
+    volumes:
+      - ./_runtime/portable_occ/opcua/events:/events:ro
+      - ./_runtime/portable_occ/shared-state:/var/lib/occ-dashboard
+    networks:
+      - occ-stage
+
+  dds-observer:
+    image: occ-live-observers:stage
+    restart: unless-stopped
+    command:
+      - python
+      - -u
+      - /observer/dds_observer.py
+    volumes:
+      - ./_runtime/portable_occ/dds/state:/home/pi/occ-dds-subscriber-state:ro
+      - ./_runtime/portable_occ/shared-state:/var/lib/occ-dashboard
+    networks:
+      - occ-stage
+
+  dashboard:
+    environment:
+      OCC_OPCUA_LIVE_STATE: /shared/opcua-live/state.json
+      OCC_DDS_LIVE_STATE: /shared/dds-live/state.json
+    volumes:
+      - ./_runtime/portable_occ/shared-state:/shared:ro

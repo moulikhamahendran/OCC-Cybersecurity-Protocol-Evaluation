@@ -1,0 +1,21 @@
+services:
+  dds-gateway:
+    image: python:3.13-slim
+    command:
+      - python
+      - -u
+      - /opt/occ-dds/dds_udp_gateway.py
+    restart: unless-stopped
+    environment:
+      OCC_DDS_DEVICE_IP: "${OCC_DDS_DEVICE_IP:-}"
+    volumes:
+      - ./_runtime/portable_occ/dds/dds_udp_gateway.py:/opt/occ-dds/dds_udp_gateway.py:ro
+    ports:
+      - "${OCC_DDS_BIND_IP:-127.0.0.1}:${OCC_DDS_HOST_PORT:-38889}:18888/udp"
+    networks:
+      - dds-existing
+
+networks:
+  dds-existing:
+    external: true
+    name: "${OCC_DDS_NETWORK:-occ-portable-stage_occ-stage}"

@@ -1,0 +1,6 @@
+{
+  "testbed/final_runtime/vehicle/unified/telemetry_bridge.c": "a5f756448bbe3fd14ae493e1ae5659cdf6f2326606ca80e3b94b893b4fc587fa",
+  "testbed/final_runtime/vehicle/unified/opcua_c0_runtime.c": "0ad908784a9a35b2c9836c586791eee71416e5a8d9b0559d4d48b9f089f7c843",
+  "testbed/final_runtime/vehicle/unified/protocol_manager.c": "71df6d1a2473940eebef5179c6bf2076cd69e062e9aeadac262e2c99b52450ce",
+  "testbed/final_runtime/occ/opcua/opcua_operational_server.py": "a668d5f681f381ffa8c9484b88f646dc64469b8b0834a7e050106abb978a891d"
+}

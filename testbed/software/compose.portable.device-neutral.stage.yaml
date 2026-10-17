@@ -1,0 +1,9 @@
+services:
+  dds-observer:
+    environment:
+      OCC_DDS_LOG_ROOT: /state
+      OCC_DDS_LIVE_STATE: /shared/dds-live/state.json
+      OCC_DDS_CLOCK_DOMAIN: pi-monotonic
+    volumes:
+      - ./_runtime/portable_occ/dds/state:/state:ro
+      - ./_runtime/portable_occ/shared-state:/shared

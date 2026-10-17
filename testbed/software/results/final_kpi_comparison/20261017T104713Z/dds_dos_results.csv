@@ -1,0 +1,4 @@
+security_level,runs,received_legitimate_messages_mean,received_legitimate_messages_stdev,unexpected_attack_messages_mean,unexpected_attack_messages_stdev,legitimate_loss_percent_mean,legitimate_loss_percent_stdev,latency_ms_mean,latency_ms_stdev,jitter_ms_mean,jitter_ms_stdev,throughput_messages_per_second_mean,throughput_messages_per_second_stdev,impacted_runs,passed_runs
+C0,3,524.000,20.952,4028.667,48.418,12.667,3.492,23.990,0.946,3.833,0.107,8.733,0.350,3,3
+C1,3,510.000,6.083,4053.667,17.474,15.000,1.014,23.058,0.629,3.914,0.065,8.500,0.102,3,3
+C2,3,511.667,10.066,4051.667,28.746,14.722,1.678,23.549,0.517,3.936,0.079,8.528,0.168,3,3

@@ -1,0 +1,3 @@
+services:
+  opcua-c0:
+    command: ["--profile", "C0", "--endpoint", "opc.tcp://0.0.0.0:4840/occ/", "--run-id", "c0_service_docker_stage", "--clock-domain", "UTC", "--service-id", "occ-opcua-c0-stage", "--event-log", "/app/occ-events/c0_service_docker_recovery_20261017T091638Z_530b83c8_events.jsonl"]

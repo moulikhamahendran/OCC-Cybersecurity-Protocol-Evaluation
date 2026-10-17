@@ -19,7 +19,7 @@ repeat = int(sys.argv[2])
 stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 run_id = f"esp32_{profile.lower()}_formal_repeat_{repeat}_{stamp}"
 
-outdir = Path("testbed/results/hardware/esp32_mqtt") / profile
+outdir = Path("testbed/software/results/hardware/esp32_mqtt") / profile
 outdir.mkdir(parents=True, exist_ok=True)
 
 csv_path = outdir / f"{run_id}.csv"

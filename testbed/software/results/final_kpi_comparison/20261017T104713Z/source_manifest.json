@@ -1,0 +1,30 @@
+{
+  "MQTT": {
+    "path": "mqtt_final_summary.csv",
+    "sha256": "54f24c0e7cb35f22d7106aa05e1df6ce2463cc6545cb683d3b6fdf8a8c1bf532"
+  },
+  "OPC UA": {
+    "path": "opcua/opcua_final_network_summary.csv",
+    "sha256": "8605dbccb73f8c4848c3d272285f703c75f217e2bd94f9241166129e6e2c901e"
+  },
+  "DDS": {
+    "path": "dds_consolidated/dds_authoritative_software_kpi_comparison.csv",
+    "sha256": "ffaf8937c9ad2debb8324622f3bfd973bec2e6d7da54d23862615a7c783bdfac"
+  },
+  "MQTT_ATTACK": {
+    "path": "mqtt_attack_summary.csv",
+    "sha256": "5cbae32efe724c8a9fa66e0710ac2e49442fcba09339682f766e3a026d80b995"
+  },
+  "OPCUA_ATTACK": {
+    "path": "opcua/opcua_security_control_summary.csv",
+    "sha256": "f9e7eb9d3c4bf50f32b03ab42d573055f7ccf9c5b794190618166137574717bc"
+  },
+  "DDS_DOS": {
+    "path": "dds/dos/analysis_v1/dds_dos_security_summary.csv",
+    "sha256": "62fd1afc794a0f5704b0ca55e1b6135f3d8470b53f4703efd997e9f6458953c5"
+  },
+  "CROSS_ATTACK": {
+    "path": "audit/cross_protocol_security_group_summary_v1.csv",
+    "sha256": "32aeda42ea8cfd8462812e22aaca025218b9e576a859811657b110a789aade15"
+  }
+}

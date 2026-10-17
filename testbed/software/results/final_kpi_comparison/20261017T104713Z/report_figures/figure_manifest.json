@@ -1,0 +1,50 @@
+{
+  "source_directory": "/Users/moulikham/Documents/GitHub/OCC-Cybersecurity-Protocol-Evaluation/testbed/results/final_kpi_comparison/20261017T104713Z",
+  "figures": [
+    {
+      "name": "01_ideal_latency",
+      "description": "Descriptive comparison of archived software KPIs"
+    },
+    {
+      "name": "02_ideal_jitter",
+      "description": "Descriptive comparison of archived software KPIs"
+    },
+    {
+      "name": "03_ideal_throughput",
+      "description": "Descriptive comparison of archived software KPIs"
+    },
+    {
+      "name": "04_security_latency_overhead",
+      "description": "Within-protocol relative changes, not statistical significance"
+    },
+    {
+      "name": "05_network_latency_mqtt",
+      "description": "MQTT normal-scenario network comparison"
+    },
+    {
+      "name": "05_network_latency_opc_ua",
+      "description": "OPC UA normal-scenario network comparison"
+    },
+    {
+      "name": "05_network_latency_dds",
+      "description": "DDS normal-scenario network comparison"
+    },
+    {
+      "name": "06_attack_delivery_loss",
+      "description": "Archived attack loss metrics; consult original definitions"
+    },
+    {
+      "name": "07_mqtt_attack_detection",
+      "description": "Detection flags; not equivalent to prevention"
+    }
+  ],
+  "limitations": [
+    "All graphs are derived from previously collected data.",
+    "DDS normal results use the authoritative software summary.",
+    "Protocol latency measurement boundaries require methodology review.",
+    "Normal and attack campaigns must not be treated as paired experiments.",
+    "Attack loss and normal loss definitions may differ.",
+    "No confidence intervals are plotted from unavailable raw statistics.",
+    "All reported values are descriptive, not significance tests."
+  ]
+}

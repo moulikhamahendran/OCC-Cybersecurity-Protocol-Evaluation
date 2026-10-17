@@ -1,0 +1,4 @@
+#ifndef OCC_PARALLEL_DEMO_H
+#define OCC_PARALLEL_DEMO_H
+#define OCC_PARALLEL_DEMO_ENABLED 1
+#endif

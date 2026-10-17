@@ -1,0 +1,16 @@
+name: occ-portable-stage
+
+services:
+  mqtt-c0:
+    image: eclipse-mosquitto:2
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:31883:1883"
+    volumes:
+      - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    networks:
+      - occ-stage
+
+networks:
+  occ-stage:
+    driver: bridge

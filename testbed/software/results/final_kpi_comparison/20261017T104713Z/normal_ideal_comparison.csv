@@ -1,0 +1,10 @@
+protocol,security_level,network_profile,runs,latency_mean_ms,jitter_mean_ms,throughput_mean_msg_s,loss_mean_percent,loss_definition,source
+MQTT,C0,ideal,3,1.8085327489629133,0.2450951180333027,9.920681496385722,0.0,application_delivery_loss,mqtt_final_summary.csv
+MQTT,C1,ideal,3,1.826501239595281,0.20313062138116147,9.920774484176425,0.0,application_delivery_loss,mqtt_final_summary.csv
+MQTT,C2,ideal,3,1.7875151340139603,0.19473154254746586,9.920728072136523,0.0,application_delivery_loss,mqtt_final_summary.csv
+OPC UA,C0,ideal,3,28.384,2.655,9.883333333333333,,not_reported,opcua/opcua_final_network_summary.csv
+OPC UA,C1,ideal,3,28.659666666666666,2.8986666666666667,9.877666666666666,,not_reported,opcua/opcua_final_network_summary.csv
+OPC UA,C2,ideal,3,28.862666666666666,2.8506666666666667,9.877666666666666,,not_reported,opcua/opcua_final_network_summary.csv
+DDS,C0,ideal,3,7.759,5.341667,10.0,0.0,dds_message_loss,dds_consolidated/dds_authoritative_software_kpi_comparison.csv
+DDS,C1,ideal,3,8.333,5.162667,10.0,0.0,dds_message_loss,dds_consolidated/dds_authoritative_software_kpi_comparison.csv
+DDS,C2,ideal,3,8.431,5.239667,10.0,0.0,dds_message_loss,dds_consolidated/dds_authoritative_software_kpi_comparison.csv

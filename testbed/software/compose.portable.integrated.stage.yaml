@@ -1,0 +1,45 @@
+services:
+  dds-agent:
+    image: occ-dds-production-c0:stage
+    restart: unless-stopped
+    networks:
+      - occ-stage
+
+  dds-subscriber:
+    image: occ-dds-production-c0:stage
+    restart: unless-stopped
+    network_mode: "service:dds-agent"
+    depends_on:
+      - dds-agent
+    entrypoint:
+      - /opt/occ-dds/fair_v1_fastdds_occ_telemetry_candidate
+    command:
+      - --profile
+      - c0
+      - --domain
+      - "0"
+      - --run-id
+      - dds_c0_compose_stage
+      - --clock-domain
+      - stage-monotonic
+      - --service-id
+      - occ-dds-compose-stage
+      - --event-log
+      - /state/dds_c0_compose.jsonl
+    volumes:
+      - ./_runtime/portable_occ/dds/state:/state
+
+  dashboard:
+    image: occ-dashboard-production:stage
+    restart: unless-stopped
+    depends_on:
+      - mqtt-c0
+      - opcua-c0
+      - dds-agent
+    ports:
+      - "127.0.0.1:38080:8080"
+    environment:
+      MQTT_HOST: mqtt-c0
+      MQTT_PORT: "1883"
+    networks:
+      - occ-stage

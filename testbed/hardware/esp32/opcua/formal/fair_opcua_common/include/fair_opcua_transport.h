@@ -49,6 +49,9 @@ struct fair_opcua_transport {
 
     UA_UInt16 namespace_index;
 
+    /* Explicit opt-in; formal clients retain frozen FAIR-V1 validation. */
+    bool operational_telemetry;
+
     bool namespace_resolved;
     bool accept_callbacks;
 };

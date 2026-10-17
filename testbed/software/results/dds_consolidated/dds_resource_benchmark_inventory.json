@@ -1,0 +1,3592 @@
+{
+  "created_utc": "2026-10-12T17:50:19.350282+00:00",
+  "scope": "September DDS software resource benchmark",
+  "hardware_evidence_merged": false,
+  "files_matched": 73,
+  "files_read": 73,
+  "invalid_files": [],
+  "runs": [
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-delay_repeat_1_20260915T160336Z_5aa63a35.csv",
+      "date": "20260915",
+      "security_level": "C0",
+      "network_profile": "delay",
+      "repeat": 1,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.179724137931036,
+          "min": 0.0,
+          "max": 56.334
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 10.179540229885058,
+          "min": 0.0,
+          "max": 23.33
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2721.1454896551722,
+          "min": 20.82,
+          "max": 8148.75
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 19.90896551724138,
+          "min": 0.26,
+          "max": 59.4
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-delay_repeat_1_20260917T141338Z_d3d2e69c.csv",
+      "date": "20260917",
+      "security_level": "C0",
+      "network_profile": "delay",
+      "repeat": 1,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.187689655172413,
+          "min": 0.0,
+          "max": 56.347
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 10.337011494252874,
+          "min": 0.0,
+          "max": 23.1
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2573.2116988505745,
+          "min": 21.96,
+          "max": 7935.1875
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.49206896551724,
+          "min": 0.28,
+          "max": 66.1
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-delay_repeat_2_20260915T160440Z_01775913.csv",
+      "date": "20260915",
+      "security_level": "C0",
+      "network_profile": "delay",
+      "repeat": 2,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.171655172413793,
+          "min": 0.0,
+          "max": 56.315
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 10.28551724137931,
+          "min": 0.0,
+          "max": 23.64
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2723.9014735632186,
+          "min": 20.99,
+          "max": 8141.1406
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 19.92816091954023,
+          "min": 0.26,
+          "max": 59.3
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-delay_repeat_2_20260917T141442Z_b5569bc7.csv",
+      "date": "20260917",
+      "security_level": "C0",
+      "network_profile": "delay",
+      "repeat": 2,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.18741379310345,
+          "min": 0.0,
+          "max": 56.341
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 11.235172413793103,
+          "min": 0.0,
+          "max": 23.37
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2530.2154022988507,
+          "min": 20.76,
+          "max": 7773.7031
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.420114942528734,
+          "min": 0.26,
+          "max": 65.1
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-delay_repeat_3_20260915T160544Z_0bf335e6.csv",
+      "date": "20260915",
+      "security_level": "C0",
+      "network_profile": "delay",
+      "repeat": 3,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.17593103448276,
+          "min": 0.0,
+          "max": 56.328
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 10.474022988505746,
+          "min": 0.0,
+          "max": 23.77
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2726.303791954023,
+          "min": 20.82,
+          "max": 8214.2344
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 19.941724137931036,
+          "min": 0.26,
+          "max": 59.7
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-delay_repeat_3_20260917T141546Z_ac36ccbb.csv",
+      "date": "20260917",
+      "security_level": "C0",
+      "network_profile": "delay",
+      "repeat": 3,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.170620689655173,
+          "min": 0.0,
+          "max": 56.316
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 9.380689655172414,
+          "min": 0.0,
+          "max": 22.67
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2544.007412643678,
+          "min": 20.99,
+          "max": 7674.2656
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.437816091954023,
+          "min": 0.26,
+          "max": 64.2
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-ideal_repeat_1_20260915T155402Z_4c1a739d.csv",
+      "date": "20260915",
+      "security_level": "C0",
+      "network_profile": "ideal",
+      "repeat": 1,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.15948275862069,
+          "min": 0.0,
+          "max": 56.276
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 8.26344827586207,
+          "min": 0.0,
+          "max": 22.03
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2720.5388229885057,
+          "min": 21.05,
+          "max": 8258.2188
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 19.897701149425288,
+          "min": 0.27,
+          "max": 60.0
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-ideal_repeat_1_20260917T140404Z_278cde0a.csv",
+      "date": "20260917",
+      "security_level": "C0",
+      "network_profile": "ideal",
+      "repeat": 1,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.16951724137931,
+          "min": 0.0,
+          "max": 56.325
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 10.426896551724138,
+          "min": 0.0,
+          "max": 23.05
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2569.0290022988506,
+          "min": 21.2,
+          "max": 7882.5312
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.336781609195402,
+          "min": 0.27,
+          "max": 64.7
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-ideal_repeat_1_20260917T161531Z_cf6ac002.csv",
+      "date": "20260917",
+      "security_level": "C0",
+      "network_profile": "ideal",
+      "repeat": 1,
+      "rows": 12,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 12,
+          "mean": 3.0404999999999998,
+          "min": 0.0,
+          "max": 6.069
+        },
+        "cpu_percent": {
+          "count": 12,
+          "mean": 12.29,
+          "min": 0.0,
+          "max": 23.9
+        },
+        "memory_mb": {
+          "count": 12,
+          "mean": 2563.2904166666667,
+          "min": 21.02,
+          "max": 7855.2344
+        },
+        "memory_percent": {
+          "count": 12,
+          "mean": 21.858333333333334,
+          "min": 0.26,
+          "max": 66.3
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-ideal_repeat_2_20260915T155506Z_206dd8c5.csv",
+      "date": "20260915",
+      "security_level": "C0",
+      "network_profile": "ideal",
+      "repeat": 2,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.173758620689654,
+          "min": 0.0,
+          "max": 56.309
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 9.24551724137931,
+          "min": 0.0,
+          "max": 22.6
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2711.1569804597702,
+          "min": 21.04,
+          "max": 8519.2969
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 19.85287356321839,
+          "min": 0.27,
+          "max": 61.6
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-ideal_repeat_2_20260917T140508Z_d88c14b4.csv",
+      "date": "20260917",
+      "security_level": "C0",
+      "network_profile": "ideal",
+      "repeat": 2,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.192758620689656,
+          "min": 0.0,
+          "max": 56.361
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 11.740344827586206,
+          "min": 0.0,
+          "max": 23.81
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2602.4025367816093,
+          "min": 20.84,
+          "max": 7959.1094
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.429080459770116,
+          "min": 0.26,
+          "max": 64.9
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-ideal_repeat_3_20260915T155610Z_b9ff48dd.csv",
+      "date": "20260915",
+      "security_level": "C0",
+      "network_profile": "ideal",
+      "repeat": 3,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.164793103448275,
+          "min": 0.0,
+          "max": 56.301
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 8.549195402298851,
+          "min": 0.0,
+          "max": 21.76
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2689.58376091954,
+          "min": 20.79,
+          "max": 8157.6094
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 19.719425287356323,
+          "min": 0.26,
+          "max": 59.4
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-ideal_repeat_3_20260917T140612Z_ba7ca6df.csv",
+      "date": "20260917",
+      "security_level": "C0",
+      "network_profile": "ideal",
+      "repeat": 3,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.18989655172414,
+          "min": 0.0,
+          "max": 56.338
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 9.461379310344828,
+          "min": 0.0,
+          "max": 22.38
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2584.8886022988504,
+          "min": 20.73,
+          "max": 7805.6094
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.35551724137931,
+          "min": 0.26,
+          "max": 64.1
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-jitter_repeat_1_20260915T161318Z_a164a7f9.csv",
+      "date": "20260915",
+      "security_level": "C0",
+      "network_profile": "jitter",
+      "repeat": 1,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.156793103448276,
+          "min": 0.0,
+          "max": 56.289
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 10.417241379310346,
+          "min": 0.0,
+          "max": 23.29
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2744.3027505747127,
+          "min": 21.24,
+          "max": 8518.9062
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 20.077011494252872,
+          "min": 0.27,
+          "max": 61.7
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-jitter_repeat_1_20260917T142320Z_034d4d37.csv",
+      "date": "20260917",
+      "security_level": "C0",
+      "network_profile": "jitter",
+      "repeat": 1,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.167137931034482,
+          "min": 0.0,
+          "max": 56.328
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 9.874252873563218,
+          "min": 0.0,
+          "max": 23.77
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2509.929097701149,
+          "min": 20.7,
+          "max": 7809.5
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.407471264367818,
+          "min": 0.26,
+          "max": 65.2
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-jitter_repeat_2_20260915T161422Z_072b8800.csv",
+      "date": "20260915",
+      "security_level": "C0",
+      "network_profile": "jitter",
+      "repeat": 2,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.177689655172415,
+          "min": 0.0,
+          "max": 56.332
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 8.735977011494253,
+          "min": 0.0,
+          "max": 22.93
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2705.428559770115,
+          "min": 21.22,
+          "max": 8179.0
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 19.83241379310345,
+          "min": 0.27,
+          "max": 59.6
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-jitter_repeat_2_20260917T142424Z_63aeec1a.csv",
+      "date": "20260917",
+      "security_level": "C0",
+      "network_profile": "jitter",
+      "repeat": 2,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.17448275862069,
+          "min": 0.0,
+          "max": 56.325
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 11.412528735632185,
+          "min": 0.0,
+          "max": 22.74
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2524.393314942529,
+          "min": 20.46,
+          "max": 7769.0312
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.72816091954023,
+          "min": 0.26,
+          "max": 66.3
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-jitter_repeat_3_20260915T161526Z_03cc0ddc.csv",
+      "date": "20260915",
+      "security_level": "C0",
+      "network_profile": "jitter",
+      "repeat": 3,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.177586206896553,
+          "min": 0.0,
+          "max": 56.341
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 9.813333333333333,
+          "min": 0.0,
+          "max": 23.3
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2722.5763793103447,
+          "min": 20.71,
+          "max": 8453.8438
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 20.048505747126438,
+          "min": 0.26,
+          "max": 62.2
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-jitter_repeat_3_20260917T142528Z_cbb3205b.csv",
+      "date": "20260917",
+      "security_level": "C0",
+      "network_profile": "jitter",
+      "repeat": 3,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.16889655172414,
+          "min": 0.0,
+          "max": 56.326
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 11.654712643678161,
+          "min": 0.0,
+          "max": 24.65
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2544.595259770115,
+          "min": 20.73,
+          "max": 7817.125
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.743563218390804,
+          "min": 0.26,
+          "max": 66.0
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-loss_repeat_1_20260915T162259Z_266ec3e3.csv",
+      "date": "20260915",
+      "security_level": "C0",
+      "network_profile": "loss",
+      "repeat": 1,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.201137931034484,
+          "min": 0.0,
+          "max": 56.374
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 8.375057471264368,
+          "min": 0.0,
+          "max": 22.19
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2643.1674666666668,
+          "min": 20.52,
+          "max": 8017.1719
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 19.655977011494254,
+          "min": 0.26,
+          "max": 59.2
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-loss_repeat_1_20260917T143302Z_488a0bb7.csv",
+      "date": "20260917",
+      "security_level": "C0",
+      "network_profile": "loss",
+      "repeat": 1,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.184,
+          "min": 0.0,
+          "max": 56.317
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 11.403218390804598,
+          "min": 0.0,
+          "max": 24.2
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2500.4212735632186,
+          "min": 21.01,
+          "max": 7810.2031
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.44022988505747,
+          "min": 0.26,
+          "max": 65.9
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-loss_repeat_2_20260915T162403Z_4f2863d6.csv",
+      "date": "20260915",
+      "security_level": "C0",
+      "network_profile": "loss",
+      "repeat": 2,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.169103448275862,
+          "min": 0.0,
+          "max": 56.316
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 8.331379310344827,
+          "min": 0.0,
+          "max": 22.29
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2658.287322988506,
+          "min": 20.5,
+          "max": 8030.0
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 19.74183908045977,
+          "min": 0.26,
+          "max": 59.3
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-loss_repeat_2_20260917T143406Z_9e756bd9.csv",
+      "date": "20260917",
+      "security_level": "C0",
+      "network_profile": "loss",
+      "repeat": 2,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.168758620689655,
+          "min": 0.0,
+          "max": 56.311
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 9.778735632183908,
+          "min": 0.0,
+          "max": 23.08
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2480.717363218391,
+          "min": 21.02,
+          "max": 7731.3594
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.232183908045975,
+          "min": 0.26,
+          "max": 65.1
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-loss_repeat_3_20260915T162507Z_93c444cf.csv",
+      "date": "20260915",
+      "security_level": "C0",
+      "network_profile": "loss",
+      "repeat": 3,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.16796551724138,
+          "min": 0.0,
+          "max": 56.311
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 8.207816091954022,
+          "min": 0.0,
+          "max": 21.52
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2661.4811551724138,
+          "min": 20.48,
+          "max": 8012.7031
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 19.769885057471264,
+          "min": 0.26,
+          "max": 59.2
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c0_net-loss_repeat_3_20260917T143510Z_34d15f3a.csv",
+      "date": "20260917",
+      "security_level": "C0",
+      "network_profile": "loss",
+      "repeat": 3,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.20303448275862,
+          "min": 0.0,
+          "max": 56.368
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 8.89287356321839,
+          "min": 0.0,
+          "max": 21.64
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2494.276796551724,
+          "min": 21.06,
+          "max": 7656.9688
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.207011494252875,
+          "min": 0.27,
+          "max": 64.4
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-delay_repeat_1_20260915T160648Z_a481d4a2.csv",
+      "date": "20260915",
+      "security_level": "C1",
+      "network_profile": "delay",
+      "repeat": 1,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.201533333333334,
+          "min": 0.0,
+          "max": 58.358
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 10.401444444444444,
+          "min": 0.0,
+          "max": 23.25
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2751.411672222222,
+          "min": 20.97,
+          "max": 8382.7969
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 20.09777777777778,
+          "min": 0.26,
+          "max": 60.8
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-delay_repeat_1_20260917T141650Z_661f774d.csv",
+      "date": "20260917",
+      "security_level": "C1",
+      "network_profile": "delay",
+      "repeat": 1,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.1919,
+          "min": 0.0,
+          "max": 58.357
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 8.975444444444445,
+          "min": 0.0,
+          "max": 23.27
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2549.0612544444443,
+          "min": 21.03,
+          "max": 7659.4688
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 21.430888888888887,
+          "min": 0.27,
+          "max": 64.1
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-delay_repeat_2_20260915T160753Z_0549e5a3.csv",
+      "date": "20260915",
+      "security_level": "C1",
+      "network_profile": "delay",
+      "repeat": 2,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.165933333333335,
+          "min": 0.0,
+          "max": 58.309
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 8.273,
+          "min": 0.0,
+          "max": 22.2
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2757.469201111111,
+          "min": 20.73,
+          "max": 8369.6562
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 20.134444444444444,
+          "min": 0.26,
+          "max": 60.7
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-delay_repeat_2_20260917T141755Z_83c69046.csv",
+      "date": "20260917",
+      "security_level": "C1",
+      "network_profile": "delay",
+      "repeat": 2,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.181133333333335,
+          "min": 0.0,
+          "max": 58.332
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 9.329666666666666,
+          "min": 0.0,
+          "max": 23.21
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2560.7591322222224,
+          "min": 20.95,
+          "max": 7752.0781
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 21.49877777777778,
+          "min": 0.26,
+          "max": 64.6
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-delay_repeat_3_20260915T160858Z_df21fcd2.csv",
+      "date": "20260915",
+      "security_level": "C1",
+      "network_profile": "delay",
+      "repeat": 3,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.1755,
+          "min": 0.0,
+          "max": 58.314
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 8.310888888888888,
+          "min": 0.0,
+          "max": 21.7
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2747.9502377777776,
+          "min": 21.0,
+          "max": 8262.7344
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 20.082555555555555,
+          "min": 0.26,
+          "max": 60.1
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-delay_repeat_3_20260917T141900Z_2f1b9bb9.csv",
+      "date": "20260917",
+      "security_level": "C1",
+      "network_profile": "delay",
+      "repeat": 3,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.194133333333333,
+          "min": 0.0,
+          "max": 58.335
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 12.537888888888888,
+          "min": 0.0,
+          "max": 30.2
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2575.9472288888887,
+          "min": 20.97,
+          "max": 7827.7031
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 21.557555555555556,
+          "min": 0.26,
+          "max": 65.0
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-ideal_repeat_1_20260915T155713Z_0cf439b3.csv",
+      "date": "20260915",
+      "security_level": "C1",
+      "network_profile": "ideal",
+      "repeat": 1,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.176586206896552,
+          "min": 0.0,
+          "max": 56.35
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 8.778850574712644,
+          "min": 0.0,
+          "max": 22.42
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2698.753547126437,
+          "min": 21.31,
+          "max": 8175.9219
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 19.777011494252875,
+          "min": 0.27,
+          "max": 59.5
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-ideal_repeat_1_20260917T140715Z_037b32c6.csv",
+      "date": "20260917",
+      "security_level": "C1",
+      "network_profile": "ideal",
+      "repeat": 1,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 28.224133333333334,
+          "min": 0.0,
+          "max": 57.363
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 9.487666666666666,
+          "min": 0.0,
+          "max": 22.72
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2579.3512166666665,
+          "min": 21.26,
+          "max": 7748.5625
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 21.32,
+          "min": 0.27,
+          "max": 63.7
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-ideal_repeat_2_20260915T155817Z_57f386c6.csv",
+      "date": "20260915",
+      "security_level": "C1",
+      "network_profile": "ideal",
+      "repeat": 2,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.18362068965517,
+          "min": 0.0,
+          "max": 56.346
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 8.849080459770114,
+          "min": 0.0,
+          "max": 22.33
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2711.0775942528735,
+          "min": 21.5,
+          "max": 8243.3594
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 19.855862068965518,
+          "min": 0.27,
+          "max": 60.0
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-ideal_repeat_2_20260917T140819Z_26bd981c.csv",
+      "date": "20260917",
+      "security_level": "C1",
+      "network_profile": "ideal",
+      "repeat": 2,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.179724137931036,
+          "min": 0.0,
+          "max": 56.343
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 9.461609195402298,
+          "min": 0.0,
+          "max": 22.04
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2575.4109149425285,
+          "min": 21.0,
+          "max": 7757.5469
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.39080459770115,
+          "min": 0.26,
+          "max": 64.0
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-ideal_repeat_3_20260915T155921Z_2035caf8.csv",
+      "date": "20260915",
+      "security_level": "C1",
+      "network_profile": "ideal",
+      "repeat": 3,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.165724137931036,
+          "min": 0.0,
+          "max": 56.309
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 8.394712643678162,
+          "min": 0.0,
+          "max": 22.77
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2696.4773275862067,
+          "min": 20.72,
+          "max": 8241.8438
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 19.76471264367816,
+          "min": 0.26,
+          "max": 59.9
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-ideal_repeat_3_20260917T140923Z_e281cc30.csv",
+      "date": "20260917",
+      "security_level": "C1",
+      "network_profile": "ideal",
+      "repeat": 3,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.17251724137931,
+          "min": 0.0,
+          "max": 56.332
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 9.298275862068966,
+          "min": 0.0,
+          "max": 22.41
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2567.03081954023,
+          "min": 21.01,
+          "max": 7740.9375
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.341494252873563,
+          "min": 0.26,
+          "max": 63.9
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-jitter_repeat_1_20260915T161629Z_7ad31279.csv",
+      "date": "20260915",
+      "security_level": "C1",
+      "network_profile": "jitter",
+      "repeat": 1,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.2008,
+          "min": 0.0,
+          "max": 58.365
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 11.113,
+          "min": 0.0,
+          "max": 23.86
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2584.1716244444447,
+          "min": 21.19,
+          "max": 7887.1719
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 19.392222222222223,
+          "min": 0.27,
+          "max": 58.7
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-jitter_repeat_1_20260917T142632Z_37e32783.csv",
+      "date": "20260917",
+      "security_level": "C1",
+      "network_profile": "jitter",
+      "repeat": 1,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.2051,
+          "min": 0.0,
+          "max": 58.393
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 10.926777777777778,
+          "min": 0.0,
+          "max": 23.37
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2533.131181111111,
+          "min": 21.21,
+          "max": 7866.9531
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 21.60022222222222,
+          "min": 0.27,
+          "max": 66.0
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-jitter_repeat_2_20260915T161734Z_5fb6fdf3.csv",
+      "date": "20260915",
+      "security_level": "C1",
+      "network_profile": "jitter",
+      "repeat": 2,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.173266666666667,
+          "min": 0.0,
+          "max": 58.34
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 8.077,
+          "min": 0.0,
+          "max": 22.9
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2562.3598944444443,
+          "min": 20.71,
+          "max": 7705.2656
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 19.242555555555555,
+          "min": 0.26,
+          "max": 57.6
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-jitter_repeat_2_20260917T142737Z_264e86ee.csv",
+      "date": "20260917",
+      "security_level": "C1",
+      "network_profile": "jitter",
+      "repeat": 2,
+      "rows": 93,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 93,
+          "mean": 29.224612903225808,
+          "min": 0.0,
+          "max": 59.378
+        },
+        "cpu_percent": {
+          "count": 93,
+          "mean": 9.945698924731182,
+          "min": 0.0,
+          "max": 23.71
+        },
+        "memory_mb": {
+          "count": 93,
+          "mean": 2526.174558064516,
+          "min": 0.0,
+          "max": 7862.1094
+        },
+        "memory_percent": {
+          "count": 93,
+          "mean": 21.52010752688172,
+          "min": 0.0,
+          "max": 66.0
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-jitter_repeat_3_20260915T161839Z_78115e09.csv",
+      "date": "20260915",
+      "security_level": "C1",
+      "network_profile": "jitter",
+      "repeat": 3,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.162266666666667,
+          "min": 0.0,
+          "max": 58.296
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 7.967444444444444,
+          "min": 0.0,
+          "max": 22.47
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2562.803388888889,
+          "min": 21.03,
+          "max": 7746.1406
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 19.252666666666666,
+          "min": 0.27,
+          "max": 57.8
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-jitter_repeat_3_20260917T142842Z_a5a7bfbb.csv",
+      "date": "20260917",
+      "security_level": "C1",
+      "network_profile": "jitter",
+      "repeat": 3,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.178433333333334,
+          "min": 0.0,
+          "max": 58.346
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 10.47788888888889,
+          "min": 0.58,
+          "max": 100.0
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2508.7523255555557,
+          "min": 20.96,
+          "max": 7648.0625
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 21.394,
+          "min": 0.26,
+          "max": 64.6
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-loss_repeat_1_20260915T162610Z_3be29f44.csv",
+      "date": "20260915",
+      "security_level": "C1",
+      "network_profile": "loss",
+      "repeat": 1,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.180699999999998,
+          "min": 0.0,
+          "max": 58.33
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 7.740666666666667,
+          "min": 0.0,
+          "max": 20.99
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2645.266308888889,
+          "min": 0.0,
+          "max": 7963.2969
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 19.662333333333333,
+          "min": 0.0,
+          "max": 58.8
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-loss_repeat_1_20260917T143613Z_025d91d0.csv",
+      "date": "20260917",
+      "security_level": "C1",
+      "network_profile": "loss",
+      "repeat": 1,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.171241379310345,
+          "min": 0.0,
+          "max": 56.327
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 9.027816091954023,
+          "min": 0.0,
+          "max": 22.85
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2515.705,
+          "min": 20.46,
+          "max": 7726.6719
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.332873563218392,
+          "min": 0.26,
+          "max": 64.8
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-loss_repeat_2_20260915T162714Z_acd6d42c.csv",
+      "date": "20260915",
+      "security_level": "C1",
+      "network_profile": "loss",
+      "repeat": 2,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.18389655172414,
+          "min": 0.0,
+          "max": 56.326
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 8.834022988505748,
+          "min": 0.0,
+          "max": 23.02
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2661.4531574712646,
+          "min": 21.23,
+          "max": 8243.1562
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 19.763448275862068,
+          "min": 0.27,
+          "max": 60.6
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-loss_repeat_2_20260917T143717Z_d3c770a0.csv",
+      "date": "20260917",
+      "security_level": "C1",
+      "network_profile": "loss",
+      "repeat": 2,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.185068965517242,
+          "min": 0.0,
+          "max": 56.354
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 10.593218390804598,
+          "min": 0.0,
+          "max": 23.45
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2512.918259770115,
+          "min": 21.23,
+          "max": 7694.9062
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.36344827586207,
+          "min": 0.27,
+          "max": 64.8
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-loss_repeat_3_20260915T162818Z_700b0f59.csv",
+      "date": "20260915",
+      "security_level": "C1",
+      "network_profile": "loss",
+      "repeat": 3,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.16106896551724,
+          "min": 0.0,
+          "max": 56.298
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 8.52632183908046,
+          "min": 0.0,
+          "max": 21.95
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2668.6346333333336,
+          "min": 20.96,
+          "max": 8036.8125
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 19.796781609195403,
+          "min": 0.26,
+          "max": 59.3
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c1_net-loss_repeat_3_20260917T143821Z_dcc073a8.csv",
+      "date": "20260917",
+      "security_level": "C1",
+      "network_profile": "loss",
+      "repeat": 3,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.176620689655174,
+          "min": 0.0,
+          "max": 56.326
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 9.6,
+          "min": 0.0,
+          "max": 22.37
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2507.5328712643677,
+          "min": 20.74,
+          "max": 7658.2812
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.313218390804597,
+          "min": 0.26,
+          "max": 64.4
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-delay_repeat_1_20260915T161003Z_9cdf3bcf.csv",
+      "date": "20260915",
+      "security_level": "C2",
+      "network_profile": "delay",
+      "repeat": 1,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.1671,
+          "min": 0.0,
+          "max": 58.31
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 8.38411111111111,
+          "min": 0.0,
+          "max": 22.25
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2752.1100755555553,
+          "min": 20.77,
+          "max": 8265.8125
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 20.105444444444444,
+          "min": 0.26,
+          "max": 60.1
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-delay_repeat_1_20260917T142005Z_be3778be.csv",
+      "date": "20260917",
+      "security_level": "C2",
+      "network_profile": "delay",
+      "repeat": 1,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.182033333333333,
+          "min": 0.0,
+          "max": 58.358
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 11.57611111111111,
+          "min": 0.0,
+          "max": 23.77
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2575.4673444444443,
+          "min": 21.28,
+          "max": 7777.7656
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 21.567666666666668,
+          "min": 0.27,
+          "max": 64.7
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-delay_repeat_2_20260915T161108Z_e27ebb28.csv",
+      "date": "20260915",
+      "security_level": "C2",
+      "network_profile": "delay",
+      "repeat": 2,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.1685,
+          "min": 0.0,
+          "max": 58.317
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 10.331555555555555,
+          "min": 0.0,
+          "max": 22.98
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2762.278801111111,
+          "min": 20.67,
+          "max": 8347.7188
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 20.170555555555556,
+          "min": 0.26,
+          "max": 60.6
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-delay_repeat_2_20260917T142110Z_142622bb.csv",
+      "date": "20260917",
+      "security_level": "C2",
+      "network_profile": "delay",
+      "repeat": 2,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.187366666666666,
+          "min": 0.0,
+          "max": 58.353
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 10.653888888888888,
+          "min": 0.0,
+          "max": 24.05
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2575.309043333333,
+          "min": 20.8,
+          "max": 7806.6875
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 21.593666666666667,
+          "min": 0.26,
+          "max": 65.1
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-delay_repeat_3_20260915T161213Z_6c845356.csv",
+      "date": "20260915",
+      "security_level": "C2",
+      "network_profile": "delay",
+      "repeat": 3,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.202333333333332,
+          "min": 0.0,
+          "max": 58.366
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 12.546,
+          "min": 0.0,
+          "max": 26.6
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2770.7205955555555,
+          "min": 20.73,
+          "max": 8509.8438
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 20.21988888888889,
+          "min": 0.26,
+          "max": 61.6
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-delay_repeat_3_20260917T142215Z_9a199f75.csv",
+      "date": "20260917",
+      "security_level": "C2",
+      "network_profile": "delay",
+      "repeat": 3,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.177533333333333,
+          "min": 0.0,
+          "max": 58.324
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 9.687333333333333,
+          "min": 0.0,
+          "max": 23.08
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2500.067048888889,
+          "min": 20.96,
+          "max": 7667.0
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 21.191777777777776,
+          "min": 0.26,
+          "max": 64.3
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-ideal_repeat_1_20260915T160025Z_6a00fdbc.csv",
+      "date": "20260915",
+      "security_level": "C2",
+      "network_profile": "ideal",
+      "repeat": 1,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.18851724137931,
+          "min": 0.001,
+          "max": 56.353
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 12.33367816091954,
+          "min": 0.0,
+          "max": 25.2
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2725.8972747126436,
+          "min": 20.99,
+          "max": 8239.7969
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 19.94287356321839,
+          "min": 0.26,
+          "max": 59.9
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-ideal_repeat_1_20260917T141027Z_feaef964.csv",
+      "date": "20260917",
+      "security_level": "C2",
+      "network_profile": "ideal",
+      "repeat": 1,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.160344827586208,
+          "min": 0.0,
+          "max": 56.288
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 9.92896551724138,
+          "min": 0.0,
+          "max": 22.7
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2577.0098850574714,
+          "min": 21.75,
+          "max": 7828.3906
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.39344827586207,
+          "min": 0.27,
+          "max": 64.4
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-ideal_repeat_2_20260915T160129Z_acfecae9.csv",
+      "date": "20260915",
+      "security_level": "C2",
+      "network_profile": "ideal",
+      "repeat": 2,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.174724137931033,
+          "min": 0.0,
+          "max": 56.335
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 10.569655172413793,
+          "min": 0.0,
+          "max": 23.33
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2723.4736586206895,
+          "min": 20.73,
+          "max": 8268.0625
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 19.92103448275862,
+          "min": 0.26,
+          "max": 60.0
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-ideal_repeat_2_20260917T141131Z_20a24801.csv",
+      "date": "20260917",
+      "security_level": "C2",
+      "network_profile": "ideal",
+      "repeat": 2,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.174586206896553,
+          "min": 0.0,
+          "max": 56.314
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 9.564942528735632,
+          "min": 0.0,
+          "max": 23.42
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2572.113143678161,
+          "min": 21.0,
+          "max": 7729.9062
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.369540229885057,
+          "min": 0.26,
+          "max": 63.9
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-ideal_repeat_3_20260915T160233Z_f3a4c48a.csv",
+      "date": "20260915",
+      "security_level": "C2",
+      "network_profile": "ideal",
+      "repeat": 3,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.20351724137931,
+          "min": 0.0,
+          "max": 56.38
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 10.706206896551723,
+          "min": 0.0,
+          "max": 23.47
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2720.7053666666666,
+          "min": 20.73,
+          "max": 8145.4375
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 19.9083908045977,
+          "min": 0.26,
+          "max": 59.4
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-ideal_repeat_3_20260917T141235Z_938a6975.csv",
+      "date": "20260917",
+      "security_level": "C2",
+      "network_profile": "ideal",
+      "repeat": 3,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.16837931034483,
+          "min": 0.0,
+          "max": 56.317
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 9.385402298850575,
+          "min": 0.0,
+          "max": 21.8
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2572.325257471264,
+          "min": 21.26,
+          "max": 7713.0469
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.375402298850574,
+          "min": 0.27,
+          "max": 63.8
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-jitter_repeat_1_20260915T161944Z_2da4d63e.csv",
+      "date": "20260915",
+      "security_level": "C2",
+      "network_profile": "jitter",
+      "repeat": 1,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.2142,
+          "min": 0.0,
+          "max": 58.415
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 7.975222222222222,
+          "min": 0.0,
+          "max": 23.11
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2605.942666666667,
+          "min": 20.92,
+          "max": 7887.6406
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 19.46988888888889,
+          "min": 0.26,
+          "max": 58.6
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-jitter_repeat_1_20260917T142947Z_f41c1498.csv",
+      "date": "20260917",
+      "security_level": "C2",
+      "network_profile": "jitter",
+      "repeat": 1,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.1947,
+          "min": 0.0,
+          "max": 58.357
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 10.434444444444445,
+          "min": 0.0,
+          "max": 23.3
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2516.4092488888887,
+          "min": 21.0,
+          "max": 7902.1875
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 21.47288888888889,
+          "min": 0.26,
+          "max": 66.3
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-jitter_repeat_2_20260915T162049Z_168059a3.csv",
+      "date": "20260915",
+      "security_level": "C2",
+      "network_profile": "jitter",
+      "repeat": 2,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.216533333333334,
+          "min": 0.0,
+          "max": 58.403
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 7.711111111111111,
+          "min": 0.0,
+          "max": 20.91
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2617.292012222222,
+          "min": 20.96,
+          "max": 7961.3594
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 19.50888888888889,
+          "min": 0.26,
+          "max": 58.9
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-jitter_repeat_2_20260917T143052Z_cf6138b5.csv",
+      "date": "20260917",
+      "security_level": "C2",
+      "network_profile": "jitter",
+      "repeat": 2,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.181733333333334,
+          "min": 0.0,
+          "max": 58.324
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 9.572222222222223,
+          "min": 0.0,
+          "max": 22.98
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2505.836521111111,
+          "min": 20.84,
+          "max": 7724.4531
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 21.613333333333333,
+          "min": 0.26,
+          "max": 65.9
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-jitter_repeat_3_20260915T162154Z_ee5ac422.csv",
+      "date": "20260915",
+      "security_level": "C2",
+      "network_profile": "jitter",
+      "repeat": 3,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.1693,
+          "min": 0.0,
+          "max": 58.34
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 7.8806666666666665,
+          "min": 0.0,
+          "max": 22.35
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2616.1096166666666,
+          "min": 20.97,
+          "max": 7934.9062
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 19.493666666666666,
+          "min": 0.26,
+          "max": 58.7
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-jitter_repeat_3_20260917T143157Z_eea0de32.csv",
+      "date": "20260917",
+      "security_level": "C2",
+      "network_profile": "jitter",
+      "repeat": 3,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 29.166166666666665,
+          "min": 0.0,
+          "max": 58.32
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 9.790222222222223,
+          "min": 0.0,
+          "max": 24.23
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2524.2444644444445,
+          "min": 21.18,
+          "max": 7835.2969
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 21.698888888888888,
+          "min": 0.27,
+          "max": 67.0
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-loss_repeat_1_20260915T162922Z_eb0779bf.csv",
+      "date": "20260915",
+      "security_level": "C2",
+      "network_profile": "loss",
+      "repeat": 1,
+      "rows": 90,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 90,
+          "mean": 28.2076,
+          "min": 0.0,
+          "max": 57.329
+        },
+        "cpu_percent": {
+          "count": 90,
+          "mean": 8.524777777777778,
+          "min": 0.0,
+          "max": 21.81
+        },
+        "memory_mb": {
+          "count": 90,
+          "mean": 2671.0451722222224,
+          "min": 21.2,
+          "max": 8079.0
+        },
+        "memory_percent": {
+          "count": 90,
+          "mean": 19.817777777777778,
+          "min": 0.27,
+          "max": 59.6
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-loss_repeat_1_20260917T143925Z_b18800d3.csv",
+      "date": "20260917",
+      "security_level": "C2",
+      "network_profile": "loss",
+      "repeat": 1,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.173620689655174,
+          "min": 0.0,
+          "max": 56.312
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 9.318505747126437,
+          "min": 0.0,
+          "max": 22.3
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2517.318849425287,
+          "min": 20.7,
+          "max": 7771.7812
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.371379310344828,
+          "min": 0.26,
+          "max": 65.2
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-loss_repeat_2_20260915T163026Z_d9c95eb2.csv",
+      "date": "20260915",
+      "security_level": "C2",
+      "network_profile": "loss",
+      "repeat": 2,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.16648275862069,
+          "min": 0.0,
+          "max": 56.3
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 8.240574712643678,
+          "min": 0.0,
+          "max": 21.82
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2671.4198264367815,
+          "min": 20.72,
+          "max": 8030.1094
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 19.813563218390804,
+          "min": 0.26,
+          "max": 59.3
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-loss_repeat_2_20260917T144029Z_fe761e00.csv",
+      "date": "20260917",
+      "security_level": "C2",
+      "network_profile": "loss",
+      "repeat": 2,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.183793103448277,
+          "min": 0.0,
+          "max": 56.337
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 9.474022988505746,
+          "min": 0.0,
+          "max": 22.55
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2500.945957471264,
+          "min": 21.21,
+          "max": 7534.3906
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.268620689655172,
+          "min": 0.27,
+          "max": 63.7
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-loss_repeat_3_20260915T163130Z_ebd84930.csv",
+      "date": "20260915",
+      "security_level": "C2",
+      "network_profile": "loss",
+      "repeat": 3,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.16537931034483,
+          "min": 0.0,
+          "max": 56.302
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 8.514137931034483,
+          "min": 0.0,
+          "max": 21.53
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2673.435644827586,
+          "min": 21.48,
+          "max": 8054.6094
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 19.831264367816093,
+          "min": 0.27,
+          "max": 59.4
+        }
+      }
+    },
+    {
+      "file": "testbed/results/resources/resource_dds_c2_net-loss_repeat_3_20260917T144133Z_4feed64a.csv",
+      "date": "20260917",
+      "security_level": "C2",
+      "network_profile": "loss",
+      "repeat": 3,
+      "rows": 87,
+      "columns": [
+        "run_id",
+        "protocol",
+        "security_profile",
+        "scenario",
+        "timestamp_utc",
+        "elapsed_s",
+        "component",
+        "source",
+        "identifier",
+        "status",
+        "cpu_percent",
+        "memory_mb",
+        "memory_percent"
+      ],
+      "numeric_columns": {
+        "elapsed_s": {
+          "count": 87,
+          "mean": 28.18141379310345,
+          "min": 0.0,
+          "max": 56.355
+        },
+        "cpu_percent": {
+          "count": 87,
+          "mean": 10.490459770114942,
+          "min": 0.0,
+          "max": 23.63
+        },
+        "memory_mb": {
+          "count": 87,
+          "mean": 2528.3017471264366,
+          "min": 21.52,
+          "max": 7756.0469
+        },
+        "memory_percent": {
+          "count": 87,
+          "mean": 21.427471264367817,
+          "min": 0.27,
+          "max": 65.0
+        }
+      }
+    }
+  ],
+  "notes": [
+    "Numeric summaries are descriptive, not validated KPI definitions.",
+    "Hardware C0/C1/C2 evidence must be reported separately.",
+    "Security levels must be interpreted using actual run metadata."
+  ]
+}

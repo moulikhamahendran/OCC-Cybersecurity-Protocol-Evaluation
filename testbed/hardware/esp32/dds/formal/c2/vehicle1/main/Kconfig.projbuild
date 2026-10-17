@@ -37,3 +37,12 @@ config FAIR_WORKLOAD_STATE
     string "FAIR workload state"
     default ""
 endmenu
+
+
+config FAIR_DDS_DOMAIN_ID
+    int "Native DDS Domain ID"
+    range 0 232
+    default 2
+    help
+        DDS domain used by the C2 XRCE participant.
+        Use domain 2 to isolate C2 from C0/C1 domain 0.

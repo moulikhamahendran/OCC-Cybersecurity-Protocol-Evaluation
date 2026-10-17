@@ -1,0 +1,25 @@
+services:
+  opcua-c0:
+    image: occ-opcua-production-c0:stage
+    restart: "no"
+    ports:
+      - "127.0.0.1:34840:4840"
+    entrypoint:
+      - python
+      - -u
+      - /app/server.py
+    command:
+      - --profile
+      - C0
+      - --endpoint
+      - opc.tcp://0.0.0.0:4840/occ/
+      - --run-id
+      - portable-opcua-c0-stage
+      - --clock-domain
+      - UTC
+      - --service-id
+      - occ-opcua-c0-stage
+      - --event-log
+      - /tmp/occ-opcua-c0-stage.jsonl
+    networks:
+      - occ-stage

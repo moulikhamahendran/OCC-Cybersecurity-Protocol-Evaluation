@@ -1,0 +1,6 @@
+services:
+  opcua-c0:
+    environment:
+      OCC_OPCUA_LIVE_SENSOR_DIR: /app/occ-events
+    volumes:
+      - ./_runtime/portable_occ/opcua/server.sensor-fix.py:/app/server.py:ro

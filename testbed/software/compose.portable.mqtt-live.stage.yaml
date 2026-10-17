@@ -1,0 +1,8 @@
+services:
+  dashboard:
+    environment:
+      OCC_DASHBOARD_MQTT_ENABLED: "1"
+      OCC_DOCKER_C0_ONLY: "1"
+      OCC_DASHBOARD_RUNTIME_CONFIG: /run/occ/system.json
+    volumes:
+      - ./_runtime/portable_occ/config/mqtt-c0-stage.json:/run/occ/system.json:ro

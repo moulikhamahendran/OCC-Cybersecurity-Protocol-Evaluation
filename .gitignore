@@ -75,3 +75,13 @@ testbed/final_runtime/vehicle/**/sdkconfig.old
 **/passwd-fair-v1
 
 testbed/final_runtime/config/network.env
+
+# OCC reorganized testbed: local generated artifacts
+/testbed/software/_runtime/
+/testbed/software/_backups/
+/testbed/hardware/vehicle/**/build/
+/testbed/hardware/vehicle/**/managed_components/
+/testbed/software/**/node_modules/
+/testbed/software/**/__pycache__/
+/testbed/software/results/events.csv
+/testbed/software/results/kpi_stream.csv

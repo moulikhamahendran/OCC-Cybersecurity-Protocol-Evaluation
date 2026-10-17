@@ -10,6 +10,121 @@
 #include "fair_v1_core.h"
 #include "fair_opcua_transport.h"
 
+/* OCC_C1_HEAP_PROBE_V1: removable diagnostic, not a functional fix. */
+#include "esp_heap_caps.h"
+#include <stdio.h>
+
+/* OCC_C1_TCP_ONLY_DIAG_V1: temporary isolation, NOT a working OPC UA connection. */
+#define OCC_C1_TCP_ONLY_DIAG_V1 0
+#include "lwip/sockets.h"
+#include "lwip/inet.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include <errno.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
+
+static UA_StatusCode occ_c1_tcp_only_diag(const char *endpoint) {
+    if(endpoint == NULL) {
+        printf("OCC_C1_TCP_ONLY INVALID_ENDPOINT null\n"); fflush(stdout);
+        return UA_STATUSCODE_BADINVALIDARGUMENT;
+    }
+    const char *host_start = strstr(endpoint, "://");
+    host_start = host_start ? host_start + 3 : endpoint;
+    char host[64] = {0};
+    unsigned port = 0;
+    if(sscanf(host_start, "%63[^:/]:%u", host, &port) != 2 || port < 1 || port > 65535) {
+        printf("OCC_C1_TCP_ONLY INVALID_ENDPOINT_FORMAT\n"); fflush(stdout);
+        return UA_STATUSCODE_BADINVALIDARGUMENT;
+    }
+    struct sockaddr_in addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons((uint16_t)port);
+    if(inet_pton(AF_INET, host, &addr.sin_addr) != 1) {
+        printf("OCC_C1_TCP_ONLY NON_IPV4_ENDPOINT host=%s\n", host); fflush(stdout);
+        return UA_STATUSCODE_BADINVALIDARGUMENT;
+    }
+    printf("OCC_C1_TCP_ONLY BEGIN endpoint=%s:%u attempts=30 no_opcua_handshake=1\n", host, port);
+    fflush(stdout);
+    unsigned successes = 0, failures = 0;
+    for(unsigned i = 1; i <= 30; i++) {
+        int fd = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
+        int err = 0;
+        int connected = 0;
+        if(fd < 0) {
+            err = errno;
+        } else {
+            int flags = fcntl(fd, F_GETFL, 0);
+            if(flags < 0 || fcntl(fd, F_SETFL, flags | O_NONBLOCK) < 0) {
+                err = errno;
+            } else {
+                int rc = connect(fd, (const struct sockaddr *)&addr, sizeof(addr));
+                if(rc == 0) {
+                    connected = 1;
+                } else if(errno == EINPROGRESS) {
+                    fd_set wfds;
+                    FD_ZERO(&wfds);
+                    FD_SET(fd, &wfds);
+                    struct timeval timeout = {.tv_sec = 2, .tv_usec = 0};
+                    int sr = select(fd + 1, NULL, &wfds, NULL, &timeout);
+                    if(sr > 0) {
+                        socklen_t len = sizeof(err);
+                        if(getsockopt(fd, SOL_SOCKET, SO_ERROR, &err, &len) == 0 && err == 0)
+                            connected = 1;
+                        else if(err == 0)
+                            err = errno;
+                    } else {
+                        err = (sr == 0) ? ETIMEDOUT : errno;
+                    }
+                } else {
+                    err = errno;
+                }
+            }
+            close(fd);
+        }
+        if(connected) successes++; else failures++;
+        printf("OCC_C1_TCP_ONLY attempt=%u/30 tcp_connect=%s errno=%d heap_ok=%d\n",
+               i, connected ? "PASS" : "FAIL", err,
+               (int)heap_caps_check_integrity_all(false));
+        fflush(stdout);
+        vTaskDelay(pdMS_TO_TICKS(1500));
+    }
+    printf("OCC_C1_TCP_ONLY COMPLETE attempts=30 pass=%u fail=%u heap_ok=%d\n",
+           successes, failures, (int)heap_caps_check_integrity_all(true));
+    fflush(stdout);
+    /* Hold the client task here so the test is observable before original logic resumes. */
+    vTaskDelay(pdMS_TO_TICKS(30000));
+    return UA_STATUSCODE_BADNOTCONNECTED;
+}
+static UA_StatusCode occ_c1_heap_checked_connect(UA_Client *client, const char *endpoint) {
+
+    printf("OCC_C1_HEAP_PROBE BEFORE_CONNECT free_internal=%u largest_internal=%u\n",
+           (unsigned)heap_caps_get_free_size(MALLOC_CAP_INTERNAL),
+           (unsigned)heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
+    fflush(stdout);
+    bool ok_before = heap_caps_check_integrity_all(true);
+    printf("OCC_C1_HEAP_PROBE BEFORE_CONNECT integrity=%s\n", ok_before ? "PASS" : "FAIL");
+    fflush(stdout);
+    if(!ok_before) {
+        printf("OCC_C1_HEAP_PROBE ABORT_CONNECT_CORRUPT_HEAP\n");
+        fflush(stdout);
+        return UA_STATUSCODE_BADINTERNALERROR;
+    }
+#if OCC_C1_TCP_ONLY_DIAG_V1
+    return occ_c1_tcp_only_diag(endpoint);
+#else
+    UA_StatusCode result = UA_Client_connect(client, endpoint);
+    printf("OCC_C1_HEAP_PROBE AFTER_CONNECT status=0x%08x\n", (unsigned)result);
+    fflush(stdout);
+    bool ok_after = heap_caps_check_integrity_all(true);
+    printf("OCC_C1_HEAP_PROBE AFTER_CONNECT integrity=%s\n", ok_after ? "PASS" : "FAIL");
+    fflush(stdout);
+    return result;
+#endif
+}
+
 static const char *TAG =
     "FAIR_OPCUA";
 
@@ -288,7 +403,7 @@ UA_StatusCode fair_opcua_transport_connect(
         false;
 
     const UA_StatusCode rc =
-        UA_Client_connect(
+        occ_c1_heap_checked_connect(
             transport->client,
             transport->endpoint
         );
@@ -350,10 +465,14 @@ UA_StatusCode fair_opcua_transport_submit(
         ctx == NULL ||
         !transport->namespace_resolved ||
         slot->has_send_outcome ||
-        !fair_v1_payload_matches_slot(
-            payload,
-            slot
-        )
+        !(transport->operational_telemetry
+            ? (payload->schema_ver != NULL &&
+               strcmp(payload->schema_ver, "runtime-1.0") == 0 &&
+               payload->serialNumber != NULL && payload->serialNumber[0] &&
+               payload->state != NULL && payload->state[0] &&
+               payload->seq == slot->seq &&
+               payload->t_sched_us == slot->t_sched_us)
+            : fair_v1_payload_matches_slot(payload, slot))
     ) {
         return
             UA_STATUSCODE_BADINVALIDARGUMENT;

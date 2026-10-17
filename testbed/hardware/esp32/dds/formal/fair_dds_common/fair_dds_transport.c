@@ -12,6 +12,13 @@
 #include "fair_dds_types.h"
 #include "fair_dds_transport.h"
 
+
+#ifndef CONFIG_FAIR_DDS_DOMAIN_ID
+#define FAIR_DDS_EFFECTIVE_DOMAIN_ID 0U
+#else
+#define FAIR_DDS_EFFECTIVE_DOMAIN_ID CONFIG_FAIR_DDS_DOMAIN_ID
+#endif
+
 static const char *TAG="FAIR_DDS_XRCE";
 
 static bool status_ok(uint8_t s){ return s==UXR_STATUS_OK || s==UXR_STATUS_OK_MATCHED; }
@@ -64,9 +71,40 @@ static bool create_entities(fair_dds_transport_t *t)
     static char xml[4096];
     if (t->security_level==FAIR_DDS_SECURITY_C0){
         req[0]=uxr_buffer_create_participant_bin(&t->session,t->reliable_out,participant,0U,"FAIR_V1_XRCE_VM001_C0",UXR_REPLACE);
-    } else {
+    } else if (t->security_level==FAIR_DDS_SECURITY_C1) {
         if (!secure_participant_xml(t->security_level,xml,sizeof(xml))) return false;
-        req[0]=uxr_buffer_create_participant_xml(&t->session,t->reliable_out,participant,0U,xml,UXR_REPLACE);
+        req[0]=uxr_buffer_create_participant_xml(&t->session,t->reliable_out,participant,FAIR_DDS_EFFECTIVE_DOMAIN_ID,xml,UXR_REPLACE);
+    }
+    else if (t->security_level==FAIR_DDS_SECURITY_C2) {
+        req[0]=uxr_buffer_create_participant_ref(
+            &t->session,
+            t->reliable_out,
+            participant,
+            FAIR_DDS_EFFECTIVE_DOMAIN_ID,
+            "OCC_DDS_C2_SECURE",
+            UXR_REPLACE
+        );
+    }
+
+
+    /*
+     * OCC_DDS_C2_TWO_PHASE_REFERENCE_V1
+     * Verify the secure reference participant before creating endpoints.
+     * C0 and C1 retain their original batched creation sequence.
+     */
+    if (t->security_level == FAIR_DDS_SECURITY_C2) {
+        uint8_t participant_status[1] = {0};
+        if (!uxr_run_session_until_all_status(
+                &t->session, 3000, req, participant_status, 1U)) {
+            ESP_LOGE(TAG, "C2 reference participant acknowledgment timeout");
+            return false;
+        }
+        if (!status_ok(participant_status[0])) {
+            ESP_LOGE(TAG, "C2 reference participant rejected status=%u",
+                     (unsigned)participant_status[0]);
+            return false;
+        }
+        ESP_LOGI(TAG, "C2 reference participant acknowledged");
     }
     req[1]=uxr_buffer_create_topic_bin(&t->session,t->reliable_out,telemetry_topic,participant,FAIR_DDS_TELEMETRY_TOPIC,FAIR_DDS_TELEMETRY_TYPE,UXR_REPLACE);
     req[2]=uxr_buffer_create_topic_bin(&t->session,t->reliable_out,echo_topic,participant,FAIR_DDS_ECHO_TOPIC,FAIR_DDS_ECHO_TYPE,UXR_REPLACE);
@@ -76,8 +114,13 @@ static bool create_entities(fair_dds_transport_t *t)
     req[5]=uxr_buffer_create_datawriter_bin(&t->session,t->reliable_out,t->telemetry_writer_id,publisher,telemetry_topic,qos,UXR_REPLACE);
     req[6]=uxr_buffer_create_datareader_bin(&t->session,t->reliable_out,t->echo_reader_id,subscriber,echo_topic,qos,UXR_REPLACE);
     uint8_t status[7]={0};
-    if (!uxr_run_session_until_all_status(&t->session,3000,req,status,7U)) return false;
-    for (size_t i=0;i<7U;++i) if (!status_ok(status[i])){ ESP_LOGE(TAG,"entity status[%u]=%u",(unsigned)i,(unsigned)status[i]); return false; }
+    const bool c2_two_phase = t->security_level == FAIR_DDS_SECURITY_C2;
+    if (!uxr_run_session_until_all_status(
+            &t->session, 3000,
+            c2_two_phase ? &req[1] : req,
+            c2_two_phase ? &status[1] : status,
+            c2_two_phase ? 6U : 7U)) return false;
+    for (size_t i=(c2_two_phase ? 1U : 0U);i<7U;++i) if (!status_ok(status[i])){ ESP_LOGE(TAG,"entity status[%u]=%u",(unsigned)i,(unsigned)status[i]); return false; }
     uxrDeliveryControl dc={0};
     dc.max_samples=UXR_MAX_SAMPLES_UNLIMITED;
     (void)uxr_buffer_request_data(&t->session,t->reliable_out,t->echo_reader_id,t->reliable_in,&dc);

@@ -295,6 +295,20 @@ public:
     {
     }
 
+    // OCC_DDS_C2_SUBSCRIPTION_MATCH_DIAGNOSTIC_V1
+    void on_subscription_matched(
+        DataReader*,
+        const eprosima::fastdds::dds::SubscriptionMatchedStatus& status
+    ) override
+    {
+        std::cerr
+            << "OCC_DDS_TELEMETRY_MATCH"
+            << " MATCHED_COUNT=" << status.current_count
+            << " COUNT_CHANGE=" << status.current_count_change
+            << " TOTAL_MATCHES=" << status.total_count
+            << std::endl;
+    }
+
     void on_data_available(DataReader* reader) override
     {
         // Frozen FAIR-V1 boundary:

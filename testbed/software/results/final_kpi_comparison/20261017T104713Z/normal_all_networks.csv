@@ -1,0 +1,43 @@
+protocol,security_level,network_profile,runs,latency_mean_ms,jitter_mean_ms,throughput_mean_msg_s,loss_mean_percent,loss_definition,source
+MQTT,C0,ideal,3,1.8085327489629133,0.2450951180333027,9.920681496385722,0.0,application_delivery_loss,mqtt_final_summary.csv
+MQTT,C1,ideal,3,1.826501239595281,0.20313062138116147,9.920774484176425,0.0,application_delivery_loss,mqtt_final_summary.csv
+MQTT,C2,ideal,3,1.7875151340139603,0.19473154254746586,9.920728072136523,0.0,application_delivery_loss,mqtt_final_summary.csv
+MQTT,C0,proxy-ideal,3,2.2314701818983305,0.28875259360882294,9.920353815968324,0.0,application_delivery_loss,mqtt_final_summary.csv
+MQTT,C1,proxy-ideal,3,2.298096835722645,0.23850112441549814,9.920353815968324,0.0,application_delivery_loss,mqtt_final_summary.csv
+MQTT,C2,proxy-ideal,3,2.3704195317893677,0.24225555450950856,9.920306910186405,0.0,application_delivery_loss,mqtt_final_summary.csv
+MQTT,C0,delay,3,58.65836775362319,2.8205344202898552,6.930253623188406,0.0,application_delivery_loss,mqtt_final_summary.csv
+MQTT,C1,delay,3,58.62471423325499,2.9209477330591462,6.93671660791226,0.0,application_delivery_loss,mqtt_final_summary.csv
+MQTT,C2,delay,3,59.218593047552396,2.7486155630996163,6.935451129871999,0.0,application_delivery_loss,mqtt_final_summary.csv
+MQTT,C0,jitter,3,57.1341881286483,16.153643127412394,6.785099728100698,0.0,application_delivery_loss,mqtt_final_summary.csv
+MQTT,C1,jitter,3,56.248926938534275,15.693740252955083,6.81345390070922,0.0,application_delivery_loss,mqtt_final_summary.csv
+MQTT,C2,jitter,3,56.91709977382938,16.57197402871217,6.758462231422383,0.0,application_delivery_loss,mqtt_final_summary.csv
+MQTT,C0,loss,3,19.869271390853978,24.74857947105981,9.222334677253023,0.0,application_delivery_loss,mqtt_final_summary.csv
+MQTT,C1,loss,3,17.844474291856958,24.047110037916173,9.197880524408324,0.0,application_delivery_loss,mqtt_final_summary.csv
+MQTT,C2,loss,3,19.819196060882447,26.223610644421203,9.12388162281196,0.0,application_delivery_loss,mqtt_final_summary.csv
+OPC UA,C0,ideal,3,28.384,2.655,9.883333333333333,,not_reported,opcua/opcua_final_network_summary.csv
+OPC UA,C1,ideal,3,28.659666666666666,2.8986666666666667,9.877666666666666,,not_reported,opcua/opcua_final_network_summary.csv
+OPC UA,C2,ideal,3,28.862666666666666,2.8506666666666667,9.877666666666666,,not_reported,opcua/opcua_final_network_summary.csv
+OPC UA,C0,proxy-ideal,3,29.672,2.780333333333333,9.883,,not_reported,opcua/opcua_final_network_summary.csv
+OPC UA,C1,proxy-ideal,3,29.451,2.8173333333333335,9.867,,not_reported,opcua/opcua_final_network_summary.csv
+OPC UA,C2,proxy-ideal,3,29.745333333333335,2.845,9.877666666666666,,not_reported,opcua/opcua_final_network_summary.csv
+OPC UA,C0,delay,3,59.065333333333335,4.593333333333334,9.9,,not_reported,opcua/opcua_final_network_summary.csv
+OPC UA,C1,delay,3,59.244,4.3036666666666665,9.888666666666666,,not_reported,opcua/opcua_final_network_summary.csv
+OPC UA,C2,delay,3,59.26866666666667,4.620666666666667,9.9,,not_reported,opcua/opcua_final_network_summary.csv
+OPC UA,C0,jitter,3,57.545,13.388333333333334,9.905666666666667,,not_reported,opcua/opcua_final_network_summary.csv
+OPC UA,C1,jitter,3,57.66566666666667,13.17,9.894333333333334,,not_reported,opcua/opcua_final_network_summary.csv
+OPC UA,C2,jitter,3,58.404333333333334,12.956333333333333,9.888666666666666,,not_reported,opcua/opcua_final_network_summary.csv
+OPC UA,C0,loss,3,39.28366666666667,15.230666666666666,9.883,,not_reported,opcua/opcua_final_network_summary.csv
+OPC UA,C1,loss,3,39.806333333333335,16.001,9.872333333333334,,not_reported,opcua/opcua_final_network_summary.csv
+OPC UA,C2,loss,3,38.70333333333333,15.601333333333333,9.894333333333332,,not_reported,opcua/opcua_final_network_summary.csv
+DDS,C0,ideal,3,7.759,5.341667,10.0,0.0,dds_message_loss,dds_consolidated/dds_authoritative_software_kpi_comparison.csv
+DDS,C0,delay,3,34.625333,4.848,10.0,0.0,dds_message_loss,dds_consolidated/dds_authoritative_software_kpi_comparison.csv
+DDS,C0,jitter,3,33.994333,12.564,10.0,0.0,dds_message_loss,dds_consolidated/dds_authoritative_software_kpi_comparison.csv
+DDS,C0,loss,3,10.362333,9.318,10.0,0.0,dds_message_loss,dds_consolidated/dds_authoritative_software_kpi_comparison.csv
+DDS,C1,ideal,3,8.333,5.162667,10.0,0.0,dds_message_loss,dds_consolidated/dds_authoritative_software_kpi_comparison.csv
+DDS,C1,delay,3,34.659,4.704333,10.0,0.0,dds_message_loss,dds_consolidated/dds_authoritative_software_kpi_comparison.csv
+DDS,C1,jitter,3,34.441,12.039667,10.0,0.0,dds_message_loss,dds_consolidated/dds_authoritative_software_kpi_comparison.csv
+DDS,C1,loss,3,10.329,8.327,10.0,0.0,dds_message_loss,dds_consolidated/dds_authoritative_software_kpi_comparison.csv
+DDS,C2,ideal,3,8.431,5.239667,10.0,0.0,dds_message_loss,dds_consolidated/dds_authoritative_software_kpi_comparison.csv
+DDS,C2,delay,3,34.972,4.558667,10.0,0.0,dds_message_loss,dds_consolidated/dds_authoritative_software_kpi_comparison.csv
+DDS,C2,jitter,3,34.462333,12.711667,10.0,0.0,dds_message_loss,dds_consolidated/dds_authoritative_software_kpi_comparison.csv
+DDS,C2,loss,3,11.052333,8.951333,10.0,0.0,dds_message_loss,dds_consolidated/dds_authoritative_software_kpi_comparison.csv
