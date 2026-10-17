@@ -18,7 +18,7 @@
 
 ### Audit method
 
-The permanent audit script scans historical MQTT run directories rather than relying only on `testbed/results/kpi_stream.csv`.
+The permanent audit script scans historical MQTT run directories rather than relying only on `testbed/software/results/kpi_stream.csv`.
 
 For every common-core cell it verifies:
 
@@ -45,7 +45,7 @@ When multiple valid candidates exist, the most recent complete valid run is sele
 Evidence:
 
 - `testbed/audit/mqtt_common_core_audit.py`
-- `testbed/results/audit/mqtt_common_core_authoritative.csv`
+- `testbed/software/results/audit/mqtt_common_core_authoritative.csv`
 
 No further MQTT experiment reruns are required unless later evidence identifies a specific invalid authoritative run.
 <!-- MQTT_COMMON_CORE_END -->

@@ -13,15 +13,15 @@ case "${1:-}" in
   -h|--help)
     cat <<'HELP'
 Usage:
-  ./scripts/run_opcua_smoke.sh
-  ./scripts/run_opcua_smoke.sh --profile C0
-  ./scripts/run_opcua_smoke.sh --profile C1
-  ./scripts/run_opcua_smoke.sh --profile C2
+  ./testbed/software/scripts/smoke/run_opcua_smoke.sh
+  ./testbed/software/scripts/smoke/run_opcua_smoke.sh --profile C0
+  ./testbed/software/scripts/smoke/run_opcua_smoke.sh --profile C1
+  ./testbed/software/scripts/smoke/run_opcua_smoke.sh --profile C2
 
 Convenience wrappers:
-  ./scripts/run_opcua_c0_smoke.sh
-  ./scripts/run_opcua_c1_smoke.sh
-  ./scripts/run_opcua_c2_smoke.sh
+  ./testbed/software/scripts/smoke/run_opcua_c0_smoke.sh
+  ./testbed/software/scripts/smoke/run_opcua_c1_smoke.sh
+  ./testbed/software/scripts/smoke/run_opcua_c2_smoke.sh
 
 Environment overrides:
   FAIR_PI_HOST=moulikha@192.168.1.115
@@ -49,7 +49,7 @@ if [[ -n "$PROFILE" && "$PROFILE" != "C0" && "$PROFILE" != "C1" && "$PROFILE" !=
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
 
 PI_HOST="${FAIR_PI_HOST:-moulikha@192.168.1.115}"
 PI_IP="${FAIR_PI_IP:-192.168.1.115}"

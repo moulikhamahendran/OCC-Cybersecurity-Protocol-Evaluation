@@ -10,7 +10,7 @@ the repository for traceability but must not be used as primary evidence.
 
 Authoritative manifest:
 
-`testbed/results/audit/mqtt_common_core_authoritative.csv`
+`testbed/software/results/audit/mqtt_common_core_authoritative.csv`
 
 Authoritative campaign size:
 
@@ -21,21 +21,21 @@ Authoritative campaign size:
 
 Authoritative analysis scripts:
 
-`testbed/analysis/mqtt_analysis_v2.py`
+`testbed/software/analysis/mqtt_analysis_v2.py`
 
-`testbed/analysis/plot_mqtt_analysis_v2.py`
+`testbed/software/analysis/plot_mqtt_analysis_v2.py`
 
 Generated v2 outputs:
 
-`testbed/results/mqtt/analysis_v2/mqtt_v2_run_summary.csv`
+`testbed/software/results/mqtt/analysis_v2/mqtt_v2_run_summary.csv`
 
-`testbed/results/mqtt/analysis_v2/mqtt_v2_group_summary.csv`
+`testbed/software/results/mqtt/analysis_v2/mqtt_v2_group_summary.csv`
 
-`testbed/results/mqtt/analysis_v2/mqtt_v2_delay_effect.csv`
+`testbed/software/results/mqtt/analysis_v2/mqtt_v2_delay_effect.csv`
 
 Generated plots:
 
-`testbed/results/mqtt/analysis_v2/plots/`
+`testbed/software/results/mqtt/analysis_v2/plots/`
 
 Important methodological note:
 
@@ -47,7 +47,7 @@ published, waits for broker acknowledgement, and then waits the configured
 
 Authoritative baseline manifest:
 
-`testbed/results/audit/mqtt_v2_proxy_baseline_manifest.csv`
+`testbed/software/results/audit/mqtt_v2_proxy_baseline_manifest.csv`
 
 Purpose:
 
@@ -59,7 +59,7 @@ It must not be mixed into the four-condition primary network matrix.
 
 Authoritative manifest:
 
-`testbed/results/audit/opcua_docker_v2_authoritative.csv`
+`testbed/software/results/audit/opcua_docker_v2_authoritative.csv`
 
 Authoritative campaign size:
 
@@ -70,13 +70,13 @@ Authoritative campaign size:
 
 Authoritative analysis script:
 
-`testbed/analysis/analyze_opcua_network_v2.py`
+`testbed/software/analysis/analyze_opcua_network_v2.py`
 
 Generated v2 outputs:
 
-`testbed/results/opcua/analysis_v2/opcua_network_runs_v2.csv`
+`testbed/software/results/opcua/analysis_v2/opcua_network_runs_v2.csv`
 
-`testbed/results/opcua/analysis_v2/opcua_network_summary_v2.csv`
+`testbed/software/results/opcua/analysis_v2/opcua_network_summary_v2.csv`
 
 Important methodological notes:
 
@@ -93,7 +93,7 @@ Important methodological notes:
 
 Authoritative baseline manifest:
 
-`testbed/results/audit/opcua_v2_proxy_baseline_manifest.csv`
+`testbed/software/results/audit/opcua_v2_proxy_baseline_manifest.csv`
 
 Purpose:
 
@@ -105,7 +105,7 @@ It must not be mixed into the four-condition primary network matrix.
 
 Authoritative manifest:
 
-`testbed/results/audit/dds_common_core_authoritative.csv`
+`testbed/software/results/audit/dds_common_core_authoritative.csv`
 
 Authoritative campaign size:
 
@@ -116,15 +116,15 @@ Authoritative campaign size:
 
 Authoritative generated analysis outputs:
 
-`testbed/results/dds/analysis_v2/dds_network_summary_v2.csv`
+`testbed/software/results/dds/analysis_v2/dds_network_summary_v2.csv`
 
-`testbed/results/dds/analysis_v2/dds_run_resource_summary_v2.csv`
+`testbed/software/results/dds/analysis_v2/dds_run_resource_summary_v2.csv`
 
-`testbed/results/dds/analysis_v2/DDS_NETWORK_ANALYSIS_V2.md`
+`testbed/software/results/dds/analysis_v2/DDS_NETWORK_ANALYSIS_V2.md`
 
 Generated plots:
 
-`testbed/results/dds/analysis_v2/`
+`testbed/software/results/dds/analysis_v2/`
 
 Important methodological notes:
 
@@ -138,7 +138,7 @@ Important methodological notes:
 
 Authoritative methodology document:
 
-`testbed/docs/cross_protocol_comparability_matrix_2026-09-21.md`
+`testbed/software/docs/cross_protocol_comparability_matrix_2026-09-21.md`
 
 Status:
 
@@ -146,19 +146,19 @@ FINALIZED
 
 Authoritative analysis scripts:
 
-`testbed/analysis/analyze_cross_protocol_results_v2.py`
+`testbed/software/analysis/analyze_cross_protocol_results_v2.py`
 
-`testbed/analysis/plot_cross_protocol_results_v2.py`
+`testbed/software/analysis/plot_cross_protocol_results_v2.py`
 
 Generated v2 outputs:
 
-`testbed/results/cross_protocol/analysis_v2/cross_protocol_network_summary_v2.csv`
+`testbed/software/results/cross_protocol/analysis_v2/cross_protocol_network_summary_v2.csv`
 
-`testbed/results/cross_protocol/analysis_v2/cross_protocol_delay_effect_v2.csv`
+`testbed/software/results/cross_protocol/analysis_v2/cross_protocol_delay_effect_v2.csv`
 
 Generated plots:
 
-`testbed/results/cross_protocol/analysis_v2/plots/`
+`testbed/software/results/cross_protocol/analysis_v2/plots/`
 
 The current network comparison includes:
 
@@ -219,19 +219,19 @@ They must not be interpreted as an exact NetEm crossing count.
 
 MQTT:
 
-`testbed/results/mqtt_attack_summary.csv`
+`testbed/software/results/mqtt_attack_summary.csv`
 
 OPC UA:
 
-`testbed/results/opcua/opcua_security_control_summary.csv`
+`testbed/software/results/opcua/opcua_security_control_summary.csv`
 
-`testbed/results/opcua/opcua_final_availability_summary.csv`
+`testbed/software/results/opcua/opcua_final_availability_summary.csv`
 
 DDS:
 
-`testbed/results/dds/security_controls/dds_security_controls_20260917T152724Z_c2302ba5/summary.csv`
+`testbed/software/results/dds/security_controls/dds_security_controls_20260917T152724Z_c2302ba5/summary.csv`
 
-`testbed/results/dds/dos/dds_dos_summary.csv`
+`testbed/software/results/dds/dos/dds_dos_summary.csv`
 
 These are valid protocol-specific security experiments.
 
@@ -241,7 +241,7 @@ They are not yet a harmonized cross-protocol attacker campaign.
 
 Design document:
 
-`testbed/docs/cross_protocol_attack_comparability_2026-09-21.md`
+`testbed/software/docs/cross_protocol_attack_comparability_2026-09-21.md`
 
 Current status:
 

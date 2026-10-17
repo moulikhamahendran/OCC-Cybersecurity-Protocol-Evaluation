@@ -60,7 +60,7 @@ It reads the actual compiled `CONFIG_FAIR_RUN_ID` and endpoint from each build's
 From the repository root:
 
 ```bash
-./scripts/run_opcua_smoke.sh
+./testbed/software/scripts/smoke/run_opcua_smoke.sh
 ```
 
 That executes:
@@ -72,9 +72,9 @@ C0 -> validate -> C1 -> validate -> C2 -> validate
 Run one profile only:
 
 ```bash
-./scripts/run_opcua_c0_smoke.sh
-./scripts/run_opcua_c1_smoke.sh
-./scripts/run_opcua_c2_smoke.sh
+./testbed/software/scripts/smoke/run_opcua_c0_smoke.sh
+./testbed/software/scripts/smoke/run_opcua_c1_smoke.sh
+./testbed/software/scripts/smoke/run_opcua_c2_smoke.sh
 ```
 
 For C1/C2 the runner prompts once for the `occuser` OPC UA password. It must match the password already compiled into the secure ESP32 builds.
@@ -92,7 +92,7 @@ Optional password environment variable:
 
 ```bash
 export FAIR_OPCUA_PASSWORD='...'
-./scripts/run_opcua_smoke.sh
+./testbed/software/scripts/smoke/run_opcua_smoke.sh
 unset FAIR_OPCUA_PASSWORD
 ```
 

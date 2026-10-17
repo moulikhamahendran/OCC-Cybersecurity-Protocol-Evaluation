@@ -146,7 +146,7 @@ testbed/hardware/esp32/opcua/
 Official hardware results:
 
 ```text
-testbed/results/hardware/opcua/
+testbed/software/results/hardware/opcua/
 ├── c0/
 │   ├── repeat1.csv
 │   ├── repeat2.csv
@@ -167,7 +167,7 @@ testbed/results/hardware/opcua/
 Plotting script:
 
 ```text
-testbed/analysis/plot_opcua_hardware_comparison.py
+testbed/software/analysis/plot_opcua_hardware_comparison.py
 ```
 
 ---
@@ -645,9 +645,9 @@ Loss % =
 The older C0 files:
 
 ```text
-testbed/results/hardware/opcua/c0/repeat1.csv
-testbed/results/hardware/opcua/c0/repeat2.csv
-testbed/results/hardware/opcua/c0/repeat3.csv
+testbed/software/results/hardware/opcua/c0/repeat1.csv
+testbed/software/results/hardware/opcua/c0/repeat2.csv
+testbed/software/results/hardware/opcua/c0/repeat3.csv
 ```
 
 contain Raspberry Pi-side one-way latency measurements with fields such as:
@@ -1245,7 +1245,7 @@ It is an experimental observation from this hardware campaign.
 The report-quality figures are stored under:
 
 ```text
-testbed/results/hardware/opcua/plots/
+testbed/software/results/hardware/opcua/plots/
 ```
 
 Available plots:
@@ -1266,7 +1266,7 @@ standard deviation across the three repeats.
 Script:
 
 ```text
-testbed/analysis/plot_opcua_hardware_comparison.py
+testbed/software/analysis/plot_opcua_hardware_comparison.py
 ```
 
 ---
@@ -1311,19 +1311,19 @@ This is important for understanding run-to-run variability.
 C0:
 
 ```text
-testbed/results/hardware/opcua/c0/summary.csv
+testbed/software/results/hardware/opcua/c0/summary.csv
 ```
 
 C1:
 
 ```text
-testbed/results/hardware/opcua/c1/summary.csv
+testbed/software/results/hardware/opcua/c1/summary.csv
 ```
 
 C2:
 
 ```text
-testbed/results/hardware/opcua/c2/summary.csv
+testbed/software/results/hardware/opcua/c2/summary.csv
 ```
 
 The common summary schema is:

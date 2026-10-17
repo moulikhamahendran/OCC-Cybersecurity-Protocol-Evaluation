@@ -159,7 +159,7 @@ The runner refuses to silently create a missing build. A missing ELF is a checkp
 From the repository root:
 
 ```bash
-./scripts/run_mqtt_smoke.sh
+./testbed/software/scripts/smoke/run_mqtt_smoke.sh
 ```
 
 This executes:
@@ -171,9 +171,9 @@ C0 -> validate -> C1 -> validate -> C2 -> validate
 Run one profile only:
 
 ```bash
-./scripts/run_mqtt_c0_smoke.sh
-./scripts/run_mqtt_c1_smoke.sh
-./scripts/run_mqtt_c2_smoke.sh
+./testbed/software/scripts/smoke/run_mqtt_c0_smoke.sh
+./testbed/software/scripts/smoke/run_mqtt_c1_smoke.sh
+./testbed/software/scripts/smoke/run_mqtt_c2_smoke.sh
 ```
 
 The full runner prompts once for the `occuser` MQTT password when C1/C2 are included. The password is not written into evidence files. The runner also reuses one SSH control connection during the suite, so if your Pi uses password-based SSH you should normally be asked for the Pi login password only on the first connection.
@@ -190,7 +190,7 @@ If you intentionally supply the MQTT password through an environment variable:
 
 ```bash
 export FAIR_MQTT_PASSWORD='...'
-./scripts/run_mqtt_smoke.sh
+./testbed/software/scripts/smoke/run_mqtt_smoke.sh
 unset FAIR_MQTT_PASSWORD
 ```
 

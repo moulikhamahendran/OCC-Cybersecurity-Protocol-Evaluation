@@ -67,7 +67,7 @@ Private keys, MQTT passwords, and password files must not be copied into experim
 
 Each Raspberry Pi execution writes its publisher ledger to:
 
-`~/occ-testbed/results/runs/<RUN_ID>/publisher.csv`
+`~/occ-testbed/software/results/runs/<RUN_ID>/publisher.csv`
 
 The ledger records information including:
 
@@ -93,7 +93,7 @@ A `BROKER_ACK` confirms that the MQTT broker acknowledged the QoS 1 publication.
 After a run, the result directory can be copied from the Raspberry Pi to the Mac repository with:
 
 ```bash
-scp -r moulikha@192.168.1.115:~/occ-testbed/results/runs/<RUN_ID> testbed/results/runs/
+scp -r moulikha@192.168.1.115:~/occ-testbed/software/results/runs/<RUN_ID> testbed/software/results/runs/
 ```
 
 The results directory is intentionally excluded from Git and remains local unless results are explicitly prepared as research artifacts.

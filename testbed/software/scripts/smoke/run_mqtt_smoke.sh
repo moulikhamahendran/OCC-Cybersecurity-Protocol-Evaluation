@@ -15,10 +15,10 @@ case "${1:-}" in
   -h|--help)
     cat <<'HELP'
 Usage:
-  ./scripts/run_mqtt_smoke.sh              # C0 -> C1 -> C2
-  ./scripts/run_mqtt_smoke.sh --profile C0
-  ./scripts/run_mqtt_smoke.sh --profile C1
-  ./scripts/run_mqtt_smoke.sh --profile C2
+  ./testbed/software/scripts/smoke/run_mqtt_smoke.sh              # C0 -> C1 -> C2
+  ./testbed/software/scripts/smoke/run_mqtt_smoke.sh --profile C0
+  ./testbed/software/scripts/smoke/run_mqtt_smoke.sh --profile C1
+  ./testbed/software/scripts/smoke/run_mqtt_smoke.sh --profile C2
 
 Environment overrides:
   FAIR_PI_HOST=moulikha@192.168.1.115
@@ -42,7 +42,7 @@ if [[ -n "$PROFILE" && "$PROFILE" != "C0" && "$PROFILE" != "C1" && "$PROFILE" !=
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
 PI_HOST="${FAIR_PI_HOST:-moulikha@192.168.1.115}"
 SERIAL="${FAIR_SERIAL:-/dev/cu.usbserial-0001}"
 IDF_EXPORT="${FAIR_IDF_EXPORT:-$HOME/esp/esp-idf-v5.5.5/export.sh}"
