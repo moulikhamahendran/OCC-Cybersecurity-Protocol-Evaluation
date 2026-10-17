@@ -24,4 +24,4 @@ Older software-test Docker components have been archived. Existing KPI datasets 
 
 ## Payload structure
 
-See the [Payload Structure](software/docs/PAYLOAD_STRUCTURE.md) documentation for the operational ESP32, FAIR-V1 and VDA 5050-aligned telemetry formats.
+See the [Payload Structure](../PAYLOAD_STRUCTURE.md) documentation for the operational ESP32, FAIR-V1 and VDA 5050-aligned telemetry formats.

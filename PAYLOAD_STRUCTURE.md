@@ -51,10 +51,10 @@ The selectable ESP32 firmware maintains a deterministic vehicle state independen
 
 **Source-of-truth links:**
 
-- [ESP32 JSON serialization (`main.c`)](../../hardware/vehicle/mqtt/selectable/main/main.c)
-- [ESP32 vehicle state declaration (`vehicle_state.h`)](../../hardware/vehicle/mqtt/selectable/main/vehicle_state.h)
-- [Vehicle simulation and sequence reservation (`vehicle_state.c`)](../../hardware/vehicle/mqtt/selectable/main/vehicle_state.c)
-- [OCC payload decoder (`runtime_payload.py`)](../final_runtime/occ/core/runtime_payload.py)
+- [ESP32 JSON serialization (`main.c`)](testbed/hardware/vehicle/mqtt/selectable/main/main.c)
+- [ESP32 vehicle state declaration (`vehicle_state.h`)](testbed/hardware/vehicle/mqtt/selectable/main/vehicle_state.h)
+- [Vehicle simulation and sequence reservation (`vehicle_state.c`)](testbed/hardware/vehicle/mqtt/selectable/main/vehicle_state.c)
+- [OCC payload decoder (`runtime_payload.py`)](testbed/software/final_runtime/occ/core/runtime_payload.py)
 
 ## 2. Frozen FAIR-V1 hardware benchmark payload — `0.1`
 
@@ -97,7 +97,7 @@ schedule_latency_us = t_ack_rx_us - t_sched_us
 
 `run_id`, protocol, security profile, experiment stage, firmware hash and toolchain details are **run metadata outside** the telemetry payload. A formal FAIR-V1 payload must **not** add a second `headerId` sequence field. The frozen spec, rather than this overview, governs qualification and scientific analysis.
 
-**Authoritative reference:** [FAIR-V1 Benchmark Specification](fair_v1/FAIR_V1_SPEC.md), especially the formal scheduling, application measurement boundary, and logical schema sections.
+**Authoritative reference:** [FAIR-V1 Benchmark Specification](testbed/software/docs/fair_v1/FAIR_V1_SPEC.md), especially the formal scheduling, application measurement boundary, and logical schema sections.
 
 ## 3. VDA 5050-aligned software benchmark payload — `2.1.0`
 
@@ -167,10 +167,10 @@ The generator creates data such as position, battery charge, identity and source
 
 **Source-of-truth links:**
 
-- [Vehicle reading JSON Schema](../schemas/vehicle_reading.schema.json)
-- [Software telemetry generator](../vehicles/data_generator.py)
-- [Schema validation tests](../tests/test_vehicle_schema.py)
-- [Software DDS publisher](../protocols/dds/dds_publisher.py)
+- [Vehicle reading JSON Schema](testbed/software/schemas/vehicle_reading.schema.json)
+- [Software telemetry generator](testbed/software/vehicles/data_generator.py)
+- [Schema validation tests](testbed/software/tests/test_vehicle_schema.py)
+- [Software DDS publisher](testbed/software/protocols/dds/dds_publisher.py)
 
 ## 4. What differs between the formats?
 
@@ -184,7 +184,7 @@ The generator creates data such as position, battery charge, identity and source
 | Battery | `battery_pct` | `battery_pct` | `batteryState` |
 | Measurement context | Live OCC operational telemetry | Controlled formal hardware benchmark | Software-based protocol research |
 
-**Security profiles C0/C1/C2 are transport/security configurations, not payload versions.** The same logical application data may be conveyed over MQTT, OPC UA, or DDS, but different implementations can use different native encodings. See [Security Profile Mapping](security_profile_mapping.md).
+**Security profiles C0/C1/C2 are transport/security configurations, not payload versions.** The same logical application data may be conveyed over MQTT, OPC UA, or DDS, but different implementations can use different native encodings. See [Security Profile Mapping](testbed/software/docs/security_profile_mapping.md).
 
 ## 5. Validation, evidence, and scientific limits
 
@@ -194,7 +194,7 @@ The generator creates data such as position, battery charge, identity and source
 4. Do not conflate a timestamp from one clock domain with another, or use software-network measurements as if they were formal ESP32 hardware measurements.
 5. Preserve the distinction between previously recorded benchmarks, pilot runs, and currently live dashboard telemetry. A document or committed file is **not** evidence that all current deployments have passed runtime acceptance.
 
-See [Authoritative Results Index](AUTHORITATIVE_RESULTS_INDEX.md) for approved datasets, comparability limits and data provenance.
+See [Authoritative Results Index](testbed/software/docs/AUTHORITATIVE_RESULTS_INDEX.md) for approved datasets, comparability limits and data provenance.
 
 ---
 

@@ -32,4 +32,4 @@ See [Docker and Compose documentation](docker/README.md) for the recent portable
 
 ## Payload structure
 
-See the [Payload Structure](docs/PAYLOAD_STRUCTURE.md) documentation for the operational ESP32, FAIR-V1 and VDA 5050-aligned telemetry formats.
+See the [Payload Structure](../../PAYLOAD_STRUCTURE.md) documentation for the operational ESP32, FAIR-V1 and VDA 5050-aligned telemetry formats.
