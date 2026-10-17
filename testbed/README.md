@@ -15,3 +15,9 @@ published. This statement confirms publication, **not** comprehensive runtime
 acceptance following the directory restructuring.
 
 Generated builds, secrets and local Docker image exports remain outside Git.
+
+## Docker organization
+
+The current portable OCC deployment, local runtime resources and retained Compose configurations are explained in [software/docker/README.md](software/docker/README.md).
+
+Older software-test Docker components have been archived. Existing KPI datasets and firmware implementations remain unchanged.

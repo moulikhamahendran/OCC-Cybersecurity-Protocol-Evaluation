@@ -13,7 +13,8 @@
 | `results/` | Recorded experimental evidence |
 | `docs/` | Technical documentation and source indexes |
 | `scripts/smoke/` | MQTT and OPC UA hardware smoke runners |
-| `docker/` and `network/` | Container/network setup |
+| `docker/` | Current Docker organization and cleanup documentation |
+| `network/` | Preserved MQTT network-impairment image definition |
 | `archive/` | Historical material preserved for traceability |
 
 See the repository-root README for hardware roles and security profiles.
@@ -24,3 +25,7 @@ preserved. Recorded research evidence must not be presented as live telemetry.
 **Deployment:** The `_runtime/portable_occ/` distribution, including Docker
 image archives, is stored locally and intentionally excluded from GitHub.
 Generated credentials and machine-local configuration are also excluded.
+
+## Docker deployment
+
+See [Docker and Compose documentation](docker/README.md) for the recent portable setup, retained configurations and historical Docker cleanup.
