@@ -75,3 +75,7 @@ integration and the separate SmartRegion/AAS work are outside this project.
 
 Attack tests must run only in authorized, isolated environments.
 Do not commit secrets or private credentials.
+
+## Payload structure
+
+See the [Payload Structure](testbed/software/docs/PAYLOAD_STRUCTURE.md) documentation for the operational ESP32, FAIR-V1 and VDA 5050-aligned telemetry formats.

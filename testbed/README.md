@@ -21,3 +21,7 @@ Generated builds, secrets and local Docker image exports remain outside Git.
 The current portable OCC deployment, local runtime resources and retained Compose configurations are explained in [software/docker/README.md](software/docker/README.md).
 
 Older software-test Docker components have been archived. Existing KPI datasets and firmware implementations remain unchanged.
+
+## Payload structure
+
+See the [Payload Structure](software/docs/PAYLOAD_STRUCTURE.md) documentation for the operational ESP32, FAIR-V1 and VDA 5050-aligned telemetry formats.

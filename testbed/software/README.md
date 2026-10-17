@@ -29,3 +29,7 @@ Generated credentials and machine-local configuration are also excluded.
 ## Docker deployment
 
 See [Docker and Compose documentation](docker/README.md) for the recent portable setup, retained configurations and historical Docker cleanup.
+
+## Payload structure
+
+See the [Payload Structure](docs/PAYLOAD_STRUCTURE.md) documentation for the operational ESP32, FAIR-V1 and VDA 5050-aligned telemetry formats.
